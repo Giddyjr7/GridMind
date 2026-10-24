@@ -13,6 +13,7 @@ import {
   Cpu,
   Coins,
 } from "lucide-react";
+import { PageContainer } from "@/components/ui/page-container";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -38,7 +39,7 @@ export default async function DashboardPage() {
   const { site, telemetry, grid, solar, battery, generator, cost } = metrics;
 
   return (
-    <div className="space-y-6">
+    <PageContainer>
       {/* Foundation Status Banner */}
       <div className="rounded-xl border border-brand-200 bg-brand-50/70 p-5 shadow-sm">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -275,6 +276,6 @@ export default async function DashboardPage() {
           </Card>
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }
