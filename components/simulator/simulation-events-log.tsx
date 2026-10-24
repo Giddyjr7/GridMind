@@ -121,7 +121,7 @@ export function SimulationEventsLog() {
                 </p>
               </div>
 
-              <div className="flex items-center gap-1 text-[11px] text-slate-400 shrink-0 font-mono">
+              <div suppressHydrationWarning className="flex items-center gap-1 text-[11px] text-slate-400 shrink-0 font-mono">
                 <Clock className="w-3 h-3 text-slate-400" />
                 {formatDateTime(evt.timestamp)}
               </div>

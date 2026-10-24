@@ -141,7 +141,7 @@ export default function HistoryPage() {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-1.5 text-xs text-slate-400 font-mono shrink-0">
+                    <div suppressHydrationWarning className="flex items-center gap-1.5 text-xs text-slate-400 font-mono shrink-0">
                       <Clock className="h-3.5 w-3.5" />
                       <span>{formatDateTime(record.timestamp)}</span>
                     </div>
@@ -197,7 +197,7 @@ export default function HistoryPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 text-xs shrink-0 text-slate-400 font-mono">
+                <div suppressHydrationWarning className="flex items-center gap-2 text-xs shrink-0 text-slate-400 font-mono">
                   <Clock className="h-3.5 w-3.5 text-slate-400" />
                   <span>{formatDateTime(record.timestamp)}</span>
                 </div>

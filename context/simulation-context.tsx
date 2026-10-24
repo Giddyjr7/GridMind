@@ -20,6 +20,7 @@ import {
   MOCK_BATTERY_STATUS,
   MOCK_GENERATOR_SOURCE,
   MOCK_COST_BREAKDOWN,
+  MOCK_DASHBOARD_METRICS,
 } from "@/mocks/demo-business";
 import {
   SimulationParams,
@@ -90,7 +91,7 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
     React.useState<ApprovalRecord[]>(MOCK_APPROVAL_HISTORY);
   const [isSimulating, setIsSimulating] = React.useState<boolean>(false);
   const [lastSimulatedTick, setLastSimulatedTick] = React.useState<string>(
-    new Date().toISOString()
+    MOCK_DASHBOARD_METRICS.lastTelemetryTimestamp
   );
   const [feedbackMessage, setFeedbackMessage] = React.useState<string | null>(null);
 
@@ -426,7 +427,7 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
     );
     setRecommendations(MOCK_RECOMMENDATIONS);
     setIsSimulating(false);
-    setLastSimulatedTick(new Date().toISOString());
+    setLastSimulatedTick(MOCK_DASHBOARD_METRICS.lastTelemetryTimestamp);
     addEvent({
       category: "system_security",
       severity: "info",

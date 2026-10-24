@@ -178,7 +178,7 @@ export function ActiveAlertsCard({ initialAlerts }: ActiveAlertsCardProps) {
                 </div>
 
                 <div className="flex flex-col items-end shrink-0 gap-1 text-slate-400">
-                  <span className="text-[11px] flex items-center gap-1 text-slate-400">
+                  <span suppressHydrationWarning className="text-[11px] flex items-center gap-1 text-slate-400">
                     <Clock className="w-3 h-3" />
                     {formatDateTime(alert.timestamp)}
                   </span>

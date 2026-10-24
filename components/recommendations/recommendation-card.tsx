@@ -84,7 +84,7 @@ export function RecommendationCard({
                   Deterministic Rule
                 </span>
               </div>
-              <CardDescription className="text-xs text-slate-500 mt-0.5">
+              <CardDescription suppressHydrationWarning className="text-xs text-slate-500 mt-0.5">
                 Target Asset: <strong className="text-slate-700">{recommendation.targetApplianceName}</strong>
                 {" • "}
                 Generated {formatDateTime(recommendation.createdAt)}

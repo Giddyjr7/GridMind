@@ -116,7 +116,7 @@ export function DashboardHeader({
         </div>
 
         <div className="flex items-center gap-2 text-slate-400 font-mono text-[11px]">
-          <span>Telemetry Sync: {lastUpdated}</span>
+          <span suppressHydrationWarning>Telemetry Sync: {lastUpdated}</span>
           <span>•</span>
           <span className="text-emerald-700 font-semibold">100% Ingest Valid</span>
         </div>
