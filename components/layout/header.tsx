@@ -29,7 +29,8 @@ import {
   DropdownDivider,
 } from "@/components/ui/dropdown-menu";
 import { envConfig } from "@/config/env";
-import { MOCK_DASHBOARD_METRICS, MOCK_ENERGY_EVENTS } from "@/mocks/demo-business";
+import { MOCK_DASHBOARD_METRICS } from "@/mocks/demo-business";
+import { useSimulation } from "@/context/simulation-context";
 import { formatPower, formatPercentage } from "@/lib/formatters";
 
 interface HeaderProps {
@@ -73,8 +74,10 @@ const routeTitles: Record<string, { title: string; subtitle: string }> = {
 
 export function Header({ onOpenMobileSidebar }: HeaderProps) {
   const pathname = usePathname();
-  const { site, telemetry } = MOCK_DASHBOARD_METRICS;
-  const [events, setEvents] = React.useState(MOCK_ENERGY_EVENTS);
+  const sim = useSimulation();
+
+  const telemetry = sim?.derivedDashboardMetrics?.telemetry ?? MOCK_DASHBOARD_METRICS.telemetry;
+  const events = sim?.events ?? [];
   const [unreadCount, setUnreadCount] = React.useState(2);
 
   const routeInfo = routeTitles[pathname] || {
@@ -124,12 +127,20 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
           {/* Grid Status */}
           <div className="flex items-center gap-1.5 text-xs text-slate-600 bg-slate-50 px-2.5 py-1 rounded-md border border-slate-200/80">
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              <span
+                className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
+                  telemetry.gridOnline ? "bg-emerald-400" : "bg-rose-400"
+                }`}
+              />
+              <span
+                className={`relative inline-flex rounded-full h-2 w-2 ${
+                  telemetry.gridOnline ? "bg-emerald-500" : "bg-rose-500"
+                }`}
+              />
             </span>
             <span className="text-slate-500 font-medium">Grid:</span>
-            <span className="font-semibold text-slate-900 font-mono">
-              {formatPower(telemetry.gridImportKw)}
+            <span className={`font-semibold font-mono ${telemetry.gridOnline ? "text-slate-900" : "text-rose-700"}`}>
+              {telemetry.gridOnline ? formatPower(telemetry.gridImportKw) : "OFFLINE"}
             </span>
           </div>
 
@@ -144,9 +155,17 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
 
           {/* Battery ESS */}
           <div className="flex items-center gap-1.5 text-xs text-slate-600 bg-slate-50 px-2.5 py-1 rounded-md border border-slate-200/80">
-            <BatteryCharging className="h-3.5 w-3.5 text-emerald-600" />
+            <BatteryCharging
+              className={`h-3.5 w-3.5 ${
+                telemetry.batterySocPct <= 20 ? "text-rose-600" : "text-emerald-600"
+              }`}
+            />
             <span className="text-slate-500 font-medium">Battery:</span>
-            <span className="font-semibold text-slate-900 font-mono">
+            <span
+              className={`font-semibold font-mono ${
+                telemetry.batterySocPct <= 20 ? "text-rose-700 font-bold" : "text-slate-900"
+              }`}
+            >
               {formatPercentage(telemetry.batterySocPct)}
             </span>
           </div>
