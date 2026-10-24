@@ -10,6 +10,9 @@ import {
   EnergyEventRecord,
 } from "@/types/energy";
 
+import { IAuthService } from "@/types/auth";
+export type { IAuthService };
+
 export interface IEnergyDataService {
   getSiteProfile(): Promise<BusinessSite>;
   getDashboardMetrics(): Promise<DashboardMetrics>;
@@ -46,4 +49,5 @@ export interface IGridMindServices {
   appliances: IApplianceService;
   recommendations: IRecommendationService;
   audit: IAuditService;
+  auth: IAuthService;
 }

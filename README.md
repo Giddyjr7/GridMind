@@ -172,3 +172,60 @@ Before enabling full API mode in Phase 1, the following REST/WebSocket contracts
 - **Critical / Fault Conditions:** Crimson (`#ef4444` / `status-critical`)
 - **Surfaces:** Clean slate white (`#ffffff`) and neutral subtle backgrounds (`#f8fafc`)
 - **Typography:** Inter with tabular figures for real-time telemetry stability
+
+---
+
+## 7. Authentication Interface Specifications (Phase 2 Alignment)
+
+The frontend authentication layer (`/login`, `/signup`, `/forgot-password`) uses a decoupled service architecture (`IAuthService`). The following interfaces are prepared for alignment with the backend / Supabase team:
+
+### A. Email / Password Login (`POST /auth/login`)
+- **Request Payload**:
+  ```json
+  {
+    "email": "operator@krystalice.ng",
+    "password": "string",
+    "rememberMe": true
+  }
+  ```
+- **Expected Success Response (200 OK)**:
+  ```json
+  {
+    "user": {
+      "id": "usr_01",
+      "email": "operator@krystalice.ng",
+      "fullName": "Engr. Tunde Adeyemi",
+      "role": "facility_manager",
+      "siteId": "site_krystal_ikeja_01"
+    },
+    "token": "jwt_token_string"
+  }
+  ```
+- **Expected Error Response (401 Unauthorized / 422 Unprocessable)**:
+  ```json
+  {
+    "message": "Invalid email or password combination."
+  }
+  ```
+
+### B. Account Registration (`POST /auth/signup`)
+- **Request Payload**:
+  ```json
+  {
+    "fullName": "Babatunde Adeyemi",
+    "email": "operator@company.com",
+    "password": "SecurePassword123!",
+    "agreeToTerms": true
+  }
+  ```
+- **Expected Success Response (201 Created)**: Returns `{ user, token }` matching the login schema.
+
+### C. Password Recovery (`POST /auth/forgot-password`)
+- **Request Payload**: `{ "email": "operator@company.com" }`
+- **Expected Response (200 OK)**: `{ "success": true, "message": "Instructions dispatched." }`
+
+### D. Google OAuth 2.0 / OIDC Flow
+- Frontend exposes `loginWithGoogle()`.
+- If `NEXT_PUBLIC_GOOGLE_CLIENT_ID` is not configured, the UI cleanly presents an informative disclaimer without simulating a fake session.
+- Once client ID is provided by the backend team, the button will initiate the OIDC PKCE / redirect flow to `${NEXT_PUBLIC_API_BASE_URL}/auth/google/authorize`.
+

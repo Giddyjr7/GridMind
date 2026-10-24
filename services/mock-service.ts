@@ -5,6 +5,7 @@ import {
   IAuditService,
   IGridMindServices,
 } from "./interfaces";
+import { mockAuthService } from "./auth-service";
 import {
   MOCK_SITE_PROFILE,
   MOCK_DASHBOARD_METRICS,
@@ -146,4 +147,5 @@ export const mockServices: IGridMindServices = {
   appliances: new MockApplianceService(),
   recommendations: new MockRecommendationService(),
   audit: new MockAuditService(),
+  auth: mockAuthService,
 };

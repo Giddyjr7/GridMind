@@ -1,3 +1,4 @@
+import { apiAuthService } from "./auth-service";
 import { envConfig } from "@/config/env";
 import {
   IEnergyDataService,
@@ -134,4 +135,5 @@ export const apiServices: IGridMindServices = {
   appliances: new ApiApplianceService(),
   recommendations: new ApiRecommendationService(),
   audit: new ApiAuditService(),
+  auth: apiAuthService,
 };

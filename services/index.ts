@@ -7,6 +7,7 @@ import {
   IApplianceService,
   IRecommendationService,
   IAuditService,
+  IAuthService,
 } from "./interfaces";
 
 /**
@@ -20,5 +21,6 @@ export const energyService: IEnergyDataService = services.energy;
 export const applianceService: IApplianceService = services.appliances;
 export const recommendationService: IRecommendationService = services.recommendations;
 export const auditService: IAuditService = services.audit;
+export const authService: IAuthService = services.auth;
 
 export * from "./interfaces";
