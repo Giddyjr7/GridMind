@@ -238,6 +238,17 @@ export type RecommendationActionType =
   | "delay_generator_start"
   | "optimize_generator_load";
 
+export interface AlternativeOption {
+  option: string;
+  costOrImpact: string;
+  rejectionReason: string;
+}
+
+export interface RecommendationTelemetryInput {
+  label: string;
+  value: string;
+}
+
 export interface EnergyRecommendation {
   id: string;
   siteId: string;
@@ -252,12 +263,25 @@ export interface EnergyRecommendation {
   estimatedSavingsNgn: number;
   co2ReductionKg?: number;
   powerReductionKw?: number;
+  runtimeImpactHours?: number;
   status: RecommendationStatus;
   createdAt: string;
   expiresAt: string;
   appliedAt?: string;
   rejectionReason?: string;
   confidencePct: number;
+  uncertaintyMarginPct?: number;
+  affectedSources?: EnergySourceType[];
+  affectedAppliances?: string[];
+  relevantInputs?: RecommendationTelemetryInput[];
+  constraintsRespected?: string[];
+  benefitsAndTradeoffs?: {
+    benefits: string[];
+    tradeoffs: string[];
+  };
+  alternativesConsidered?: AlternativeOption[];
+  dataLimitations?: string;
+  isMockGenerated?: boolean;
 }
 
 export interface ApprovalRecord {

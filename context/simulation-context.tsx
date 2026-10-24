@@ -4,6 +4,7 @@ import * as React from "react";
 import {
   Appliance,
   ApplianceState,
+  ApprovalRecord,
   DashboardMetrics,
   EnergyEventRecord,
   EnergyRecommendation,
@@ -11,6 +12,7 @@ import {
 import {
   MOCK_APPLIANCES,
   MOCK_RECOMMENDATIONS,
+  MOCK_APPROVAL_HISTORY,
   MOCK_ENERGY_EVENTS,
   MOCK_SITE_PROFILE,
   MOCK_GRID_SOURCE,
@@ -37,6 +39,7 @@ export interface SimulationContextValue {
   flows: EnergyDispatchFlows;
   events: EnergyEventRecord[];
   recommendations: EnergyRecommendation[];
+  approvalHistory: ApprovalRecord[];
   isSimulating: boolean;
   lastSimulatedTick: string;
   feedbackMessage: string | null;
@@ -51,6 +54,9 @@ export interface SimulationContextValue {
   setApplianceState: (id: string, state: ApplianceState, isManual?: boolean) => void;
   setAppliancePower: (id: string, powerKw: number) => void;
   applyAiRecommendation: (recId: string) => void;
+  approveRecommendation: (id: string, notes?: string) => void;
+  rejectRecommendation: (id: string, reason?: string) => void;
+  dismissRecommendation: (id: string) => void;
   toggleSimulationRunning: () => void;
   stepSimulationHour: () => void;
   resetToDefaultScenario: () => void;
@@ -80,6 +86,8 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
   const [events, setEvents] = React.useState<EnergyEventRecord[]>(MOCK_ENERGY_EVENTS);
   const [recommendations, setRecommendations] =
     React.useState<EnergyRecommendation[]>(MOCK_RECOMMENDATIONS);
+  const [approvalHistory, setApprovalHistory] =
+    React.useState<ApprovalRecord[]>(MOCK_APPROVAL_HISTORY);
   const [isSimulating, setIsSimulating] = React.useState<boolean>(false);
   const [lastSimulatedTick, setLastSimulatedTick] = React.useState<string>(
     new Date().toISOString()
@@ -246,14 +254,23 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
     );
   }, []);
 
-  const applyAiRecommendation = React.useCallback((recId: string) => {
+  const approveRecommendation = React.useCallback((
+    recId: string,
+    notes?: string
+  ) => {
     const rec = recommendations.find((r) => r.id === recId);
     if (!rec) return;
 
+    // Prevent duplicate approval actions
+    if (rec.status === "approved") {
+      notifyFeedback(`Recommendation "${rec.title}" has already been approved.`);
+      return;
+    }
+
+    // 1. Apply explicit simulated state changes
     if (rec.actionType === "curtail_deferrable" && rec.targetApplianceId) {
       setApplianceState(rec.targetApplianceId, "curtailed", false);
     } else if (rec.actionType === "pre_cool_cold_room" && rec.targetApplianceId) {
-      // Pre-cool freezer
       setAppliances((prev) =>
         prev.map((app) =>
           app.id === rec.targetApplianceId
@@ -262,29 +279,115 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
                 state: "running",
                 currentPowerKw: Math.min(app.ratedPowerKw, 38.0),
                 isManualOverride: false,
+                notes: "Pre-cooling active via surplus solar PV buffer",
               }
             : app
         )
       );
+    } else if (rec.actionType === "delay_generator_start") {
+      setParams((p) => ({ ...p, generatorMode: "standby" }));
     }
 
+    const appliedTimestamp = new Date().toISOString();
+
+    // 2. Update recommendation status
     setRecommendations((prev) =>
       prev.map((r) =>
         r.id === recId
-          ? { ...r, status: "approved", appliedAt: new Date().toISOString() }
+          ? { ...r, status: "approved", appliedAt: appliedTimestamp }
           : r
       )
     );
 
+    // 3. Record in approval audit history
+    const approvalRecord: ApprovalRecord = {
+      id: `appr_${Date.now()}`,
+      recommendationId: recId,
+      actionTaken: "approve",
+      performedBy: "Operations Lead (Simulated)",
+      timestamp: appliedTimestamp,
+      notes: notes || "Approved by facility operator from decision queue.",
+      savingsRealizedEstimateNgn: rec.estimatedSavingsNgn,
+    };
+    setApprovalHistory((prev) => [approvalRecord, ...prev]);
+
+    // 4. Log event
     addEvent({
       category: "ai_recommendation",
       severity: "info",
-      title: `[SIMULATED] AI Policy Approved: ${rec.title}`,
-      details: `Dispatched AI optimization: ${rec.suggestedAction}`,
+      title: `[APPROVED] ${rec.title}`,
+      details: `Operator approved recommendation. ${notes ? `Note: "${notes}". ` : ""}${rec.suggestedAction}`,
+      sourceAsset: rec.affectedSources?.[0],
+      applianceId: rec.targetApplianceId,
+      resolved: true,
+      resolvedAt: appliedTimestamp,
+    });
+
+    notifyFeedback(`✅ Approved: "${rec.title}"`);
+  }, [recommendations, setApplianceState, addEvent]);
+
+  const rejectRecommendation = React.useCallback((
+    recId: string,
+    reason?: string
+  ) => {
+    const rec = recommendations.find((r) => r.id === recId);
+    if (!rec) return;
+
+    if (rec.status === "rejected") {
+      notifyFeedback(`Recommendation "${rec.title}" has already been rejected.`);
+      return;
+    }
+
+    const rejectedTimestamp = new Date().toISOString();
+
+    // 1. Update recommendation status (system state remains unchanged!)
+    setRecommendations((prev) =>
+      prev.map((r) =>
+        r.id === recId
+          ? {
+              ...r,
+              status: "rejected",
+              rejectionReason: reason || "Operator manually declined action.",
+            }
+          : r
+      )
+    );
+
+    // 2. Record in approval audit history
+    const rejectRecord: ApprovalRecord = {
+      id: `appr_${Date.now()}`,
+      recommendationId: recId,
+      actionTaken: "reject",
+      performedBy: "Operations Lead (Simulated)",
+      timestamp: rejectedTimestamp,
+      notes: reason || "Declined by operator; system state unchanged.",
+    };
+    setApprovalHistory((prev) => [rejectRecord, ...prev]);
+
+    // 3. Log event
+    addEvent({
+      category: "ai_recommendation",
+      severity: "info",
+      title: `[DECLINED] ${rec.title}`,
+      details: `Operator declined recommendation. Rationale: ${reason || "Declined without notes"}. System physical dispatch state preserved unchanged.`,
+      sourceAsset: rec.affectedSources?.[0],
+      applianceId: rec.targetApplianceId,
       resolved: true,
     });
-    notifyFeedback(`🤖 AI Recommendation "${rec.title}" applied.`);
-  }, [recommendations, setApplianceState, addEvent]);
+
+    notifyFeedback(`❌ Declined: "${rec.title}"`);
+  }, [recommendations, addEvent]);
+
+  const dismissRecommendation = React.useCallback((recId: string) => {
+    setRecommendations((prev) =>
+      prev.map((r) =>
+        r.id === recId ? { ...r, status: "expired" } : r
+      )
+    );
+    notifyFeedback("Recommendation dismissed from active queue.");
+  }, []);
+
+  const applyAiRecommendation = approveRecommendation;
 
   const toggleSimulationRunning = React.useCallback(() => {
     setIsSimulating((prev) => !prev);
@@ -407,6 +510,7 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
         flows,
         events,
         recommendations,
+        approvalHistory,
         isSimulating,
         lastSimulatedTick,
         feedbackMessage,
@@ -419,6 +523,9 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
         setApplianceState,
         setAppliancePower,
         applyAiRecommendation,
+        approveRecommendation,
+        rejectRecommendation,
+        dismissRecommendation,
         toggleSimulationRunning,
         stepSimulationHour,
         resetToDefaultScenario,

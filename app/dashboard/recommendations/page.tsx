@@ -1,116 +1,219 @@
 "use client";
 
 import * as React from "react";
-import { Sparkles, CheckCircle2, XCircle, Clock, Coins, ShieldAlert, Check } from "lucide-react";
+import {
+  Sparkles,
+  CheckCircle2,
+  XCircle,
+  Clock,
+  Coins,
+  ShieldAlert,
+  Info,
+  Layers,
+  HelpCircle,
+  RotateCcw,
+} from "lucide-react";
 import { PageContainer } from "@/components/ui/page-container";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
+import {
+  RecommendationCard,
+  DecisionDetailsModal,
+  ApprovalConfirmModal,
+  RejectModal,
+  RecommendationsFilterBar,
+} from "@/components/recommendations";
 import { useSimulation } from "@/context/simulation-context";
-import { formatCurrency } from "@/lib/formatters";
+import { EnergyRecommendation } from "@/types/energy";
 
 export default function RecommendationsPage() {
-  const { recommendations, applyAiRecommendation } = useSimulation();
+  const {
+    recommendations,
+    approveRecommendation,
+    rejectRecommendation,
+    dismissRecommendation,
+    feedbackMessage,
+    clearFeedback,
+    resetToDefaultScenario,
+  } = useSimulation();
+
+  const [statusFilter, setStatusFilter] = React.useState<
+    "all" | "pending" | "approved" | "rejected"
+  >("all");
+  const [priorityFilter, setPriorityFilter] = React.useState<string>("all");
+  const [searchQuery, setSearchQuery] = React.useState<string>("");
+
+  // Modals state
+  const [inspectingRec, setInspectingRec] =
+    React.useState<EnergyRecommendation | null>(null);
+  const [approvingRec, setApprovingRec] =
+    React.useState<EnergyRecommendation | null>(null);
+  const [rejectingRec, setRejectingRec] =
+    React.useState<EnergyRecommendation | null>(null);
+
+  // Compute filter counts
+  const counts = React.useMemo(() => {
+    return {
+      all: recommendations.length,
+      pending: recommendations.filter((r) => r.status === "pending").length,
+      approved: recommendations.filter((r) => r.status === "approved").length,
+      rejected: recommendations.filter((r) => r.status === "rejected").length,
+    };
+  }, [recommendations]);
+
+  // Filter recommendations
+  const filteredRecommendations = React.useMemo(() => {
+    return recommendations.filter((rec) => {
+      // 1. Status filter
+      if (statusFilter !== "all" && rec.status !== statusFilter) {
+        return false;
+      }
+      // 2. Priority filter
+      if (priorityFilter !== "all" && rec.urgency !== priorityFilter) {
+        return false;
+      }
+      // 3. Search query
+      if (searchQuery.trim() !== "") {
+        const q = searchQuery.toLowerCase();
+        const matchesTitle = rec.title.toLowerCase().includes(q);
+        const matchesTarget = (rec.targetApplianceName || "").toLowerCase().includes(q);
+        const matchesAction = rec.suggestedAction.toLowerCase().includes(q);
+        if (!matchesTitle && !matchesTarget && !matchesAction) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }, [recommendations, statusFilter, priorityFilter, searchQuery]);
 
   return (
     <PageContainer>
-      <SectionHeading
-        title="AI Energy Recommendations"
-        description="Algorithmic dispatch recommendations generated from solar generation forecasts, grid reliability modeling, and cold chain priority rules."
-        badge={
-          <Badge variant="healthy" size="sm" className="font-mono text-[10px]">
-            {recommendations.length} ACTIVE
-          </Badge>
-        }
-      />
+      <div className="space-y-6">
+        {/* Section Heading */}
+        <SectionHeading
+          title="Energy Recommendations & Approval Workflow"
+          description="Transparent algorithmic dispatch recommendations generated from solar generation forecasts, grid reliability modeling, and cold chain preservation constraints. Human authorization is strictly required before simulated dispatch."
+          badge={
+            <Badge variant="healthy" size="sm" className="font-mono text-[10px] uppercase font-bold">
+              Human-in-the-Loop Queue
+            </Badge>
+          }
+          actions={
+            <div className="flex items-center gap-2">
+              <Badge variant="warning" size="sm" className="font-mono text-[10px] uppercase font-bold">
+                Deterministic Optimization
+              </Badge>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={resetToDefaultScenario}
+                className="text-xs h-7 text-slate-600 border-slate-200 hover:bg-slate-50"
+              >
+                <RotateCcw className="w-3 h-3 mr-1" />
+                Reset Queue
+              </Button>
+            </div>
+          }
+        />
 
-      <div className="space-y-4">
-        {recommendations.map((rec) => (
-          <Card key={rec.id} className="border-slate-200">
-            <CardHeader>
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <div className="flex items-center gap-2.5">
-                  <div className="p-1.5 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200">
-                    <Sparkles className="h-4 w-4" />
-                  </div>
-                  <div>
-                    <CardTitle>{rec.title}</CardTitle>
-                    <CardDescription>Target: {rec.targetApplianceName}</CardDescription>
-                  </div>
-                </div>
+        {/* Global Action Confirmation Toast */}
+        {feedbackMessage && (
+          <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-800 flex items-center justify-between animate-in fade-in duration-200 shadow-2xs">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span className="font-medium">{feedbackMessage}</span>
+            </div>
+            <button
+              type="button"
+              onClick={clearFeedback}
+              className="text-[11px] text-emerald-700 hover:underline font-semibold"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
 
-                <div className="flex items-center gap-2">
-                  <Badge
-                    variant={rec.status === "approved" ? "healthy" : "warning"}
-                    size="sm"
-                    className="capitalize font-mono text-[10px]"
-                  >
-                    {rec.status}
-                  </Badge>
-                  <Badge variant="outline" size="sm" className="text-[10px]">
-                    {rec.confidencePct}% Confidence
-                  </Badge>
-                </div>
-              </div>
-            </CardHeader>
+        {/* Filter & Search Bar */}
+        <RecommendationsFilterBar
+          statusFilter={statusFilter}
+          onStatusFilterChange={setStatusFilter}
+          priorityFilter={priorityFilter}
+          onPriorityFilterChange={setPriorityFilter}
+          searchQuery={searchQuery}
+          onSearchQueryChange={setSearchQuery}
+          counts={counts}
+        />
 
-            <CardContent className="space-y-3 text-xs text-slate-600">
-              <p className="leading-relaxed">{rec.description}</p>
+        {/* Recommendation Cards List */}
+        {filteredRecommendations.length === 0 ? (
+          <EmptyState
+            title="No matching recommendations"
+            description={
+              statusFilter === "pending"
+                ? "All recommendations have been evaluated and authorized by the operations team."
+                : "No recommendations match your selected filters. Adjust your search or reset filters."
+            }
+            action={
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  setStatusFilter("all");
+                  setPriorityFilter("all");
+                  setSearchQuery("");
+                }}
+              >
+                Reset All Filters
+              </Button>
+            }
+          />
+        ) : (
+          <div className="space-y-4">
+            {filteredRecommendations.map((rec) => (
+              <RecommendationCard
+                key={rec.id}
+                recommendation={rec}
+                onInspect={(target) => setInspectingRec(target)}
+                onRequestApprove={(target) => setApprovingRec(target)}
+                onRequestReject={(target) => setRejectingRec(target)}
+                onDismiss={(id) => dismissRecommendation(id)}
+              />
+            ))}
+          </div>
+        )}
 
-              <div className="bg-slate-50 p-3 rounded-lg border border-slate-100 flex items-start gap-2">
-                <ShieldAlert className="h-4 w-4 text-emerald-700 shrink-0 mt-0.5" />
-                <div>
-                  <span className="font-semibold text-slate-800">Operational Reasoning: </span>
-                  <span>{rec.reasoning}</span>
-                </div>
-              </div>
+        {/* Inspection Details Dialog */}
+        <DecisionDetailsModal
+          recommendation={inspectingRec}
+          isOpen={Boolean(inspectingRec)}
+          onClose={() => setInspectingRec(null)}
+          onApprove={(id) => {
+            const target = recommendations.find((r) => r.id === id);
+            if (target) setApprovingRec(target);
+          }}
+          onReject={(id) => {
+            const target = recommendations.find((r) => r.id === id);
+            if (target) setRejectingRec(target);
+          }}
+        />
 
-              <div className="flex items-center gap-4 text-xs font-mono pt-1">
-                <div className="flex items-center gap-1.5">
-                  <Coins className="h-4 w-4 text-amber-600" />
-                  <span>
-                    Est. Savings:{" "}
-                    <strong className="text-emerald-700">
-                      +{formatCurrency(rec.estimatedSavingsNgn, "NGN")}
-                    </strong>
-                  </span>
-                </div>
-                <div>
-                  <span>
-                    CO₂ Reduction:{" "}
-                    <strong className="text-slate-800">{rec.co2ReductionKg} kg</strong>
-                  </span>
-                </div>
-              </div>
-            </CardContent>
+        {/* Approval Confirmation Dialog */}
+        <ApprovalConfirmModal
+          recommendation={approvingRec}
+          isOpen={Boolean(approvingRec)}
+          onClose={() => setApprovingRec(null)}
+          onConfirm={(id, notes) => approveRecommendation(id, notes)}
+        />
 
-            <CardFooter className="bg-slate-50/50 border-t border-slate-100 flex items-center justify-between py-3">
-              <span className="text-[11px] text-slate-400">
-                Action: {rec.suggestedAction}
-              </span>
-
-              {rec.status === "pending" ? (
-                <div className="flex items-center gap-2">
-                  <Button
-                    size="sm"
-                    variant="primary"
-                    onClick={() => applyAiRecommendation(rec.id)}
-                    className="text-xs h-8 bg-emerald-600 hover:bg-emerald-700"
-                  >
-                    <Check className="h-3.5 w-3.5 mr-1" />
-                    Approve & Dispatch
-                  </Button>
-                </div>
-              ) : (
-                <span className="text-xs font-semibold text-emerald-700 flex items-center gap-1">
-                  <CheckCircle2 className="h-3.5 w-3.5" />
-                  Policy Active in Simulator
-                </span>
-              )}
-            </CardFooter>
-          </Card>
-        ))}
+        {/* Rejection / Decline Dialog */}
+        <RejectModal
+          recommendation={rejectingRec}
+          isOpen={Boolean(rejectingRec)}
+          onClose={() => setRejectingRec(null)}
+          onConfirm={(id, reason) => rejectRecommendation(id, reason)}
+        />
       </div>
     </PageContainer>
   );

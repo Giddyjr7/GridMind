@@ -18,6 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EnergyRecommendation } from "@/types";
 import { formatCurrency } from "@/lib/formatters";
+import { useSimulation } from "@/context/simulation-context";
 
 interface CurrentRecommendationCardProps {
   initialRecommendation: EnergyRecommendation;
@@ -28,26 +29,28 @@ export function CurrentRecommendationCard({
   initialRecommendation,
   totalPendingCount = 1,
 }: CurrentRecommendationCardProps) {
-  const [recommendation, setRecommendation] =
-    React.useState<EnergyRecommendation>(initialRecommendation);
+  const {
+    recommendations,
+    approveRecommendation,
+    rejectRecommendation,
+    resetToDefaultScenario,
+  } = useSimulation();
+
+  // Pick up-to-date recommendation from shared state if available
+  const recommendation =
+    recommendations.find((r) => r.id === initialRecommendation.id) ||
+    initialRecommendation;
+
   const [actionFeedback, setActionFeedback] = React.useState<string | null>(null);
 
   const handleApprove = () => {
-    setRecommendation((prev) => ({
-      ...prev,
-      status: "approved",
-      appliedAt: new Date().toISOString(),
-    }));
-    setActionFeedback("Recommendation approved! Setpoint change scheduled for Blast Freezer Room A.");
+    approveRecommendation(recommendation.id, "Approved from Overview Command Console.");
+    setActionFeedback("Recommendation approved & dispatched in microgrid engine!");
   };
 
   const handleDismiss = () => {
-    setRecommendation((prev) => ({
-      ...prev,
-      status: "rejected",
-      rejectionReason: "Operator manually dismissed recommendation from command dashboard.",
-    }));
-    setActionFeedback("Recommendation dismissed by operator.");
+    rejectRecommendation(recommendation.id, "Declined from Overview Command Console.");
+    setActionFeedback("Recommendation declined by operator.");
   };
 
   const isApproved = recommendation.status === "approved";
@@ -194,7 +197,7 @@ export function CurrentRecommendationCard({
                 size="sm"
                 variant="outline"
                 onClick={() => {
-                  setRecommendation(initialRecommendation);
+                  resetToDefaultScenario();
                   setActionFeedback(null);
                 }}
                 className="text-xs text-slate-500 hover:text-slate-700"
