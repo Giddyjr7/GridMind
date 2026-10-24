@@ -17,6 +17,10 @@ export interface SimulationParams {
   inverterEfficiencyPct: number; // typically 92%
   fuelCostPerLiterNgn: number; // typically 1,250 NGN/L
   gridTariffPerKwhNgn: number; // typically 206 NGN/kWh (Band A)
+  contractedDemandLimitKw?: number;
+  solarInstalledCapacityKwp?: number;
+  batteryTotalCapacityKwh?: number;
+  generatorRatedCapacityKw?: number;
 }
 
 export interface EnergyDispatchFlows {
@@ -63,6 +67,10 @@ export const DEFAULT_SIMULATION_PARAMS: SimulationParams = {
   inverterEfficiencyPct: 92,
   fuelCostPerLiterNgn: 1250,
   gridTariffPerKwhNgn: 206,
+  contractedDemandLimitKw: 150,
+  solarInstalledCapacityKwp: 75,
+  batteryTotalCapacityKwh: 120,
+  generatorRatedCapacityKw: 128,
 };
 
 /**
@@ -124,8 +132,15 @@ export function calculateUsableBatteryEnergy(
 export function computeSimulationDispatch(
   appliances: Appliance[],
   params: SimulationParams,
-  batterySpecs = { totalCapacityKwh: 120, maxDischargeKw: 60, maxChargeKw: 40 },
-  generatorSpecs = { ratedCapacityKw: 128, fuelConsumptionPerKwh: 0.285 } // Cummins 160kVA = 128kW @ 0.8pf
+  batterySpecs = {
+    totalCapacityKwh: params.batteryTotalCapacityKwh ?? 120,
+    maxDischargeKw: 60,
+    maxChargeKw: 40,
+  },
+  generatorSpecs = {
+    ratedCapacityKw: params.generatorRatedCapacityKw ?? 128,
+    fuelConsumptionPerKwh: 0.285,
+  } // Cummins 160kVA = 128kW @ 0.8pf
 ): EnergyDispatchFlows {
   const {
     totalActiveDemandKw,

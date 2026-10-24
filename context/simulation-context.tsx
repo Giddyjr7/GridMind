@@ -54,6 +54,11 @@ export interface SimulationContextValue {
   setGeneratorMode: (mode: SimulationParams["generatorMode"]) => void;
   setApplianceState: (id: string, state: ApplianceState, isManual?: boolean) => void;
   setAppliancePower: (id: string, powerKw: number) => void;
+  updateAppliance: (id: string, updates: Partial<Appliance>) => void;
+  updateSourceConfig: (
+    source: "grid" | "solar" | "battery" | "generator",
+    updates: Partial<SimulationParams>
+  ) => void;
   applyAiRecommendation: (recId: string) => void;
   approveRecommendation: (id: string, notes?: string) => void;
   rejectRecommendation: (id: string, reason?: string) => void;
@@ -254,6 +259,69 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
       )
     );
   }, []);
+
+  const updateAppliance = React.useCallback((id: string, updates: Partial<Appliance>) => {
+    let updatedName = "";
+    setAppliances((prev) =>
+      prev.map((app) => {
+        if (app.id !== id) return app;
+        updatedName = app.name;
+        const newRated = updates.ratedPowerKw ?? app.ratedPowerKw;
+        const newCurrent =
+          app.state === "running"
+            ? Math.round(newRated * 0.9 * 10) / 10
+            : app.currentPowerKw;
+
+        return {
+          ...app,
+          ...updates,
+          ratedPowerKw: newRated,
+          currentPowerKw: newCurrent,
+        };
+      })
+    );
+
+    addEvent({
+      category: "appliance_state",
+      severity: "info",
+      title: `[CONFIG] ${updatedName || "Appliance"} Parameters Updated`,
+      details: `Updated parameters: ${Object.entries(updates)
+        .map(([k, v]) => `${k}=${JSON.stringify(v)}`)
+        .join(", ")}. Recalculating microgrid load model.`,
+      applianceId: id,
+      resolved: true,
+    });
+    notifyFeedback(`⚙️ Updated ${updatedName || "equipment"} configuration.`);
+  }, [addEvent]);
+
+  const updateSourceConfig = React.useCallback((
+    source: "grid" | "solar" | "battery" | "generator",
+    updates: Partial<SimulationParams>
+  ) => {
+    setParams((prev) => ({
+      ...prev,
+      ...updates,
+    }));
+
+    addEvent({
+      category:
+        source === "grid"
+          ? "grid_event"
+          : source === "battery"
+          ? "battery_event"
+          : source === "generator"
+          ? "generator_event"
+          : "ai_recommendation",
+      severity: "info",
+      title: `[CONFIG] ${source.toUpperCase()} Technical Parameters Updated`,
+      details: `Applied technical overrides: ${Object.entries(updates)
+        .map(([k, v]) => `${k}=${v}`)
+        .join(", ")}. Microgrid dispatch flows recalculated.`,
+      sourceAsset: source,
+      resolved: true,
+    });
+    notifyFeedback(`⚙️ Updated ${source.toUpperCase()} parameters.`);
+  }, [addEvent]);
 
   const approveRecommendation = React.useCallback((
     recId: string,
@@ -523,6 +591,8 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
         setGeneratorMode,
         setApplianceState,
         setAppliancePower,
+        updateAppliance,
+        updateSourceConfig,
         applyAiRecommendation,
         approveRecommendation,
         rejectRecommendation,

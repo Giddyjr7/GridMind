@@ -1,135 +1,233 @@
 "use client";
 
 import * as React from "react";
-import { Sliders, ThermometerSnowflake, Lightbulb, Shield, Power, User, Cpu, Sparkles } from "lucide-react";
+import {
+  Sliders,
+  ThermometerSnowflake,
+  Lightbulb,
+  Power,
+  ShieldCheck,
+  ShieldAlert,
+  Info,
+  CheckCircle2,
+  AlertTriangle,
+  RotateCcw,
+} from "lucide-react";
 import { PageContainer } from "@/components/ui/page-container";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useSimulation } from "@/context/simulation-context";
+import { Button } from "@/components/ui/button";
+import { EquipmentCard, ApplianceDetailsModal } from "@/components/equipment";
+import { useSimulation, ApplianceWithSimMetadata } from "@/context/simulation-context";
+import { Appliance } from "@/types/energy";
 import { formatPower } from "@/lib/formatters";
 
 export default function EquipmentPage() {
-  const { appliances, setApplianceState, params } = useSimulation();
+  const {
+    appliances,
+    setApplianceState,
+    updateAppliance,
+    flows,
+    feedbackMessage,
+    clearFeedback,
+    resetToDefaultScenario,
+  } = useSimulation();
+
+  const [selectedAppliance, setSelectedAppliance] =
+    React.useState<ApplianceWithSimMetadata | null>(null);
+
+  // Group appliances by priority
+  const criticalAppliances = appliances.filter((a) => a.priority === "critical");
+  const importantAppliances = appliances.filter((a) => a.priority === "important");
+  const deferrableAppliances = appliances.filter((a) => a.priority === "deferrable");
+
+  const totalRatedKw = appliances.reduce((sum, a) => sum + a.ratedPowerKw, 0);
+
+  const handleToggleState = (id: string, currentState: string) => {
+    const nextState = currentState === "running" ? "curtailed" : "running";
+    setApplianceState(id, nextState, true);
+  };
 
   return (
     <PageContainer>
-      <SectionHeading
-        title="Equipment & Load Hierarchy"
-        description="Establish operational dispatch priorities. In the event of a grid failure, nonessential deferrable equipment is automatically shed to preserve battery life for critical cold chains."
-        badge={
-          <Badge variant="healthy" size="sm" className="font-mono text-[10px]">
-            {appliances.length} ASSETS SYNCHRONIZED
-          </Badge>
-        }
-      />
-
-      <div className="grid grid-cols-1 gap-3">
-        {appliances.map((app) => (
-          <Card key={app.id} className="p-4 hover:border-slate-300 transition-colors">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <div
-                  className={`h-9 w-9 rounded-xl flex items-center justify-center shrink-0 ${
-                    app.priority === "critical"
-                      ? "bg-red-50 text-red-600 border border-red-200"
-                      : app.priority === "important"
-                      ? "bg-amber-50 text-amber-600 border border-amber-200"
-                      : "bg-emerald-50 text-emerald-600 border border-emerald-200"
-                  }`}
-                >
-                  {app.category === "refrigeration" ? (
-                    <ThermometerSnowflake className="h-5 w-5" />
-                  ) : app.category === "lighting" ? (
-                    <Lightbulb className="h-5 w-5" />
-                  ) : (
-                    <Power className="h-5 w-5" />
-                  )}
-                </div>
-
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h4 className="text-sm font-bold text-slate-900 leading-tight">
-                      {app.name}
-                    </h4>
-                    {app.temperatureCritical && (
-                      <span className="text-[10px] font-mono font-bold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200/60">
-                        {app.temperatureCritical.currentTempCelsius}°C
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    {app.notes || "Standard operational load profile"}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-4 text-xs shrink-0 flex-wrap">
-                <div className="text-right">
-                  <span className="text-slate-400 block text-[10px]">Demand</span>
-                  <span className="font-mono font-bold text-slate-800">
-                    {formatPower(app.currentPowerKw)}
-                  </span>
-                  <span className="text-slate-400 text-[10px] block">
-                    Rated {formatPower(app.ratedPowerKw)}
-                  </span>
-                </div>
-
-                <div className="text-right">
-                  <span className="text-slate-400 block text-[10px]">Priority Tier</span>
-                  <Badge
-                    variant={
-                      app.priority === "critical"
-                        ? "critical"
-                        : app.priority === "important"
-                        ? "warning"
-                        : "healthy"
-                    }
-                    size="sm"
-                    className="capitalize text-[10px]"
-                  >
-                    {app.priority}
-                  </Badge>
-                </div>
-
-                <div className="text-right">
-                  <span className="text-slate-400 block text-[10px]">Circuit State</span>
-                  <div className="flex items-center gap-1">
-                    <Badge
-                      variant={
-                        app.state === "running"
-                          ? "healthy"
-                          : app.state === "curtailed"
-                          ? "critical"
-                          : "neutral"
-                      }
-                      size="sm"
-                      className="capitalize text-[10px]"
-                    >
-                      {app.state}
-                    </Badge>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-1">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setApplianceState(
-                        app.id,
-                        app.state === "running" ? "curtailed" : "running",
-                        true
-                      )
-                    }
-                    className="text-xs px-2.5 py-1 rounded border border-slate-200 bg-slate-50 hover:bg-slate-100 font-medium text-slate-700 transition-colors"
-                  >
-                    {app.state === "running" ? "Curtail" : "Engage"}
-                  </button>
-                </div>
-              </div>
+      <div className="space-y-6">
+        {/* Section Heading */}
+        <SectionHeading
+          title="Equipment & Load Hierarchy"
+          description="Establish physical appliance dispatch priorities, rated capacities, and thermal boundaries. During grid blackouts, deferrable loads are shed first to guarantee continuous power to frozen cold chains."
+          badge={
+            <Badge variant="healthy" size="sm" className="font-mono text-[10px] uppercase font-bold">
+              {appliances.length} Assets Synchronized
+            </Badge>
+          }
+          actions={
+            <div className="flex items-center gap-2">
+              <Badge variant="warning" size="sm" className="font-mono text-[10px] uppercase font-bold">
+                Automated Shedding Active
+              </Badge>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={resetToDefaultScenario}
+                className="text-xs h-7 text-slate-600 border-slate-200 hover:bg-slate-50"
+              >
+                <RotateCcw className="w-3 h-3 mr-1" />
+                Reset Defaults
+              </Button>
             </div>
-          </Card>
-        ))}
+          }
+        />
+
+        {/* Global Action Confirmation Toast */}
+        {feedbackMessage && (
+          <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-800 flex items-center justify-between animate-in fade-in duration-200 shadow-2xs">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span className="font-medium">{feedbackMessage}</span>
+            </div>
+            <button
+              type="button"
+              onClick={clearFeedback}
+              className="text-[11px] text-emerald-700 hover:underline font-semibold"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
+
+        {/* Summary Metric Strip */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+          <div className="p-3.5 rounded-xl border border-slate-200 bg-white shadow-2xs space-y-1">
+            <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+              Total Active Demand
+            </span>
+            <div className="text-xl font-extrabold text-slate-900 font-mono">
+              {formatPower(flows.totalActiveDemandKw)}
+            </div>
+            <p className="text-[11px] text-slate-500 font-mono">
+              Rated: {formatPower(totalRatedKw)}
+            </p>
+          </div>
+
+          <div className="p-3.5 rounded-xl border border-rose-200 bg-rose-50/30 shadow-2xs space-y-1">
+            <span className="text-[10px] uppercase font-bold text-rose-700 tracking-wider flex items-center gap-1">
+              <ShieldAlert className="w-3 h-3" />
+              Critical Cold Chain
+            </span>
+            <div className="text-xl font-extrabold text-rose-950 font-mono">
+              {formatPower(flows.criticalDemandKw)}
+            </div>
+            <p className="text-[11px] text-rose-700 font-medium">
+              3 Assets Protected (0% Spoilage)
+            </p>
+          </div>
+
+          <div className="p-3.5 rounded-xl border border-amber-200 bg-amber-50/30 shadow-2xs space-y-1">
+            <span className="text-[10px] uppercase font-bold text-amber-700 tracking-wider flex items-center gap-1">
+              <Lightbulb className="w-3 h-3" />
+              Important Infrastructure
+            </span>
+            <div className="text-xl font-extrabold text-amber-950 font-mono">
+              {formatPower(flows.importantDemandKw)}
+            </div>
+            <p className="text-[11px] text-amber-700 font-medium">
+              2 Assets (Warehouse LED + IT)
+            </p>
+          </div>
+
+          <div className="p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/30 shadow-2xs space-y-1">
+            <span className="text-[10px] uppercase font-bold text-emerald-700 tracking-wider flex items-center gap-1">
+              <Power className="w-3 h-3" />
+              Sheddable Deferrable
+            </span>
+            <div className="text-xl font-extrabold text-emerald-950 font-mono">
+              {formatPower(flows.deferrableDemandKw)}
+            </div>
+            <p className="text-[11px] text-emerald-700 font-medium">
+              HVAC & Admin Air Conditioning
+            </p>
+          </div>
+        </div>
+
+        {/* 1. Critical Refrigeration Appliances */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-bold text-rose-900 uppercase tracking-wider flex items-center gap-1.5">
+              <ShieldAlert className="w-4 h-4 text-rose-600" />
+              Critical Refrigeration Circuits (Zero Curtailment Tolerance)
+            </h3>
+            <span className="text-xs text-slate-500 font-mono">
+              Subtotal: {formatPower(flows.criticalDemandKw)}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 gap-3">
+            {criticalAppliances.map((app) => (
+              <EquipmentCard
+                key={app.id}
+                appliance={app}
+                onToggleState={handleToggleState}
+                onOpenDetails={(target) => setSelectedAppliance(target)}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* 2. Important Appliances */}
+        <div className="space-y-3 pt-2">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-bold text-amber-900 uppercase tracking-wider flex items-center gap-1.5">
+              <Lightbulb className="w-4 h-4 text-amber-600" />
+              Important Operational Assets (Warehouse Lighting & Security Rack)
+            </h3>
+            <span className="text-xs text-slate-500 font-mono">
+              Subtotal: {formatPower(flows.importantDemandKw)}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 gap-3">
+            {importantAppliances.map((app) => (
+              <EquipmentCard
+                key={app.id}
+                appliance={app}
+                onToggleState={handleToggleState}
+                onOpenDetails={(target) => setSelectedAppliance(target)}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* 3. Deferrable Air Conditioners & HVAC */}
+        <div className="space-y-3 pt-2">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-bold text-emerald-900 uppercase tracking-wider flex items-center gap-1.5">
+              <Power className="w-4 h-4 text-emerald-600" />
+              Deferrable Loads (Sheddable during Grid Failure)
+            </h3>
+            <span className="text-xs text-slate-500 font-mono">
+              Subtotal: {formatPower(flows.deferrableDemandKw)}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 gap-3">
+            {deferrableAppliances.map((app) => (
+              <EquipmentCard
+                key={app.id}
+                appliance={app}
+                onToggleState={handleToggleState}
+                onOpenDetails={(target) => setSelectedAppliance(target)}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Equipment Details & Configuration Modal */}
+        <ApplianceDetailsModal
+          appliance={selectedAppliance}
+          isOpen={Boolean(selectedAppliance)}
+          onClose={() => setSelectedAppliance(null)}
+          onSaveConfig={(id, updates) => updateAppliance(id, updates)}
+        />
       </div>
     </PageContainer>
   );
