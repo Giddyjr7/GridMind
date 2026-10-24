@@ -18,7 +18,7 @@ import {
   EnergyReading,
   EnergyEventRecord,
 } from "@/types";
-import { energyService, applianceService, recommendationService, auditService } from "@/services";
+import { useSimulation } from "@/context/simulation-context";
 
 interface OverviewClientProps {
   initialMetrics: DashboardMetrics;
@@ -35,43 +35,33 @@ export function OverviewClient({
   initialTelemetry,
   initialEvents,
 }: OverviewClientProps) {
-  const [metrics, setMetrics] = React.useState<DashboardMetrics>(initialMetrics);
-  const [appliances, setAppliances] = React.useState<Appliance[]>(initialAppliances);
-  const [recommendations, setRecommendations] =
-    React.useState<EnergyRecommendation[]>(initialRecommendations);
-  const [telemetry, setTelemetry] = React.useState<EnergyReading[]>(initialTelemetry);
-  const [events, setEvents] = React.useState<EnergyEventRecord[]>(initialEvents);
-  const [lastUpdated, setLastUpdated] = React.useState<string>(
-    initialMetrics.lastTelemetryTimestamp
-  );
+  const {
+    derivedDashboardMetrics,
+    appliances: simAppliances,
+    recommendations: simRecommendations,
+    events: simEvents,
+    lastSimulatedTick,
+    stepSimulationHour,
+  } = useSimulation();
+
+  const [telemetry] = React.useState<EnergyReading[]>(initialTelemetry);
   const [isRefreshing, setIsRefreshing] = React.useState<boolean>(false);
+
+  // Synchronized state with simulator
+  const activeMetrics = derivedDashboardMetrics || initialMetrics;
+  const activeAppliances = simAppliances || initialAppliances;
+  const activeRecommendations = simRecommendations || initialRecommendations;
+  const activeEvents = simEvents || initialEvents;
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    try {
-      const [newMetrics, newAppliances, newRecommendations, newTelemetry, newEvents] =
-        await Promise.all([
-          energyService.getDashboardMetrics(),
-          applianceService.getAppliances(),
-          recommendationService.getRecommendations(),
-          energyService.getTelemetryHistory(24),
-          auditService.getEvents(10),
-        ]);
-
-      setMetrics(newMetrics);
-      setAppliances(newAppliances);
-      setRecommendations(newRecommendations);
-      setTelemetry(newTelemetry);
-      setEvents(newEvents);
-      setLastUpdated(new Date().toISOString());
-    } catch (err) {
-      console.error("Failed to refresh simulated telemetry:", err);
-    } finally {
+    stepSimulationHour();
+    setTimeout(() => {
       setIsRefreshing(false);
-    }
+    }, 400);
   };
 
-  const pendingRecommendationsCount = recommendations.filter(
+  const pendingRecommendationsCount = activeRecommendations.filter(
     (r) => r.status === "pending"
   ).length;
 
@@ -80,23 +70,23 @@ export function OverviewClient({
       <div className="space-y-6">
         {/* 1. Dashboard Header */}
         <DashboardHeader
-          site={metrics.site}
-          grid={metrics.grid}
-          lastUpdated={lastUpdated}
+          site={activeMetrics.site}
+          grid={activeMetrics.grid}
+          lastUpdated={lastSimulatedTick}
           onRefresh={handleRefresh}
           isRefreshing={isRefreshing}
         />
 
         {/* 2. Key Metric Cards */}
-        <MetricCardsRow metrics={metrics} />
+        <MetricCardsRow metrics={activeMetrics} />
 
         {/* 3. Power Source Overview */}
         <PowerSourcesOverview
-          grid={metrics.grid}
-          solar={metrics.solar}
-          battery={metrics.battery}
-          generator={metrics.generator}
-          totalLoadKw={metrics.telemetry.currentLoadKw}
+          grid={activeMetrics.grid}
+          solar={activeMetrics.solar}
+          battery={activeMetrics.battery}
+          generator={activeMetrics.generator}
+          totalLoadKw={activeMetrics.telemetry.currentLoadKw}
         />
 
         {/* 4. Main Two-Column Layout */}
@@ -104,18 +94,18 @@ export function OverviewClient({
           {/* Left Column (8 cols): Energy Usage Chart & Equipment Status */}
           <div className="lg:col-span-8 space-y-6">
             <EnergyUsageChart telemetry={telemetry} />
-            <EquipmentStatusTable appliances={appliances} />
+            <EquipmentStatusTable appliances={activeAppliances} />
           </div>
 
           {/* Right Column (4 cols): AI Recommendation & Active Alerts */}
           <div className="lg:col-span-4 space-y-6">
-            {recommendations.length > 0 && (
+            {activeRecommendations.length > 0 && (
               <CurrentRecommendationCard
-                initialRecommendation={recommendations[0]}
+                initialRecommendation={activeRecommendations[0]}
                 totalPendingCount={pendingRecommendationsCount}
               />
             )}
-            <ActiveAlertsCard initialAlerts={events} />
+            <ActiveAlertsCard initialAlerts={activeEvents} />
           </div>
         </div>
       </div>
