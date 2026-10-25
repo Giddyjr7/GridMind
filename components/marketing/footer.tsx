@@ -120,13 +120,13 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/privacy" className="hover:text-white transition-colors text-slate-500">
-                  Privacy Policy (Prototype Notice)
+                <Link href="/privacy" className="hover:text-white transition-colors text-slate-400">
+                  Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link href="/terms" className="hover:text-white transition-colors text-slate-500">
-                  Terms of Service (Prototype Notice)
+                <Link href="/terms" className="hover:text-white transition-colors text-slate-400">
+                  Terms of Service
                 </Link>
               </li>
             </ul>
