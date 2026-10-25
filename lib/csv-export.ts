@@ -45,7 +45,7 @@ export function exportAnalyticsToCsv(
   const lines: string[] = [];
 
   // Metadata Header
-  lines.push(escapeCsvField("GRIDMIND ENERGY INTELLIGENCE — 24-HOUR ANALYTICS & BASELINE COMPARISON"));
+  lines.push(escapeCsvField("GRIDMIND ENERGY INTELLIGENCE: 24-HOUR ANALYTICS & BASELINE COMPARISON"));
   lines.push(`Site,${escapeCsvField(siteName)}`);
   lines.push(`GeneratedAt,${escapeCsvField(new Date().toISOString())}`);
   lines.push(`Scenario,${escapeCsvField(summary.scenarioName)}`);

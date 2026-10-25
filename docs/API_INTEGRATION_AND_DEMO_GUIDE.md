@@ -1,4 +1,4 @@
-# GridMind — Backend API Integration Checklist & Hackathon Demo Guide
+# GridMind: Backend API Integration Checklist & Hackathon Demo Guide
 
 > **Phase 7 QA Deliverable**: Frontend contract specifications, backend integration boundary, and deterministic demo demonstration script for **GridMind: AI-Assisted Microgrid Intelligence**.
 

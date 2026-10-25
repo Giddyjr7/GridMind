@@ -251,7 +251,7 @@ export default function MarketingLandingPage() {
                   D. AI-Assisted Recommendations
                 </h3>
                 <p className="text-sm text-slate-600 leading-relaxed">
-                  Receive proactive dispatch suggestions before crises occur—such as pre-cooling cold storage using surplus solar power prior to an afternoon grid outage window.
+                  Receive proactive dispatch suggestions before crises occur, such as pre-cooling cold storage using surplus solar power prior to an afternoon grid outage window.
                 </p>
               </div>
 

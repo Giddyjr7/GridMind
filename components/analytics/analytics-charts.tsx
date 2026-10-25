@@ -544,7 +544,7 @@ export function AnalyticsCharts({ summary }: AnalyticsChartsProps) {
                           </div>
                           <div className="text-[10px] text-slate-400 pt-1">
                             {pt.gmSoc <= 20
-                              ? "⚠️ At Reserve Floor — Generator engaged to protect cell health"
+                              ? "⚠️ At Reserve Floor: generator engaged to protect cell health"
                               : "✅ Safe buffer maintained for blast freezers"}
                           </div>
                         </div>

@@ -75,7 +75,7 @@ export default function PrivacyPolicyPage() {
         </div>
 
         <p>
-          GridMind (referred to as <strong>&quot;GridMind,&quot; &quot;we,&quot; &quot;our,&quot;</strong> or <strong>&quot;us&quot;</strong>) provides an intelligent energy continuity and microgrid decision-support platform designed to help commercial enterprises—particularly cold-storage facilities, frozen-food processors, healthcare clinics, pharmacies, supermarkets, and decentralized energy service operators—monitor, forecast, and optimize multi-source power systems comprising national utility grids, diesel generators, solar photovoltaic (PV) arrays, and battery energy storage systems (BESS).
+          GridMind (referred to as <strong>&quot;GridMind,&quot; &quot;we,&quot; &quot;our,&quot;</strong> or <strong>&quot;us&quot;</strong>) provides an intelligent energy continuity and microgrid decision-support platform designed to help commercial enterprises (particularly cold-storage facilities, frozen-food processors, healthcare clinics, pharmacies, supermarkets, and decentralized energy service operators) monitor, forecast, and optimize multi-source power systems comprising national utility grids, diesel generators, solar photovoltaic (PV) arrays, and battery energy storage systems (BESS).
         </p>
 
         <p>
@@ -489,7 +489,7 @@ export default function PrivacyPolicyPage() {
         </p>
 
         <p className="text-xs text-slate-700 leading-relaxed">
-          Where personal data originating in Nigeria is transferred internationally, such transfers will comply with Sections 41–43 of the Nigeria Data Protection Act 2023, utilizing appropriate contractual safeguards, standard contractual clauses, or transfers to jurisdictions recognized by the Nigeria Data Protection Commission (NDPC) as providing adequate data protection.
+          Where personal data originating in Nigeria is transferred internationally, such transfers will comply with Sections 41 to 43 of the Nigeria Data Protection Act 2023, utilizing appropriate contractual safeguards, standard contractual clauses, or transfers to jurisdictions recognized by the Nigeria Data Protection Commission (NDPC) as providing adequate data protection.
         </p>
       </section>
 

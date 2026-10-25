@@ -3,7 +3,7 @@ import { AuthLayout } from "@/components/auth/auth-layout";
 import { ForgotPasswordForm } from "@/components/auth/forgot-password-form";
 
 export const metadata: Metadata = {
-  title: "Reset Password — GridMind Energy Intelligence",
+  title: "Reset Password | GridMind Energy Intelligence",
   description: "Reset your GridMind account password.",
 };
 

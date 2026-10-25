@@ -250,7 +250,7 @@ export function ApplianceDetailsModal({
                   className="w-full text-xs p-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white font-mono"
                 />
                 <span className="text-[10px] text-slate-400">
-                  Bounds: 0.5 kW – 120.0 kW
+                  Bounds: 0.5 kW to 120.0 kW
                 </span>
               </div>
 

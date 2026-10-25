@@ -29,7 +29,7 @@ export function HeroDashboardPreview() {
             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
           </span>
           <span className="text-xs font-semibold text-slate-800">
-            Krystal Ice Cold Storage — Ikeja Industrial
+            Krystal Ice Cold Storage, Ikeja Industrial
           </span>
           <Badge variant="outline" size="sm" className="text-[10px] bg-white font-bold text-slate-900 border-slate-300">
             SIMULATED BENCHMARK

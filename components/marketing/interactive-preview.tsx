@@ -315,7 +315,7 @@ export function InteractiveSimulatorPreview() {
                       </>
                     ) : (
                       <>
-                        <strong className="text-amber-400">Warning — Load Spurt:</strong> Packaging AC is adding 16 kW during outage,
+                        <strong className="text-amber-400">Warning (High Demand):</strong> Packaging AC is adding 16 kW during outage,
                         accelerating battery exhaustion. Click &quot;Curtail Packaging Floor AC&quot; to extend freezer runtime by 1.5+ hours.
                       </>
                     )}

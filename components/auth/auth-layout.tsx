@@ -65,7 +65,7 @@ export function AuthLayout({ children, heading, supportingText }: AuthLayoutProp
               <div className="flex items-center gap-2">
                 <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
                 <span className="text-xs font-semibold text-slate-200">
-                  Krystal Ice Cold Storage — Ikeja Industrial
+                  Krystal Ice Cold Storage, Ikeja Industrial
                 </span>
               </div>
               <span className="text-[10px] font-mono text-emerald-400">DEMO BENCHMARK</span>

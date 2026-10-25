@@ -1,4 +1,4 @@
-# GridMind — Pre-Production Legal & Regulatory Review Checklist
+# GridMind: Pre-Production Legal & Regulatory Review Checklist
 
 This document is an **internal compliance and operational checklist** for the GridMind project owner, corporate counsel, and engineering team. 
 
@@ -46,7 +46,7 @@ Before transitioning the GridMind Energy Continuity Intelligence Platform from h
 - [ ] **Cloud Provider Confirmation**: Identify the production cloud hosting providers (e.g. AWS, Supabase, Azure, Vercel).
 - [ ] **Data Residency & Cross-Border Transfers**:
   - Document international hosting regions (EU, US, South Africa).
-  - Confirm compliance with Sections 41–43 of the NDPA 2023 regarding cross-border data transfer mechanisms (Standard Contractual Clauses or NDPC white-listed jurisdictions).
+  - Confirm compliance with Sections 41 to 43 of the NDPA 2023 regarding cross-border data transfer mechanisms (Standard Contractual Clauses or NDPC white-listed jurisdictions).
 - [ ] **Database Encryption**: Enforce AES-256 encryption at rest and TLS 1.3 in transit across all telemetry and customer databases.
 
 ## 7. AI & Optimization Logic Disclosures
@@ -65,4 +65,4 @@ Before transitioning the GridMind Energy Continuity Intelligence Platform from h
 
 ---
 
-*Document Status: Draft v1.0 — Pending Corporate Legal Counsel Sign-off.*
+*Document Status: Draft v1.0, pending corporate legal counsel sign-off.*

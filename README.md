@@ -1,4 +1,4 @@
-# GridMind — Frontend Engineering Foundation (Phase 0)
+# GridMind: Frontend Engineering Foundation (Phase 0)
 
 GridMind is an energy continuity intelligence platform designed for commercial and industrial facilities operating in challenging grid environments (such as Nigeria). It optimizes energy dispatch and protects critical loads across a combination of:
 - **National Grid Electricity** (e.g., Ikeja Electric Band A)

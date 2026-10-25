@@ -178,7 +178,7 @@ export default function TermsOfServicePage() {
         </div>
 
         <p className="text-xs text-slate-500 italic">
-          * Architectural Boundary: Certain advanced capabilities—such as automatic Modbus-RTU / MQTT physical relay actuation, automated utility tariff synchronizations, and live weather radar integration—represent planned production features that require hardware commissioning and are not claimed as active in the standalone prototype.
+          * Architectural Boundary: Certain advanced capabilities (such as automatic Modbus-RTU / MQTT physical relay actuation, automated utility tariff synchronizations, and live weather radar integration) represent planned production features that require hardware commissioning and are not claimed as active in the standalone prototype.
         </p>
       </section>
 
@@ -201,7 +201,7 @@ export default function TermsOfServicePage() {
             <span>Essential Evaluation Caveat</span>
           </div>
           <p className="leading-relaxed">
-            You expressly acknowledge that the current build of GridMind utilizes synthetic mathematical models (such as the simulated 150 kW cold-storage facility &quot;Krystal Ice Ltd.&quot; in Ikeja Industrial Estate). Simulated values—including battery runtime hours, grid Band A tariff rates (₦206/kWh), diesel consumption figures, and avoided generator expenditures—are illustrative benchmarks.
+            You expressly acknowledge that the current build of GridMind utilizes synthetic mathematical models (such as the simulated 150 kW cold-storage facility &quot;Krystal Ice Ltd.&quot; in Ikeja Industrial Estate). Simulated values, including battery runtime hours, grid Band A tariff rates of ₦206/kWh, diesel consumption figures, and avoided generator expenditures, are illustrative benchmarks.
           </p>
           <ul className="list-disc pl-5 space-y-1 text-slate-800">
             <li>Demonstration outputs do not guarantee verified financial savings or operational performance in real-world facilities.</li>
@@ -499,7 +499,7 @@ export default function TermsOfServicePage() {
             Statutory Legal Qualifications under Nigerian Law:
           </p>
           <p className="leading-relaxed">
-            TO THE MAXIMUM EXTENT PERMITTED BY THE LAWS OF THE FEDERAL REPUBLIC OF NIGERIA, IN NO EVENT SHALL GRIDMIND, ITS DIRECTORS, EMPLOYEES, AGENTS, OR AFFILIATES BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, EXEMPLARY, OR PUNITIVE DAMAGES—INCLUDING DAMAGES FOR LOSS OF PROFITS, SPOILAGE OF COLD-ROOM INVENTORY, DRUG OR VACCINE DEGRADATION, EQUIPMENT REPAIR COSTS, BUSINESS INTERRUPTION, LOSS OF DATA, OR COST OF SUBSTITUTE POWER GENERATION—ARISING OUT OF OR RELATED TO YOUR USE OF OR INABILITY TO USE THE PLATFORM OR RELIANCE UPON ANY SIMULATED OR AI-GENERATED RECOMMENDATION.
+            TO THE MAXIMUM EXTENT PERMITTED BY THE LAWS OF THE FEDERAL REPUBLIC OF NIGERIA, IN NO EVENT SHALL GRIDMIND, ITS DIRECTORS, EMPLOYEES, AGENTS, OR AFFILIATES BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, EXEMPLARY, OR PUNITIVE DAMAGES (INCLUDING DAMAGES FOR LOSS OF PROFITS, SPOILAGE OF COLD-ROOM INVENTORY, DRUG OR VACCINE DEGRADATION, EQUIPMENT REPAIR COSTS, BUSINESS INTERRUPTION, LOSS OF DATA, OR COST OF SUBSTITUTE POWER GENERATION), ARISING OUT OF OR RELATED TO YOUR USE OF OR INABILITY TO USE THE PLATFORM OR RELIANCE UPON ANY SIMULATED OR AI-GENERATED RECOMMENDATION.
           </p>
           <p className="leading-relaxed">
             FOR THE FREE DEMONSTRATION PROTOTYPE, GRIDMIND&apos;S TOTAL AGGREGATE LIABILITY UNDER THESE TERMS SHALL BE STRICTLY LIMITED TO DIRECT DAMAGES NOT EXCEEDING THE SUM OF <strong>TEN THOUSAND NIGERIAN NAIRA (₦10,000 NGN)</strong> OR THE MINIMUM AMOUNT ENFORCEABLE UNDER APPLICABLE STATUTES.

@@ -3,7 +3,7 @@ import { AuthLayout } from "@/components/auth/auth-layout";
 import { SignupForm } from "@/components/auth/signup-form";
 
 export const metadata: Metadata = {
-  title: "Create Account — GridMind Energy Intelligence",
+  title: "Create Account | GridMind Energy Intelligence",
   description: "Create your GridMind account to explore smarter energy management and load continuity.",
 };
 
