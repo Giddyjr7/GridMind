@@ -45,7 +45,7 @@ export function Navbar() {
               <span className="font-bold text-lg tracking-tight text-slate-900 group-hover:text-brand-950 transition-colors">
                 GridMind
               </span>
-              <span className="text-[10px] font-semibold tracking-wider uppercase text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200/80">
+              <span className="text-[10px] font-bold tracking-wider uppercase text-emerald-950 bg-emerald-100 px-1.5 py-0.5 rounded border border-emerald-300">
                 Intelligence
               </span>
             </div>

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
-import { Badge } from "./badge";
+import { Badge, BadgeVariant } from "./badge";
 
 export interface MetricCardProps {
   label: string;
@@ -8,7 +8,7 @@ export interface MetricCardProps {
   unit?: string;
   subValue?: string;
   badgeText?: string;
-  badgeVariant?: "healthy" | "warning" | "critical" | "info" | "neutral";
+  badgeVariant?: BadgeVariant;
   icon?: React.ReactNode;
   className?: string;
 }
@@ -31,11 +31,11 @@ export function MetricCard({
       )}
     >
       <div className="flex items-center justify-between">
-        <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+        <span className="text-xs font-semibold text-slate-600 uppercase tracking-wider">
           {label}
         </span>
         {icon && (
-          <div className="text-slate-400 p-1 rounded-md bg-slate-50">
+          <div className="text-slate-600 p-1.5 rounded-lg bg-slate-100 border border-slate-200">
             {icon}
           </div>
         )}
@@ -46,17 +46,17 @@ export function MetricCard({
           {value}
         </span>
         {unit && (
-          <span className="text-xs font-medium text-slate-500">
+          <span className="text-xs font-semibold text-slate-600">
             {unit}
           </span>
         )}
       </div>
 
       {(subValue || badgeText) && (
-        <div className="mt-3 flex items-center justify-between text-xs text-slate-500 border-t border-slate-50 pt-2">
-          <span>{subValue}</span>
+        <div className="mt-3 flex items-center justify-between text-xs text-slate-600 border-t border-slate-100 pt-2 gap-2">
+          <span className="truncate">{subValue}</span>
           {badgeText && (
-            <Badge variant={badgeVariant} size="sm">
+            <Badge variant={badgeVariant} size="sm" className="shrink-0 font-medium">
               {badgeText}
             </Badge>
           )}

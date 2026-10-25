@@ -384,16 +384,16 @@ export default function HistoryPage() {
                             <Badge
                               variant={isApproved ? "healthy" : "critical"}
                               size="sm"
-                              className="capitalize font-mono text-[10px]"
+                              className="capitalize font-mono text-[10px] font-bold"
                             >
                               {isApproved ? "Authorized & Applied" : "Declined by Operator"}
                             </Badge>
-                            <span className="text-[10px] font-mono text-slate-400">
+                            <span className="text-[10px] font-mono text-slate-500 font-semibold">
                               Ref: {record.recommendationId}
                             </span>
-                            <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-100/70 px-1.5 py-0.2 rounded">
+                            <Badge variant="warning" size="sm" className="font-mono text-[9px] uppercase font-bold">
                               [SIMULATED]
-                            </span>
+                            </Badge>
                           </div>
 
                           <p className="text-xs text-slate-600 leading-relaxed">
@@ -462,17 +462,17 @@ export default function HistoryPage() {
                             <span className="text-sm font-bold text-slate-900">
                               {record.title}
                             </span>
-                            <span className="text-[10px] font-mono text-slate-400">
+                            <span className="text-[10px] font-mono text-slate-500 font-semibold">
                               ID: {record.id}
                             </span>
-                            <span className="text-[10px] font-mono uppercase bg-slate-100 text-slate-600 px-1.5 py-0.2 rounded border border-slate-200">
+                            <Badge variant="neutral" size="sm" className="text-[9px] font-mono uppercase">
                               {record.category.replace("_", " ")}
-                            </span>
-                            <span className="text-[10px] font-mono font-bold text-amber-800 bg-amber-100/70 px-1.5 py-0.2 rounded">
+                            </Badge>
+                            <Badge variant="warning" size="sm" className="font-mono text-[9px] uppercase font-bold">
                               [SIMULATED]
-                            </span>
+                            </Badge>
                             {record.sourceAsset && (
-                              <Badge variant="neutral" size="sm" className="capitalize text-[10px]">
+                              <Badge variant="neutral" size="sm" className="capitalize text-[9px]">
                                 Source: {record.sourceAsset}
                               </Badge>
                             )}

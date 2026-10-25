@@ -3,6 +3,7 @@
 import * as React from "react";
 import { Coins, Zap, Fuel, BatteryCharging, ShieldCheck, TrendingDown } from "lucide-react";
 import { MetricCard } from "@/components/ui/metric-card";
+import { Badge } from "@/components/ui/badge";
 import { AnalyticsSummary } from "@/lib/analytics-engine";
 import { formatCurrency } from "@/lib/formatters";
 
@@ -16,16 +17,16 @@ export function AnalyticsKpiStrip({ summary }: AnalyticsKpiStripProps) {
   return (
     <div className="space-y-3">
       {/* Simulation Estimation Notice */}
-      <div className="flex items-center justify-between text-[11px] px-3.5 py-2 bg-emerald-50/70 border border-emerald-200/80 rounded-xl text-emerald-950">
+      <div className="flex items-center justify-between text-[11px] px-3.5 py-2 bg-emerald-50 border border-emerald-300 rounded-xl text-emerald-950">
         <div className="flex items-center gap-2">
-          <span className="font-mono font-bold text-emerald-800 bg-emerald-200/70 px-1.5 py-0.5 rounded text-[10px]">
+          <Badge variant="warning" size="sm" className="font-mono text-[9px] uppercase font-bold">
             SIMULATED 24H BENCHMARK
-          </span>
+          </Badge>
           <span>
-            Modeled under scenario: <strong className="font-semibold text-emerald-900">{summary.scenarioName}</strong> ({summary.outageHoursCount}h grid outage).
+            Modeled under scenario: <strong className="font-bold text-emerald-950">{summary.scenarioName}</strong> ({summary.outageHoursCount}h grid outage).
           </span>
         </div>
-        <span className="text-[10px] text-emerald-700/80 hidden sm:inline">
+        <span className="text-[10px] text-emerald-800 font-medium hidden sm:inline">
           Deterministic energy balance calculations • Not live customer billing
         </span>
       </div>

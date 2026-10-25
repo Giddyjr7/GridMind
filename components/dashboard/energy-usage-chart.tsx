@@ -67,16 +67,16 @@ export function EnergyUsageChart({ telemetry }: EnergyUsageChartProps) {
           </div>
 
           {/* Time Range Selector */}
-          <div className="inline-flex items-center rounded-lg border border-slate-200 p-0.5 bg-slate-50 text-xs">
+          <div className="inline-flex items-center rounded-lg border border-slate-200 p-0.5 bg-slate-100 text-xs">
             {(["6h", "12h", "24h"] as const).map((range) => (
               <button
                 key={range}
                 type="button"
                 onClick={() => setTimeRange(range)}
-                className={`px-3 py-1 rounded-md font-semibold transition-colors uppercase ${
+                className={`px-3 py-1 rounded-md font-bold transition-colors uppercase ${
                   timeRange === range
-                    ? "bg-white text-brand-950 shadow-sm border border-slate-200/80"
-                    : "text-slate-500 hover:text-slate-800"
+                    ? "bg-white text-slate-950 shadow-xs border border-slate-300"
+                    : "text-slate-700 hover:text-slate-950"
                 }`}
               >
                 {range}

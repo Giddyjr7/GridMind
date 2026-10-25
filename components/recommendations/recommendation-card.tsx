@@ -80,9 +80,9 @@ export function RecommendationCard({
                 <CardTitle className="text-base font-bold text-slate-900 leading-snug">
                   {recommendation.title}
                 </CardTitle>
-                <span className="text-[10px] font-mono font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-200 uppercase">
+                <Badge variant="warning" size="sm" className="font-mono text-[10px] uppercase font-bold">
                   Deterministic Rule
-                </span>
+                </Badge>
               </div>
               <CardDescription suppressHydrationWarning className="text-xs text-slate-500 mt-0.5">
                 Target Asset: <strong className="text-slate-700">{recommendation.targetApplianceName}</strong>
@@ -108,7 +108,7 @@ export function RecommendationCard({
                 ? "Declined"
                 : "Pending Authorization"}
             </Badge>
-            <span className="text-xs font-mono font-semibold text-slate-600 bg-slate-100 px-2 py-1 rounded border border-slate-200">
+            <span className="text-xs font-mono font-bold text-slate-900 bg-white px-2.5 py-1 rounded border border-slate-300 shadow-2xs">
               {recommendation.confidencePct}% Confidence
             </span>
           </div>
@@ -180,9 +180,9 @@ export function RecommendationCard({
               {recommendation.relevantInputs.map((input, idx) => (
                 <span
                   key={idx}
-                  className="text-[11px] font-mono text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200"
+                  className="text-[11px] font-mono text-slate-900 bg-slate-100 px-2 py-0.5 rounded border border-slate-300 font-medium"
                 >
-                  <strong className="text-slate-500">{input.label}:</strong> {input.value}
+                  <strong className="text-slate-700">{input.label}:</strong> {input.value}
                 </span>
               ))}
             </div>

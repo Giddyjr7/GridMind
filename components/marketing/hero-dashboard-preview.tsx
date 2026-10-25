@@ -31,7 +31,7 @@ export function HeroDashboardPreview() {
           <span className="text-xs font-semibold text-slate-800">
             Krystal Ice Cold Storage — Ikeja Industrial
           </span>
-          <Badge variant="outline" size="sm" className="text-[10px] bg-white font-medium text-slate-600">
+          <Badge variant="outline" size="sm" className="text-[10px] bg-white font-bold text-slate-900 border-slate-300">
             SIMULATED BENCHMARK
           </Badge>
         </div>
@@ -118,7 +118,7 @@ export function HeroDashboardPreview() {
               </p>
             </div>
             <div className="text-right">
-              <Badge variant="healthy" size="sm" className="bg-emerald-100 text-emerald-800">
+              <Badge variant="healthy" size="sm">
                 Safe Buffer
               </Badge>
               <p className="text-[10px] text-slate-500 mt-1">Curtailed non-essentials</p>
@@ -159,7 +159,7 @@ export function HeroDashboardPreview() {
                   <span className="h-2 w-2 rounded-full bg-slate-300" />
                   <span className="line-through text-[11px]">Packaging HVAC 1 & 2</span>
                 </div>
-                <span className="text-[10px] font-medium text-amber-700 bg-amber-50 px-1 rounded">
+                <span className="text-[10px] font-bold text-amber-950 bg-amber-100 border border-amber-300 px-1.5 py-0.5 rounded">
                   Curtailed (Saved ₦14,200/h)
                 </span>
               </div>

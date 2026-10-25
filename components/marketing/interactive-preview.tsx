@@ -70,7 +70,7 @@ export function InteractiveSimulatorPreview() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Section Heading */}
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <Badge variant="healthy" size="md" className="mb-3 bg-emerald-950 text-emerald-300 border-emerald-800">
+          <Badge variant="healthy" size="md" className="mb-3 font-bold">
             Interactive Product Preview
           </Badge>
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">
@@ -91,9 +91,9 @@ export function InteractiveSimulatorPreview() {
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-sm font-semibold text-white">Scenario: Outage Mitigation & Load Shedding</span>
-                <span className="text-xs text-amber-400 font-mono bg-amber-950/60 px-2 py-0.5 rounded border border-amber-800/70">
+                <Badge variant={gridOnline ? "healthy" : "warning"} size="sm" className="font-mono text-xs font-bold">
                   {gridOnline ? "GRID CONNECTED" : "FEEDER DROPPED (OUTAGE)"}
-                </span>
+                </Badge>
               </div>
               <p className="text-xs text-slate-400 mt-0.5">
                 Simulating: 150 kW Cold Storage Facility with 75 kWp Solar + 120 kWh Battery
@@ -302,7 +302,7 @@ export function InteractiveSimulatorPreview() {
                       </div>
                       <span className="text-xs font-bold text-white">Continuity Optimization</span>
                     </div>
-                    <Badge variant="healthy" size="sm" className="bg-emerald-950 text-emerald-400 border-emerald-800">
+                    <Badge variant="healthy" size="sm" className="font-bold">
                       High Confidence
                     </Badge>
                   </div>

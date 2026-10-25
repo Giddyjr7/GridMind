@@ -1,8 +1,28 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
+export type BadgeVariant =
+  | "default"
+  | "healthy"
+  | "healthy-high"
+  | "solid-healthy"
+  | "warning"
+  | "warning-high"
+  | "solid-warning"
+  | "critical"
+  | "critical-high"
+  | "solid-critical"
+  | "info"
+  | "info-high"
+  | "solid-info"
+  | "neutral"
+  | "neutral-high"
+  | "solid-neutral"
+  | "brand"
+  | "outline";
+
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
-  variant?: "default" | "healthy" | "warning" | "critical" | "info" | "neutral" | "outline";
+  variant?: BadgeVariant;
   size?: "sm" | "md";
 }
 
@@ -13,26 +33,50 @@ export function Badge({
   children,
   ...props
 }: BadgeProps) {
-  const variantStyles = {
-    default: "bg-brand-900 text-brand-50 border-transparent",
-    healthy: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800",
-    warning: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-800",
-    critical: "bg-red-50 text-red-700 border-red-200 dark:bg-red-950/40 dark:text-red-400 dark:border-red-800",
-    info: "bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/40 dark:text-sky-400 dark:border-sky-800",
-    neutral: "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700",
-    outline: "border-slate-300 text-slate-700 bg-transparent dark:border-slate-700 dark:text-slate-300",
-  }[variant];
+  const variantStyles: Record<BadgeVariant, string> = {
+    // Brand
+    default: "bg-brand-950 text-white border-transparent shadow-xs font-semibold",
+    brand: "bg-brand-950 text-white border-brand-800 shadow-xs font-semibold",
+
+    // Success / Protected / Online (Green/Emerald)
+    healthy: "bg-emerald-100 text-emerald-950 border-emerald-300 font-semibold",
+    "healthy-high": "bg-emerald-700 text-white border-emerald-800 font-semibold shadow-xs",
+    "solid-healthy": "bg-emerald-700 text-white border-emerald-800 font-semibold shadow-xs",
+
+    // Warning / Simulation / Benchmark (Amber/Yellow)
+    warning: "bg-amber-100 text-amber-950 border-amber-300 font-semibold",
+    "warning-high": "bg-amber-500 text-slate-950 border-amber-600 font-bold shadow-xs",
+    "solid-warning": "bg-amber-500 text-slate-950 border-amber-600 font-bold shadow-xs",
+
+    // Critical / Outage / Hazard (Red/Rose)
+    critical: "bg-rose-100 text-rose-950 border-rose-300 font-semibold",
+    "critical-high": "bg-rose-700 text-white border-rose-800 font-semibold shadow-xs",
+    "solid-critical": "bg-rose-700 text-white border-rose-800 font-semibold shadow-xs",
+
+    // Info / Mode / Status (Sky/Navy)
+    info: "bg-sky-100 text-sky-950 border-sky-300 font-semibold",
+    "info-high": "bg-sky-800 text-white border-sky-900 font-semibold shadow-xs",
+    "solid-info": "bg-sky-800 text-white border-sky-900 font-semibold shadow-xs",
+
+    // Neutral / Standby / Holding (Slate/Zinc)
+    neutral: "bg-slate-100 text-slate-900 border-slate-300 font-semibold",
+    "neutral-high": "bg-slate-800 text-white border-slate-900 font-semibold shadow-xs",
+    "solid-neutral": "bg-slate-800 text-white border-slate-900 font-semibold shadow-xs",
+
+    // Outline
+    outline: "bg-white text-slate-900 border-slate-300 font-semibold",
+  };
 
   const sizeStyles = {
-    sm: "px-2 py-0.5 text-xs font-medium",
-    md: "px-2.5 py-1 text-xs font-semibold",
+    sm: "px-2.5 py-0.5 text-xs",
+    md: "px-3 py-1 text-xs",
   }[size];
 
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full border transition-colors",
-        variantStyles,
+        "inline-flex items-center gap-1.5 rounded-full border transition-colors leading-none tracking-normal select-none",
+        variantStyles[variant] || variantStyles.default,
         sizeStyles,
         className
       )}

@@ -93,13 +93,13 @@ export function ActiveAlertsCard({ initialAlerts }: ActiveAlertsCardProps) {
               <CardTitle className="text-base font-semibold text-slate-900 flex items-center gap-2">
                 Operational Alerts
                 {activeCount > 0 ? (
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-rose-100 text-rose-700 border border-rose-200">
+                  <Badge variant="critical" size="sm" className="font-bold">
                     {activeCount} Active
-                  </span>
+                  </Badge>
                 ) : (
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200">
+                  <Badge variant="healthy" size="sm" className="font-bold">
                     All Clear
-                  </span>
+                  </Badge>
                 )}
               </CardTitle>
               <p className="text-xs text-slate-500">
@@ -108,14 +108,14 @@ export function ActiveAlertsCard({ initialAlerts }: ActiveAlertsCardProps) {
             </div>
           </div>
 
-          <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-xs">
+          <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg border border-slate-300 text-xs">
             <button
               type="button"
               onClick={() => setFilter("active")}
-              className={`px-2.5 py-1 rounded font-medium transition-colors ${
+              className={`px-2.5 py-1 rounded font-bold transition-colors ${
                 filter === "active"
-                  ? "bg-white text-slate-900 shadow-xs"
-                  : "text-slate-500 hover:text-slate-800"
+                  ? "bg-white text-slate-900 shadow-xs border border-slate-200"
+                  : "text-slate-700 hover:text-slate-950 font-semibold"
               }`}
             >
               Active ({activeCount})
@@ -123,10 +123,10 @@ export function ActiveAlertsCard({ initialAlerts }: ActiveAlertsCardProps) {
             <button
               type="button"
               onClick={() => setFilter("all")}
-              className={`px-2.5 py-1 rounded font-medium transition-colors ${
+              className={`px-2.5 py-1 rounded font-bold transition-colors ${
                 filter === "all"
-                  ? "bg-white text-slate-900 shadow-xs"
-                  : "text-slate-500 hover:text-slate-800"
+                  ? "bg-white text-slate-900 shadow-xs border border-slate-200"
+                  : "text-slate-700 hover:text-slate-950 font-semibold"
               }`}
             >
               All ({alerts.length})

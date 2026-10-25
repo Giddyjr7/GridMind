@@ -198,16 +198,16 @@ export function SimulationControlPanel() {
             </div>
 
             {/* Quick Presets */}
-            <div className="grid grid-cols-4 gap-1 pt-0.5">
+            <div className="grid grid-cols-4 gap-1.5 pt-0.5">
               {[20, 50, 68, 90].map((soc) => (
                 <button
                   key={soc}
                   type="button"
                   onClick={() => setBatterySoc(soc)}
-                  className={`text-[10px] py-1 rounded font-medium border transition-colors ${
+                  className={`text-[11px] py-1 rounded-md border transition-colors ${
                     params.batterySocPct === soc
-                      ? "bg-emerald-700 text-white border-emerald-700 font-bold"
-                      : "bg-white text-slate-600 border-slate-200 hover:bg-slate-100"
+                      ? "bg-emerald-700 text-white border-emerald-800 font-bold shadow-xs"
+                      : "bg-white text-slate-900 border-slate-300 hover:bg-slate-100 font-semibold"
                   }`}
                 >
                   {soc}%
@@ -253,14 +253,14 @@ export function SimulationControlPanel() {
             </div>
 
             {/* Quick Presets */}
-            <div className="grid grid-cols-3 gap-1 pt-0.5">
+            <div className="grid grid-cols-3 gap-1.5 pt-0.5">
               <button
                 type="button"
                 onClick={() => setSolarGenerationKw(0)}
-                className={`text-[10px] py-1 rounded font-medium border transition-colors ${
+                className={`text-[11px] py-1 rounded-md border transition-colors ${
                   params.solarGenerationKw === 0
-                    ? "bg-amber-600 text-white border-amber-600 font-bold"
-                    : "bg-white text-slate-600 border-slate-200 hover:bg-slate-100"
+                    ? "bg-amber-500 text-slate-950 border-amber-600 font-bold shadow-xs"
+                    : "bg-white text-slate-900 border-slate-300 hover:bg-slate-100 font-semibold"
                 }`}
               >
                 Night (0kW)
@@ -268,10 +268,10 @@ export function SimulationControlPanel() {
               <button
                 type="button"
                 onClick={() => setSolarGenerationKw(24)}
-                className={`text-[10px] py-1 rounded font-medium border transition-colors ${
+                className={`text-[11px] py-1 rounded-md border transition-colors ${
                   params.solarGenerationKw === 24
-                    ? "bg-amber-600 text-white border-amber-600 font-bold"
-                    : "bg-white text-slate-600 border-slate-200 hover:bg-slate-100"
+                    ? "bg-amber-500 text-slate-950 border-amber-600 font-bold shadow-xs"
+                    : "bg-white text-slate-900 border-slate-300 hover:bg-slate-100 font-semibold"
                 }`}
               >
                 Overcast (24kW)
@@ -279,10 +279,10 @@ export function SimulationControlPanel() {
               <button
                 type="button"
                 onClick={() => setSolarGenerationKw(48)}
-                className={`text-[10px] py-1 rounded font-medium border transition-colors ${
+                className={`text-[11px] py-1 rounded-md border transition-colors ${
                   params.solarGenerationKw === 48
-                    ? "bg-amber-600 text-white border-amber-600 font-bold"
-                    : "bg-white text-slate-600 border-slate-200 hover:bg-slate-100"
+                    ? "bg-amber-500 text-slate-950 border-amber-600 font-bold shadow-xs"
+                    : "bg-white text-slate-900 border-slate-300 hover:bg-slate-100 font-semibold"
                 }`}
               >
                 Clear Sun (48kW)
@@ -316,14 +316,14 @@ export function SimulationControlPanel() {
               Cummins 160kVA prime genset. ₦1,250/L diesel (0.28 L/kWh burn rate).
             </p>
 
-            <div className="grid grid-cols-3 gap-1 pt-1">
+            <div className="grid grid-cols-3 gap-1.5 pt-1">
               <button
                 type="button"
                 onClick={() => setGeneratorMode("standby")}
-                className={`text-[10px] py-1 rounded font-medium border transition-colors ${
+                className={`text-[11px] py-1 rounded-md border transition-colors ${
                   params.generatorMode === "standby"
-                    ? "bg-slate-800 text-white border-slate-800 font-bold"
-                    : "bg-white text-slate-600 border-slate-200 hover:bg-slate-100"
+                    ? "bg-slate-900 text-white border-slate-950 font-bold shadow-xs"
+                    : "bg-white text-slate-900 border-slate-300 hover:bg-slate-100 font-semibold"
                 }`}
               >
                 Auto Standby
@@ -331,10 +331,10 @@ export function SimulationControlPanel() {
               <button
                 type="button"
                 onClick={() => setGeneratorMode("running")}
-                className={`text-[10px] py-1 rounded font-medium border transition-colors ${
+                className={`text-[11px] py-1 rounded-md border transition-colors ${
                   params.generatorMode === "running"
-                    ? "bg-amber-600 text-white border-amber-600 font-bold"
-                    : "bg-white text-slate-600 border-slate-200 hover:bg-slate-100"
+                    ? "bg-amber-500 text-slate-950 border-amber-600 font-bold shadow-xs"
+                    : "bg-white text-slate-900 border-slate-300 hover:bg-slate-100 font-semibold"
                 }`}
               >
                 Force Run
@@ -342,10 +342,10 @@ export function SimulationControlPanel() {
               <button
                 type="button"
                 onClick={() => setGeneratorMode("disabled")}
-                className={`text-[10px] py-1 rounded font-medium border transition-colors ${
+                className={`text-[11px] py-1 rounded-md border transition-colors ${
                   params.generatorMode === "disabled"
-                    ? "bg-rose-700 text-white border-rose-700 font-bold"
-                    : "bg-white text-slate-600 border-slate-200 hover:bg-slate-100"
+                    ? "bg-rose-700 text-white border-rose-800 font-bold shadow-xs"
+                    : "bg-white text-slate-900 border-slate-300 hover:bg-slate-100 font-semibold"
                 }`}
               >
                 Lockout

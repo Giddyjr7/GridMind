@@ -74,7 +74,7 @@ export function DashboardHeader({
               Contracted Capacity: <strong className="text-slate-800">{site.contractedDemandKw} kW</strong>
             </span>
             <span className="hidden sm:inline text-slate-300">•</span>
-            <span className="font-mono text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+            <span className="font-mono text-emerald-950 bg-emerald-100 px-2.5 py-1 rounded-md border border-emerald-300 font-bold">
               Tariff: ₦{grid.tariffPerKwh}/kWh (IE 11kV Industrial)
             </span>
           </div>

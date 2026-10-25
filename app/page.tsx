@@ -51,7 +51,7 @@ export default function MarketingLandingPage() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
               {/* Left Column: Core Positioning Copy & CTAs */}
               <div className="lg:col-span-6 space-y-6">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-brand-200/80 bg-brand-50/80 text-brand-950 text-xs font-medium">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-brand-300 bg-brand-100 text-brand-950 text-xs font-semibold">
                   <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                   AI-Assisted Energy Continuity Intelligence
                 </div>
@@ -527,7 +527,7 @@ export default function MarketingLandingPage() {
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.12),transparent_50%)]" />
 
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 space-y-6">
-            <Badge variant="healthy" size="md" className="bg-emerald-950 text-emerald-300 border-emerald-800">
+            <Badge variant="healthy" size="md" className="font-bold">
               Get Started with GridMind
             </Badge>
 

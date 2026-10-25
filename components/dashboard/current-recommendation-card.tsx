@@ -69,9 +69,9 @@ export function CurrentRecommendationCard({
               <CardTitle className="text-base font-semibold text-slate-900">
                 Recommended Action
               </CardTitle>
-              <span className="text-[11px] font-semibold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-200">
+              <Badge variant="healthy" size="sm" className="font-bold">
                 AI Optimization
-              </span>
+              </Badge>
             </div>
             <p className="text-xs text-slate-500">
               Continuous tariff and thermal storage optimization
@@ -80,7 +80,7 @@ export function CurrentRecommendationCard({
         </div>
 
         <div className="flex items-center gap-1.5">
-          <span className="text-xs font-semibold text-slate-600 bg-white px-2 py-1 rounded border border-slate-200 shadow-xs">
+          <span className="text-xs font-bold text-slate-900 bg-white px-2.5 py-1 rounded border border-slate-300 shadow-xs">
             {recommendation.confidencePct}% Confidence
           </span>
         </div>

@@ -69,7 +69,7 @@ export function EquipmentCard({
                 </Badge>
               )}
               {appliance.temperatureCritical && (
-                <span className="text-[10px] font-mono font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200/80">
+                <span className="text-[10px] font-mono font-bold text-sky-950 bg-sky-100 px-2 py-0.5 rounded border border-sky-300">
                   {appliance.temperatureCritical.currentTempCelsius}°C (Target: {appliance.temperatureCritical.targetCelsius}°C)
                 </span>
               )}
@@ -118,17 +118,17 @@ export function EquipmentCard({
 
           {/* Attribution Badge */}
           <div className="text-right hidden md:block">
-            <span className="text-slate-400 block text-[10px] uppercase font-semibold">
+            <span className="text-slate-500 block text-[10px] uppercase font-bold">
               Control
             </span>
             {appliance.isManualOverride ? (
-              <Badge variant="outline" size="sm" className="text-[10px] flex items-center gap-1 bg-slate-50">
-                <User className="w-3 h-3 text-slate-500" />
+              <Badge variant="outline" size="sm" className="text-[10px] flex items-center gap-1 bg-slate-100 text-slate-900 border-slate-300 font-semibold">
+                <User className="w-3 h-3 text-slate-700" />
                 Manual
               </Badge>
             ) : (
-              <Badge variant="healthy" size="sm" className="text-[10px] flex items-center gap-1">
-                <Cpu className="w-3 h-3" />
+              <Badge variant="healthy" size="sm" className="text-[10px] flex items-center gap-1 font-semibold">
+                <Cpu className="w-3 h-3 text-emerald-950" />
                 AI Policy
               </Badge>
             )}
@@ -136,7 +136,7 @@ export function EquipmentCard({
 
           {/* Circuit Operating State Badge */}
           <div className="text-right">
-            <span className="text-slate-400 block text-[10px] uppercase font-semibold">
+            <span className="text-slate-500 block text-[10px] uppercase font-bold">
               State
             </span>
             <Badge
@@ -158,9 +158,13 @@ export function EquipmentCard({
           <div className="flex items-center gap-2">
             <Button
               size="sm"
-              variant="outline"
+              variant={isRunning ? "outline" : "primary"}
               onClick={() => onToggleState(appliance.id, appliance.state)}
-              className="text-xs h-8"
+              className={`text-xs h-8 font-semibold ${
+                isRunning
+                  ? "border-slate-300 text-slate-800 hover:bg-slate-100"
+                  : "bg-emerald-700 hover:bg-emerald-800 text-white"
+              }`}
             >
               {isRunning ? "Curtail" : "Engage"}
             </Button>
@@ -169,7 +173,7 @@ export function EquipmentCard({
               size="sm"
               variant="outline"
               onClick={() => onOpenDetails(appliance)}
-              className="text-xs h-8 text-emerald-800 border-emerald-200 hover:bg-emerald-50"
+              className="text-xs h-8 text-emerald-900 border-emerald-300 hover:bg-emerald-50 font-semibold"
             >
               <Settings className="w-3.5 h-3.5 mr-1 text-emerald-700" />
               Configure

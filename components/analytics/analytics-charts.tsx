@@ -102,14 +102,14 @@ export function AnalyticsCharts({ summary }: AnalyticsChartsProps) {
           </div>
 
           {/* Chart View Tabs */}
-          <div className="flex flex-wrap items-center gap-1 bg-slate-200/70 p-1 rounded-xl text-xs font-medium">
+          <div className="flex flex-wrap items-center gap-1 bg-slate-100 p-1 rounded-xl text-xs font-semibold border border-slate-200">
             <button
               type="button"
               onClick={() => setActiveTab("consumption")}
               className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors ${
                 activeTab === "consumption"
-                  ? "bg-white text-slate-900 shadow-xs font-semibold"
-                  : "text-slate-600 hover:text-slate-900"
+                  ? "bg-white text-slate-900 shadow-xs border border-slate-300 font-bold"
+                  : "text-slate-700 hover:text-slate-950 hover:bg-white/60 font-semibold"
               }`}
             >
               <Zap className="w-3.5 h-3.5 text-amber-500" />
@@ -121,8 +121,8 @@ export function AnalyticsCharts({ summary }: AnalyticsChartsProps) {
               onClick={() => setActiveTab("sources")}
               className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors ${
                 activeTab === "sources"
-                  ? "bg-white text-slate-900 shadow-xs font-semibold"
-                  : "text-slate-600 hover:text-slate-900"
+                  ? "bg-white text-slate-900 shadow-xs border border-slate-300 font-bold"
+                  : "text-slate-700 hover:text-slate-950 hover:bg-white/60 font-semibold"
               }`}
             >
               <Layers className="w-3.5 h-3.5 text-emerald-600" />
@@ -134,8 +134,8 @@ export function AnalyticsCharts({ summary }: AnalyticsChartsProps) {
               onClick={() => setActiveTab("cost")}
               className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors ${
                 activeTab === "cost"
-                  ? "bg-white text-slate-900 shadow-xs font-semibold"
-                  : "text-slate-600 hover:text-slate-900"
+                  ? "bg-white text-slate-900 shadow-xs border border-slate-300 font-bold"
+                  : "text-slate-700 hover:text-slate-950 hover:bg-white/60 font-semibold"
               }`}
             >
               <Coins className="w-3.5 h-3.5 text-teal-600" />
@@ -147,8 +147,8 @@ export function AnalyticsCharts({ summary }: AnalyticsChartsProps) {
               onClick={() => setActiveTab("battery")}
               className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors ${
                 activeTab === "battery"
-                  ? "bg-white text-slate-900 shadow-xs font-semibold"
-                  : "text-slate-600 hover:text-slate-900"
+                  ? "bg-white text-slate-900 shadow-xs border border-slate-300 font-bold"
+                  : "text-slate-700 hover:text-slate-950 hover:bg-white/60 font-semibold"
               }`}
             >
               <BatteryCharging className="w-3.5 h-3.5 text-sky-600" />
@@ -160,8 +160,8 @@ export function AnalyticsCharts({ summary }: AnalyticsChartsProps) {
               onClick={() => setActiveTab("generator")}
               className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors ${
                 activeTab === "generator"
-                  ? "bg-white text-slate-900 shadow-xs font-semibold"
-                  : "text-slate-600 hover:text-slate-900"
+                  ? "bg-white text-slate-900 shadow-xs border border-slate-300 font-bold"
+                  : "text-slate-700 hover:text-slate-950 hover:bg-white/60 font-semibold"
               }`}
             >
               <Fuel className="w-3.5 h-3.5 text-rose-600" />

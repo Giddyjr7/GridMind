@@ -80,7 +80,7 @@ export function EquipmentStatusTable({ appliances }: EquipmentStatusTableProps) 
                         {app.name}
                       </h4>
                       {app.temperatureCritical && (
-                        <span className="font-mono text-[10px] font-bold text-blue-700 bg-blue-50 px-1.5 py-0.2 rounded border border-blue-200">
+                        <span className="font-mono text-[10px] font-bold text-sky-950 bg-sky-100 px-2 py-0.5 rounded border border-sky-300">
                           {app.temperatureCritical.currentTempCelsius}°C
                         </span>
                       )}
@@ -121,16 +121,16 @@ export function EquipmentStatusTable({ appliances }: EquipmentStatusTableProps) 
                   {/* Safeguard Status */}
                   <div className="min-w-[90px] text-right">
                     {isProtected ? (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700">
-                        <ShieldCheck className="h-3.5 w-3.5" />
+                      <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-950">
+                        <ShieldCheck className="h-3.5 w-3.5 text-emerald-700" />
                         Protected
                       </span>
                     ) : isCurtailed ? (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
+                      <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-950 bg-amber-100 px-2 py-0.5 rounded border border-amber-300">
                         Shed Active
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-600">
+                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-700">
                         Running
                       </span>
                     )}

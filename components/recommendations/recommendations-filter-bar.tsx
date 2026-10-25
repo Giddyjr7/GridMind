@@ -35,10 +35,10 @@ export function RecommendationsFilterBar({
         <button
           type="button"
           onClick={() => onStatusFilterChange("all")}
-          className={`px-3 py-1.5 rounded-md font-semibold transition-colors shrink-0 ${
+          className={`px-3 py-1.5 rounded-md font-bold transition-colors shrink-0 ${
             statusFilter === "all"
-              ? "bg-white text-slate-900 shadow-xs"
-              : "text-slate-600 hover:text-slate-900"
+              ? "bg-white text-slate-900 shadow-xs border border-slate-300"
+              : "text-slate-700 hover:text-slate-950 hover:bg-white/60"
           }`}
         >
           All ({counts.all})
@@ -46,10 +46,10 @@ export function RecommendationsFilterBar({
         <button
           type="button"
           onClick={() => onStatusFilterChange("pending")}
-          className={`px-3 py-1.5 rounded-md font-semibold transition-colors shrink-0 ${
+          className={`px-3 py-1.5 rounded-md font-bold transition-colors shrink-0 ${
             statusFilter === "pending"
-              ? "bg-white text-emerald-800 shadow-xs"
-              : "text-slate-600 hover:text-slate-900"
+              ? "bg-emerald-100 text-emerald-950 shadow-xs border border-emerald-300"
+              : "text-slate-700 hover:text-slate-950 hover:bg-white/60"
           }`}
         >
           Pending Authorization ({counts.pending})
@@ -57,10 +57,10 @@ export function RecommendationsFilterBar({
         <button
           type="button"
           onClick={() => onStatusFilterChange("approved")}
-          className={`px-3 py-1.5 rounded-md font-semibold transition-colors shrink-0 ${
+          className={`px-3 py-1.5 rounded-md font-bold transition-colors shrink-0 ${
             statusFilter === "approved"
-              ? "bg-white text-slate-900 shadow-xs"
-              : "text-slate-600 hover:text-slate-900"
+              ? "bg-white text-slate-900 shadow-xs border border-slate-300"
+              : "text-slate-700 hover:text-slate-950 hover:bg-white/60"
           }`}
         >
           Approved & Active ({counts.approved})
@@ -68,10 +68,10 @@ export function RecommendationsFilterBar({
         <button
           type="button"
           onClick={() => onStatusFilterChange("rejected")}
-          className={`px-3 py-1.5 rounded-md font-semibold transition-colors shrink-0 ${
+          className={`px-3 py-1.5 rounded-md font-bold transition-colors shrink-0 ${
             statusFilter === "rejected"
-              ? "bg-white text-slate-900 shadow-xs"
-              : "text-slate-600 hover:text-slate-900"
+              ? "bg-white text-slate-900 shadow-xs border border-slate-300"
+              : "text-slate-700 hover:text-slate-950 hover:bg-white/60"
           }`}
         >
           Declined ({counts.rejected})
@@ -85,7 +85,7 @@ export function RecommendationsFilterBar({
           <select
             value={priorityFilter}
             onChange={(e) => onPriorityFilterChange(e.target.value)}
-            className="text-xs h-9 px-3 rounded-lg border border-slate-200 bg-white text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            className="text-xs h-9 px-3 rounded-lg border border-slate-300 bg-white text-slate-900 font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500"
             aria-label="Filter by priority tier"
           >
             <option value="all">All Priorities</option>
