@@ -10,6 +10,12 @@ import {
   EnergyRecommendation,
 } from "@/types/energy";
 import {
+  OperationalRiskSummary,
+  StrategyComparison,
+  AgentWorkflowPipeline,
+  ScenarioPreset,
+} from "@/types/decision-intelligence";
+import {
   MOCK_APPLIANCES,
   MOCK_RECOMMENDATIONS,
   MOCK_APPROVAL_HISTORY,
@@ -28,6 +34,13 @@ import {
   EnergyDispatchFlows,
   computeSimulationDispatch,
 } from "@/lib/simulation-engine";
+import {
+  evaluateOperationalRisk,
+  evaluateDynamicRecommendations,
+  computeStrategyComparison,
+  evaluateAgentPipeline,
+  SCENARIO_PRESETS,
+} from "@/lib/decision-engine";
 
 export interface ApplianceWithSimMetadata extends Appliance {
   isManualOverride?: boolean;
@@ -40,10 +53,20 @@ export interface SimulationContextValue {
   flows: EnergyDispatchFlows;
   events: EnergyEventRecord[];
   recommendations: EnergyRecommendation[];
+  activeRecommendation: EnergyRecommendation;
   approvalHistory: ApprovalRecord[];
   isSimulating: boolean;
   lastSimulatedTick: string;
   feedbackMessage: string | null;
+
+  // Intelligence additions (Feature 1, 2, 3, 4, 5)
+  riskSummary: OperationalRiskSummary;
+  strategyComparison: StrategyComparison;
+  agentPipeline: AgentWorkflowPipeline;
+  activePresetId: string | null;
+  loadScenarioPreset: (presetId: string) => void;
+  setBatteryCapacityKwh: (capacityKwh: number) => void;
+  setBatteryReserveFloorPct: (floorPct: number) => void;
 
   // Working simulator actions
   triggerGridOutage: () => void;
@@ -99,6 +122,7 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
     MOCK_DASHBOARD_METRICS.lastTelemetryTimestamp
   );
   const [feedbackMessage, setFeedbackMessage] = React.useState<string | null>(null);
+  const [activePresetId, setActivePresetId] = React.useState<string | null>("preset_normal");
 
   const clearFeedback = React.useCallback(() => {
     setFeedbackMessage(null);
@@ -125,14 +149,41 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
     setEvents((prev) => [newRecord, ...prev]);
   }, []);
 
-  // Compute deterministic flows in real-time
+  // 1. Compute deterministic flows in real-time
   const flows = React.useMemo(() => {
     return computeSimulationDispatch(appliances, params);
   }, [appliances, params]);
 
+  // 2. Dynamically re-evaluate explainable recommendations
+  const dynamicRecommendations = React.useMemo(() => {
+    return evaluateDynamicRecommendations(params, flows, appliances, recommendations);
+  }, [params, flows, appliances, recommendations]);
+
+  // Primary recommendation that drives dashboard & agent pipeline
+  const activeRecommendation = React.useMemo(() => {
+    const pending = dynamicRecommendations.find((r) => r.status === "pending");
+    return pending || dynamicRecommendations[0];
+  }, [dynamicRecommendations]);
+
+  // 3. Operational Risk Summary
+  const riskSummary = React.useMemo(() => {
+    return evaluateOperationalRisk(params, flows, appliances);
+  }, [params, flows, appliances]);
+
+  // 4. Before-and-After Strategy Performance Benchmark
+  const strategyComparison = React.useMemo(() => {
+    return computeStrategyComparison(params, flows, appliances, activeRecommendation);
+  }, [params, flows, appliances, activeRecommendation]);
+
+  // 5. Visible 5-Stage Agent Pipeline
+  const agentPipeline = React.useMemo(() => {
+    return evaluateAgentPipeline(params, flows, appliances, activeRecommendation, approvalHistory);
+  }, [params, flows, appliances, activeRecommendation, approvalHistory]);
+
   // Actions
   const triggerGridOutage = React.useCallback(() => {
     setParams((p) => ({ ...p, gridAvailable: false }));
+    setActivePresetId(null);
     addEvent({
       category: "grid_event",
       severity: "critical",
@@ -141,11 +192,12 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
       sourceAsset: "grid",
       resolved: false,
     });
-    notifyFeedback("⚡ Grid outage triggered! Islanded to Solar PV & Battery.");
+    notifyFeedback("Grid outage triggered! Islanded to Solar PV and Battery.");
   }, [addEvent]);
 
   const restoreGrid = React.useCallback(() => {
     setParams((p) => ({ ...p, gridAvailable: true }));
+    setActivePresetId("preset_normal");
     addEvent({
       category: "grid_event",
       severity: "info",
@@ -155,12 +207,13 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
       resolved: true,
       resolvedAt: new Date().toISOString(),
     });
-    notifyFeedback("🔌 National Grid power restored. Feeder synchronized.");
+    notifyFeedback("National Grid power restored. Feeder synchronized.");
   }, [addEvent]);
 
   const setBatterySoc = React.useCallback((socPct: number) => {
     const bounded = Math.max(0, Math.min(100, Math.round(socPct)));
     setParams((p) => ({ ...p, batterySocPct: bounded }));
+    setActivePresetId(null);
     addEvent({
       category: "battery_event",
       severity: bounded <= 20 ? "warning" : "info",
@@ -169,11 +222,26 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
       sourceAsset: "battery",
       resolved: bounded > 20,
     });
-    notifyFeedback(`🔋 Battery SOC adjusted to ${bounded}%.`);
+    notifyFeedback(`Battery SOC adjusted to ${bounded}%.`);
   }, [addEvent]);
+
+  const setBatteryCapacityKwh = React.useCallback((capacityKwh: number) => {
+    const bounded = Math.max(10, Math.min(500, Math.round(capacityKwh)));
+    setParams((p) => ({ ...p, batteryTotalCapacityKwh: bounded }));
+    setActivePresetId(null);
+    notifyFeedback(`Battery capacity adjusted to ${bounded} kWh.`);
+  }, []);
+
+  const setBatteryReserveFloorPct = React.useCallback((floorPct: number) => {
+    const bounded = Math.max(10, Math.min(50, Math.round(floorPct)));
+    setParams((p) => ({ ...p, batteryReserveFloorPct: bounded }));
+    setActivePresetId(null);
+    notifyFeedback(`Battery reserve floor set to ${bounded}%.`);
+  }, []);
 
   const setSolarEnabled = React.useCallback((enabled: boolean) => {
     setParams((p) => ({ ...p, solarEnabled: enabled }));
+    setActivePresetId(null);
     addEvent({
       category: "ai_recommendation",
       severity: "info",
@@ -184,17 +252,19 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
       sourceAsset: "solar",
       resolved: true,
     });
-    notifyFeedback(enabled ? "☀️ Solar PV generation enabled." : "🌙 Solar PV disconnected (0 kW).");
+    notifyFeedback(enabled ? "Solar PV generation enabled." : "Solar PV disconnected (0 kW).");
   }, [addEvent]);
 
   const setSolarGenerationKw = React.useCallback((kw: number) => {
     const bounded = Math.max(0, Math.min(75, Math.round(kw * 10) / 10));
     setParams((p) => ({ ...p, solarGenerationKw: bounded, solarEnabled: bounded > 0 }));
-    notifyFeedback(`☀️ Solar generation set to ${bounded} kW.`);
+    setActivePresetId(null);
+    notifyFeedback(`Solar generation set to ${bounded} kW.`);
   }, []);
 
   const setGeneratorMode = React.useCallback((mode: SimulationParams["generatorMode"]) => {
     setParams((p) => ({ ...p, generatorMode: mode }));
+    setActivePresetId(null);
     addEvent({
       category: "generator_event",
       severity: mode === "running" ? "warning" : "info",
@@ -203,7 +273,7 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
       sourceAsset: "generator",
       resolved: true,
     });
-    notifyFeedback(`⚙️ Generator mode switched to ${mode}.`);
+    notifyFeedback(`Generator mode switched to ${mode}.`);
   }, [addEvent]);
 
   const setApplianceState = React.useCallback((
@@ -234,13 +304,13 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
     if (target) {
       addEvent({
         category: "appliance_state",
-        severity: state === "curtailed" ? "info" : "info",
+        severity: "info",
         title: `[SIMULATED] ${target.name} set to ${state.toUpperCase()}`,
         details: `${isManual ? "Manual operator override" : "Automated policy"}: ${target.name} now ${state}.`,
         applianceId: id,
         resolved: true,
       });
-      notifyFeedback(`⚙️ ${target.name} set to ${state}.`);
+      notifyFeedback(`${target.name} set to ${state}.`);
     }
   }, [appliances, addEvent]);
 
@@ -291,7 +361,7 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
       applianceId: id,
       resolved: true,
     });
-    notifyFeedback(`⚙️ Updated ${updatedName || "equipment"} configuration.`);
+    notifyFeedback(`Updated ${updatedName || "equipment"} configuration.`);
   }, [addEvent]);
 
   const updateSourceConfig = React.useCallback((
@@ -320,17 +390,57 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
       sourceAsset: source,
       resolved: true,
     });
-    notifyFeedback(`⚙️ Updated ${source.toUpperCase()} parameters.`);
+    notifyFeedback(`Updated ${source.toUpperCase()} parameters.`);
+  }, [addEvent]);
+
+  const loadScenarioPreset = React.useCallback((presetId: string) => {
+    const preset = SCENARIO_PRESETS.find((p) => p.id === presetId);
+    if (!preset) return;
+
+    setActivePresetId(preset.id);
+    setParams((prev) => ({
+      ...prev,
+      ...preset.params,
+    }));
+
+    if (preset.applianceOverrides && preset.applianceOverrides.length > 0) {
+      setAppliances((prev) =>
+        prev.map((app) => {
+          const override = preset.applianceOverrides?.find((o) => o.id === app.id);
+          if (!override) return app;
+          const currentPowerKw =
+            override.state === "curtailed" || override.state === "off"
+              ? 0
+              : override.state === "standby"
+              ? Math.round(app.ratedPowerKw * 0.1 * 10) / 10
+              : Math.round(app.ratedPowerKw * 0.9 * 10) / 10;
+          return {
+            ...app,
+            state: override.state,
+            currentPowerKw,
+            isManualOverride: false,
+          };
+        })
+      );
+    }
+
+    addEvent({
+      category: "ai_recommendation",
+      severity: "info",
+      title: `[PRESET] Loaded Scenario: ${preset.name}`,
+      details: preset.narrative,
+      resolved: true,
+    });
+    notifyFeedback(`Loaded preset: ${preset.name}`);
   }, [addEvent]);
 
   const approveRecommendation = React.useCallback((
     recId: string,
     notes?: string
   ) => {
-    const rec = recommendations.find((r) => r.id === recId);
+    const rec = dynamicRecommendations.find((r) => r.id === recId) || recommendations.find((r) => r.id === recId);
     if (!rec) return;
 
-    // Prevent duplicate approval actions
     if (rec.status === "approved") {
       notifyFeedback(`Recommendation "${rec.title}" has already been approved.`);
       return;
@@ -354,7 +464,7 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
         )
       );
     } else if (rec.actionType === "delay_generator_start") {
-      setParams((p) => ({ ...p, generatorMode: "standby" }));
+      setParams((p) => ({ ...p, generatorMode: "running" }));
     }
 
     const appliedTimestamp = new Date().toISOString();
@@ -392,14 +502,14 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
       resolvedAt: appliedTimestamp,
     });
 
-    notifyFeedback(`✅ Approved: "${rec.title}"`);
-  }, [recommendations, setApplianceState, addEvent]);
+    notifyFeedback(`Approved: "${rec.title}"`);
+  }, [dynamicRecommendations, recommendations, setApplianceState, addEvent]);
 
   const rejectRecommendation = React.useCallback((
     recId: string,
     reason?: string
   ) => {
-    const rec = recommendations.find((r) => r.id === recId);
+    const rec = dynamicRecommendations.find((r) => r.id === recId) || recommendations.find((r) => r.id === recId);
     if (!rec) return;
 
     if (rec.status === "rejected") {
@@ -444,8 +554,8 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
       resolved: true,
     });
 
-    notifyFeedback(`❌ Declined: "${rec.title}"`);
-  }, [recommendations, addEvent]);
+    notifyFeedback(`Declined: "${rec.title}"`);
+  }, [dynamicRecommendations, recommendations, addEvent]);
 
   const dismissRecommendation = React.useCallback((recId: string) => {
     setRecommendations((prev) =>
@@ -460,7 +570,7 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
 
   const toggleSimulationRunning = React.useCallback(() => {
     setIsSimulating((prev) => !prev);
-    notifyFeedback(!isSimulating ? "▶ Simulation ticker started." : "⏸ Simulation paused.");
+    notifyFeedback(!isSimulating ? "Simulation ticker started." : "Simulation paused.");
   }, [isSimulating]);
 
   const stepSimulationHour = React.useCallback(() => {
@@ -468,21 +578,22 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
       let nextSoc = p.batterySocPct;
       if (!p.gridAvailable && flows.batteryContributionKw > 0) {
         // Discharging by (kW * 1 hr / totalCapacityKwh) * 100
-        const dischargePct = Math.round((flows.batteryContributionKw / 120) * 100);
+        const dischargePct = Math.round((flows.batteryContributionKw / (p.batteryTotalCapacityKwh || 120)) * 100);
         nextSoc = Math.max(p.batteryReserveFloorPct, nextSoc - dischargePct);
       } else if (p.gridAvailable && flows.batteryContributionKw < 0) {
         // Charging by solar excess
-        const chargePct = Math.round((Math.abs(flows.batteryContributionKw) / 120) * 100);
+        const chargePct = Math.round((Math.abs(flows.batteryContributionKw) / (p.batteryTotalCapacityKwh || 120)) * 100);
         nextSoc = Math.min(100, nextSoc + chargePct);
       }
       return { ...p, batterySocPct: nextSoc };
     });
     setLastSimulatedTick(new Date().toISOString());
-    notifyFeedback("⏩ Stepped simulation forward 1 hour.");
+    notifyFeedback("Stepped simulation forward 1 hour.");
   }, [flows.batteryContributionKw]);
 
   const resetToDefaultScenario = React.useCallback(() => {
     setParams(DEFAULT_SIMULATION_PARAMS);
+    setActivePresetId("preset_normal");
     setAppliances(
       MOCK_APPLIANCES.map((app) => ({
         ...app,
@@ -503,7 +614,7 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
       details: "Restored baseline benchmark: Grid connected, 68% battery SOC, 48kW Solar, default appliances.",
       resolved: true,
     });
-    notifyFeedback("🔄 Reset scenario to initial demo baseline.");
+    notifyFeedback("Reset scenario to initial demo baseline.");
   }, [addEvent]);
 
   // Derived dashboard metrics synchronized across all pages
@@ -566,10 +677,10 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
         todayTotalCost: flows.hourlyOperatingCostNgn * 8, // simulated day projection
       },
       activeAlertsCount: events.filter((e) => !e.resolved).length,
-      pendingRecommendationsCount: recommendations.filter((r) => r.status === "pending").length,
+      pendingRecommendationsCount: dynamicRecommendations.filter((r) => r.status === "pending").length,
       lastTelemetryTimestamp: lastSimulatedTick,
     };
-  }, [params, flows, events, recommendations, lastSimulatedTick]);
+  }, [params, flows, events, dynamicRecommendations, lastSimulatedTick]);
 
   return (
     <SimulationContext.Provider
@@ -578,11 +689,19 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
         appliances,
         flows,
         events,
-        recommendations,
+        recommendations: dynamicRecommendations,
+        activeRecommendation,
         approvalHistory,
         isSimulating,
         lastSimulatedTick,
         feedbackMessage,
+        riskSummary,
+        strategyComparison,
+        agentPipeline,
+        activePresetId,
+        loadScenarioPreset,
+        setBatteryCapacityKwh,
+        setBatteryReserveFloorPct,
         triggerGridOutage,
         restoreGrid,
         setBatterySoc,

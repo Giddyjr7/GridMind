@@ -10,7 +10,9 @@ import {
   EquipmentStatusTable,
   ActiveAlertsCard,
   CurrentRecommendationCard,
+  OperationalRiskCard,
 } from "@/components/dashboard";
+import { AgentPipelineWorkflow } from "@/components/workflow";
 import {
   DashboardMetrics,
   Appliance,
@@ -42,6 +44,8 @@ export function OverviewClient({
     events: simEvents,
     lastSimulatedTick,
     stepSimulationHour,
+    riskSummary,
+    agentPipeline,
   } = useSimulation();
 
   const [telemetry] = React.useState<EnergyReading[]>(initialTelemetry);
@@ -77,10 +81,20 @@ export function OverviewClient({
           isRefreshing={isRefreshing}
         />
 
+        {/* Operational Risk Assessment Banner */}
+        {riskSummary && (
+          <OperationalRiskCard riskSummary={riskSummary} />
+        )}
+
         {/* 2. Key Metric Cards */}
         <MetricCardsRow metrics={activeMetrics} />
 
-        {/* 3. Power Source Overview */}
+        {/* 3. 5-Stage Agent Decision Pipeline */}
+        {agentPipeline && (
+          <AgentPipelineWorkflow pipeline={agentPipeline} />
+        )}
+
+        {/* 4. Power Source Overview */}
         <PowerSourcesOverview
           grid={activeMetrics.grid}
           solar={activeMetrics.solar}

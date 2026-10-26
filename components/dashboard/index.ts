@@ -5,3 +5,5 @@ export { EnergyUsageChart } from "./energy-usage-chart";
 export { EquipmentStatusTable } from "./equipment-status-table";
 export { ActiveAlertsCard } from "./active-alerts-card";
 export { CurrentRecommendationCard } from "./current-recommendation-card";
+export { OperationalRiskCard } from "./operational-risk-card";
+

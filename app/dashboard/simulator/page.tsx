@@ -22,11 +22,13 @@ import {
   LiveEnergyStatus,
   ApplianceControlPanel,
   SimulationEventsLog,
+  StrategyComparisonCard,
 } from "@/components/simulator";
+import { AgentPipelineWorkflow } from "@/components/workflow";
 import { useSimulation } from "@/context/simulation-context";
 
 export default function SimulatorPage() {
-  const { resetToDefaultScenario } = useSimulation();
+  const { strategyComparison, agentPipeline } = useSimulation();
 
   return (
     <PageContainer>
@@ -52,10 +54,20 @@ export default function SimulatorPage() {
         {/* 1. Live Energy Status & Dispatch Balance */}
         <LiveEnergyStatus />
 
-        {/* 2. Simulation Control Panel */}
+        {/* 2. Before-and-After Strategy Comparison */}
+        {strategyComparison && (
+          <StrategyComparisonCard comparison={strategyComparison} />
+        )}
+
+        {/* 3. 5-Stage Agent Decision Pipeline */}
+        {agentPipeline && (
+          <AgentPipelineWorkflow pipeline={agentPipeline} />
+        )}
+
+        {/* 4. Simulation Control Panel (Presets + Controls) */}
         <SimulationControlPanel />
 
-        {/* 3. Main Two-Column Layout: Appliances & Events */}
+        {/* 5. Main Two-Column Layout: Appliances & Events */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* Left Column (7 cols): Appliance Priority & Load Dispatch */}
           <div className="lg:col-span-7 space-y-6">
