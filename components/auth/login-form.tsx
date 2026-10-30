@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Mail, Lock, Eye, EyeOff, AlertCircle, Sparkles, ArrowRight } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, AlertCircle, Lightbulb, ArrowRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
@@ -72,7 +72,7 @@ export function LoginForm() {
       {/* Quick Demo Pre-fill Pill for Hackathon Evaluators */}
       <div className="p-3 rounded-lg border border-brand-200 bg-brand-50/70 flex items-center justify-between text-xs">
         <div className="flex items-center gap-2 text-brand-950 font-medium">
-          <Sparkles className="h-4 w-4 text-emerald-700" />
+          <Lightbulb className="h-4 w-4 text-emerald-700" />
           <span>Demo Environment Available</span>
         </div>
         <button

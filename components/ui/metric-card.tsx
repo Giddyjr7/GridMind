@@ -1,6 +1,6 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
-import { Badge, BadgeVariant } from "./badge";
+import { BadgeVariant } from "./badge";
 
 export interface MetricCardProps {
   label: string;
@@ -26,7 +26,7 @@ export function MetricCard({
   return (
     <div
       className={cn(
-        "rounded-xl border border-slate-200/90 bg-white p-4 shadow-[0_1px_3px_0_rgba(0,0,0,0.03)] flex flex-col justify-between",
+        "rounded-2xl border border-slate-200/80 bg-white p-4 shadow-none flex flex-col justify-between",
         className
       )}
     >
@@ -35,7 +35,7 @@ export function MetricCard({
           {label}
         </span>
         {icon && (
-          <div className="text-slate-600 p-1.5 rounded-lg bg-slate-100 border border-slate-200">
+          <div className="text-brand-800 p-1.5 rounded-lg bg-brand-50">
             {icon}
           </div>
         )}
@@ -53,12 +53,10 @@ export function MetricCard({
       </div>
 
       {(subValue || badgeText) && (
-        <div className="mt-3 flex items-center justify-between text-xs text-slate-600 border-t border-slate-100 pt-2 gap-2">
+        <div className="mt-3 flex items-center justify-between text-xs text-slate-500 border-t border-slate-100 pt-2 gap-2">
           <span className="truncate">{subValue}</span>
           {badgeText && (
-            <Badge variant={badgeVariant} size="sm" className="shrink-0 font-medium">
-              {badgeText}
-            </Badge>
+            <span className="shrink-0 text-[11px] font-medium text-slate-500">{badgeText}</span>
           )}
         </div>
       )}

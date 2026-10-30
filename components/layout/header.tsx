@@ -6,22 +6,13 @@ import { usePathname } from "next/navigation";
 import {
   Bell,
   Menu,
-  Activity,
-  Sun,
-  BatteryCharging,
-  Zap,
-  Info,
   CheckCheck,
   AlertTriangle,
-  User,
   Settings,
   LogOut,
-  Building2,
-  ChevronRight,
   ShieldCheck,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Tooltip } from "@/components/ui/tooltip";
 import {
   DropdownMenu,
   DropdownItem,
@@ -31,7 +22,6 @@ import {
 import { envConfig } from "@/config/env";
 import { MOCK_DASHBOARD_METRICS } from "@/mocks/demo-business";
 import { useSimulation } from "@/context/simulation-context";
-import { formatPower, formatPercentage } from "@/lib/formatters";
 
 interface HeaderProps {
   onOpenMobileSidebar?: () => void;
@@ -39,35 +29,35 @@ interface HeaderProps {
 
 const routeTitles: Record<string, { title: string; subtitle: string }> = {
   "/dashboard": {
-    title: "System Overview",
+    title: "Overview",
     subtitle: "Real-time energy continuity & microgrid orchestration",
   },
   "/dashboard/simulator": {
-    title: "Energy Crisis Simulator",
+    title: "Simulator",
     subtitle: "What-if grid outage scenario modeling & load shedding",
   },
   "/dashboard/recommendations": {
-    title: "AI Energy Recommendations",
+    title: "Recommendations",
     subtitle: "Algorithmic dispatch guidance & operator approvals",
   },
   "/dashboard/equipment": {
-    title: "Equipment & Load Hierarchy",
+    title: "Equipment",
     subtitle: "Critical, important and deferrable asset prioritization",
   },
   "/dashboard/sources": {
-    title: "Energy Sources & Storage",
+    title: "Power sources",
     subtitle: "National grid, solar array, battery ESS & diesel generators",
   },
   "/dashboard/analytics": {
-    title: "Cost & Runtime Analytics",
+    title: "Analytics",
     subtitle: "Tariff efficiency, diesel avoidance & carbon abatement",
   },
   "/dashboard/history": {
-    title: "Decision History & Audit Trail",
+    title: "History",
     subtitle: "Operator actions, approvals, and verified outcomes",
   },
   "/dashboard/settings": {
-    title: "Facility Configuration",
+    title: "Settings",
     subtitle: "Tariff rules, site metadata and integration preferences",
   },
 };
@@ -105,16 +95,7 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
         )}
 
         <div>
-          {/* Breadcrumbs */}
-          <div className="hidden sm:flex items-center gap-1.5 text-[11px] font-medium text-slate-400 mb-0.5">
-            <Link href="/dashboard" className="hover:text-slate-600 transition-colors">
-              Console
-            </Link>
-            <ChevronRight className="h-3 w-3" />
-            <span className="text-slate-700 font-semibold">{routeInfo.title}</span>
-          </div>
-
-          <h1 className="text-sm sm:text-base font-bold text-slate-900 leading-none truncate max-w-xs sm:max-w-md">
+          <h1 className="text-sm sm:text-base font-semibold text-slate-900 leading-none truncate max-w-xs sm:max-w-md">
             {routeInfo.title}
           </h1>
         </div>
@@ -122,65 +103,20 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
 
       {/* Right: Telemetry Ribbon, Notifications, Site Context & Profile */}
       <div className="flex items-center gap-2 sm:gap-3">
-        {/* Quick Real-Time Telemetry Ribbon (Desktop) */}
-        <div className="hidden xl:flex items-center gap-2.5 pr-3 border-r border-slate-200">
-          {/* Grid Status */}
-          <div className="flex items-center gap-1.5 text-xs text-slate-600 bg-slate-50 px-2.5 py-1 rounded-md border border-slate-200/80">
+        <div className="hidden xl:flex items-center gap-2 pr-3 border-r border-slate-200">
+          <div className="flex items-center gap-2 text-xs text-slate-600">
             <span className="relative flex h-2 w-2">
-              <span
-                className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
-                  telemetry.gridOnline ? "bg-emerald-400" : "bg-rose-400"
-                }`}
-              />
               <span
                 className={`relative inline-flex rounded-full h-2 w-2 ${
                   telemetry.gridOnline ? "bg-emerald-500" : "bg-rose-500"
                 }`}
               />
             </span>
-            <span className="text-slate-500 font-medium">Grid:</span>
-            <span className={`font-semibold font-mono ${telemetry.gridOnline ? "text-slate-900" : "text-rose-700"}`}>
-              {telemetry.gridOnline ? formatPower(telemetry.gridImportKw) : "OFFLINE"}
-            </span>
-          </div>
-
-          {/* Solar PV */}
-          <div className="flex items-center gap-1.5 text-xs text-slate-600 bg-slate-50 px-2.5 py-1 rounded-md border border-slate-200/80">
-            <Sun className="h-3.5 w-3.5 text-amber-500" />
-            <span className="text-slate-500 font-medium">Solar:</span>
-            <span className="font-semibold text-slate-900 font-mono">
-              {formatPower(telemetry.solarGenerationKw)}
-            </span>
-          </div>
-
-          {/* Battery ESS */}
-          <div className="flex items-center gap-1.5 text-xs text-slate-600 bg-slate-50 px-2.5 py-1 rounded-md border border-slate-200/80">
-            <BatteryCharging
-              className={`h-3.5 w-3.5 ${
-                telemetry.batterySocPct <= 20 ? "text-rose-600" : "text-emerald-600"
-              }`}
-            />
-            <span className="text-slate-500 font-medium">Battery:</span>
-            <span
-              className={`font-semibold font-mono ${
-                telemetry.batterySocPct <= 20 ? "text-rose-700 font-bold" : "text-slate-900"
-              }`}
-            >
-              {formatPercentage(telemetry.batterySocPct)}
+            <span className={telemetry.gridOnline ? "text-slate-700" : "text-rose-700"}>
+              {telemetry.gridOnline ? "Online" : "Grid outage"}
             </span>
           </div>
         </div>
-
-        {/* Environment Badge: Explicitly labeled SIMULATED / DEMO */}
-        <Tooltip content="Running on realistic synthetic telemetry for hackathon evaluation">
-          <Badge
-            variant="warning"
-            size="sm"
-            className="hidden sm:inline-flex select-none font-mono text-[10px] uppercase font-bold tracking-wider"
-          >
-            SIMULATED DEMO
-          </Badge>
-        </Tooltip>
 
         {/* Notifications Dropdown */}
         <DropdownMenu

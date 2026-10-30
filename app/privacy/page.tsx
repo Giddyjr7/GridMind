@@ -12,7 +12,7 @@ import {
   Globe,
   UserCheck,
   Clock,
-  Sparkles,
+  Lightbulb,
   Info,
   Building,
   Mail,
@@ -300,7 +300,7 @@ export default function PrivacyPolicyPage() {
         <div className="space-y-3 text-xs">
           <div className="p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/50 space-y-1.5">
             <div className="flex items-center gap-2 font-bold text-emerald-950">
-              <Sparkles className="h-4 w-4 text-emerald-700" />
+              <Lightbulb className="h-4 w-4 text-emerald-700" />
               <span>Human-in-the-Loop Operational Architecture</span>
             </div>
             <p className="text-slate-700 leading-relaxed">

@@ -2,8 +2,9 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Zap, ArrowLeft, ShieldCheck, Sun, BatteryCharging, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, ShieldCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { GridMindLogo } from "@/components/brand/gridmind-logo";
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -25,15 +26,7 @@ export function AuthLayout({ children, heading, supportingText }: AuthLayoutProp
         {/* Top: Brand Header & Return Link */}
         <div className="relative z-10 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="h-9 w-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 group-hover:scale-105 transition-transform">
-              <Zap className="h-5 w-5 fill-emerald-400/20" />
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="font-bold text-lg text-white tracking-tight">GridMind</span>
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-emerald-400 bg-emerald-950 px-1.5 py-0.5 rounded border border-emerald-800">
-                Intelligence
-              </span>
-            </div>
+            <GridMindLogo inverse markClassName="h-9 w-9" />
           </Link>
 
           <Link
@@ -117,10 +110,7 @@ export function AuthLayout({ children, heading, supportingText }: AuthLayoutProp
         {/* Mobile Header */}
         <div className="flex items-center justify-between lg:hidden mb-8">
           <Link href="/" className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-brand-950 flex items-center justify-center text-white">
-              <Zap className="h-4 w-4 text-emerald-400" />
-            </div>
-            <span className="font-bold text-base text-slate-900">GridMind</span>
+            <GridMindLogo markClassName="h-8 w-8" />
           </Link>
           <Link href="/" className="text-xs text-slate-500 hover:text-slate-900 inline-flex items-center gap-1">
             <ArrowLeft className="h-3 w-3" />

@@ -164,11 +164,11 @@ export default function HistoryPage() {
       {/* Page Header with Actions */}
       <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
         <SectionHeading
-          title="Decision History & Operational Audit Trail"
-          description="Immutable chronological record of every operator authorization, human override, load-shedding event, and grid disturbance in the simulated microgrid."
+          title="Decision history"
+          description="A searchable record of approvals, overrides and grid events."
           badge={
-            <Badge variant="healthy" size="sm" className="font-mono text-[10px]">
-              AUDITED LOGS
+            <Badge variant="neutral" size="sm">
+              Audit log
             </Badge>
           }
         />
@@ -354,11 +354,7 @@ export default function HistoryPage() {
                 return (
                   <Card
                     key={record.id}
-                    className={`p-4 border transition-colors ${
-                      isApproved
-                        ? "border-emerald-200/90 bg-emerald-50/20 hover:border-emerald-300"
-                        : "border-rose-200/90 bg-rose-50/20 hover:border-rose-300"
-                    }`}
+                    className="p-4 border border-slate-200 bg-white transition-colors hover:border-slate-300"
                   >
                     <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                       <div className="flex items-start gap-3">

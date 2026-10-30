@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import {
-  Sparkles,
+  Lightbulb,
   TrendingDown,
   Clock,
   Leaf,
@@ -72,7 +72,7 @@ export function RecommendationCard({
                 ? "bg-slate-100 text-slate-600"
                 : "bg-emerald-50 text-emerald-700 border border-emerald-200"
             }`}>
-              <Sparkles className="w-4 h-4" />
+              <Lightbulb className="w-4 h-4" />
             </div>
 
             <div>
@@ -80,8 +80,8 @@ export function RecommendationCard({
                 <CardTitle className="text-base font-bold text-slate-900 leading-snug">
                   {recommendation.title}
                 </CardTitle>
-                <Badge variant="warning" size="sm" className="font-mono text-[10px] uppercase font-bold">
-                  Deterministic Rule
+                <Badge variant="neutral" size="sm">
+                  Rules-based
                 </Badge>
               </div>
               <CardDescription suppressHydrationWarning className="text-xs text-slate-500 mt-0.5">
@@ -131,25 +131,25 @@ export function RecommendationCard({
 
         {/* Quantified Impact Metrics */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-          <div className="p-2.5 rounded-lg border border-emerald-200 bg-emerald-50/50 flex items-center gap-2">
-            <TrendingDown className="w-4 h-4 text-emerald-700 shrink-0" />
+          <div className="p-2.5 rounded-lg border border-slate-200 bg-white flex items-center gap-2">
+            <TrendingDown className="w-4 h-4 text-brand-700 shrink-0" />
             <div>
-              <span className="text-[10px] uppercase font-semibold text-emerald-800 block">
+              <span className="text-[10px] uppercase font-semibold text-slate-500 block">
                 Financial Savings
               </span>
-              <span className="text-xs font-bold font-mono text-emerald-900">
+              <span className="text-xs font-bold font-mono text-slate-900">
                 +{formatCurrency(recommendation.estimatedSavingsNgn, "NGN")}
               </span>
             </div>
           </div>
 
-          <div className="p-2.5 rounded-lg border border-blue-200 bg-blue-50/50 flex items-center gap-2">
-            <Clock className="w-4 h-4 text-blue-700 shrink-0" />
+          <div className="p-2.5 rounded-lg border border-slate-200 bg-white flex items-center gap-2">
+            <Clock className="w-4 h-4 text-brand-700 shrink-0" />
             <div>
-              <span className="text-[10px] uppercase font-semibold text-blue-800 block">
+              <span className="text-[10px] uppercase font-semibold text-slate-500 block">
                 Runtime Extension
               </span>
-              <span className="text-xs font-bold font-mono text-blue-900">
+              <span className="text-xs font-bold font-mono text-slate-900">
                 {recommendation.runtimeImpactHours
                   ? `+${recommendation.runtimeImpactHours} hrs backup`
                   : "Thermal Buffer"}
@@ -157,13 +157,13 @@ export function RecommendationCard({
             </div>
           </div>
 
-          <div className="p-2.5 rounded-lg border border-sky-200 bg-sky-50/50 flex items-center gap-2 col-span-2 sm:col-span-1">
-            <Leaf className="w-4 h-4 text-sky-700 shrink-0" />
+          <div className="p-2.5 rounded-lg border border-slate-200 bg-white flex items-center gap-2 col-span-2 sm:col-span-1">
+            <Leaf className="w-4 h-4 text-brand-700 shrink-0" />
             <div>
-              <span className="text-[10px] uppercase font-semibold text-sky-800 block">
+              <span className="text-[10px] uppercase font-semibold text-slate-500 block">
                 Emissions Avoidance
               </span>
-              <span className="text-xs font-bold font-mono text-sky-900">
+              <span className="text-xs font-bold font-mono text-slate-900">
                 {recommendation.co2ReductionKg || 0} kg CO₂e
               </span>
             </div>
@@ -172,21 +172,19 @@ export function RecommendationCard({
 
         {/* Telemetry Input Chips */}
         {recommendation.relevantInputs && recommendation.relevantInputs.length > 0 && (
-          <div className="space-y-1.5 pt-1">
-            <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">
-              Key Relevant System Inputs:
-            </span>
-            <div className="flex items-center gap-2 flex-wrap">
-              {recommendation.relevantInputs.map((input, idx) => (
+          <details className="pt-1">
+            <summary className="cursor-pointer text-xs font-medium text-slate-500 hover:text-slate-700">View inputs used</summary>
+            <div className="mt-2 flex items-center gap-2 flex-wrap">
+              {recommendation.relevantInputs.map((input) => (
                 <span
-                  key={idx}
+                  key={`${input.label}-${input.value}`}
                   className="text-[11px] font-mono text-slate-900 bg-slate-100 px-2 py-0.5 rounded border border-slate-300 font-medium"
                 >
                   <strong className="text-slate-700">{input.label}:</strong> {input.value}
                 </span>
               ))}
             </div>
-          </div>
+          </details>
         )}
 
         {/* Rejection Note (if rejected) */}

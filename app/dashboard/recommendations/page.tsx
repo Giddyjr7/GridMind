@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import {
-  Sparkles,
+  Lightbulb,
   CheckCircle2,
   XCircle,
   Clock,
@@ -93,18 +93,15 @@ export default function RecommendationsPage() {
       <div className="space-y-6">
         {/* Section Heading */}
         <SectionHeading
-          title="Energy Recommendations & Approval Workflow"
-          description="Transparent algorithmic dispatch recommendations generated from solar generation forecasts, grid reliability modeling, and cold chain preservation constraints. Human authorization is strictly required before simulated dispatch."
+          title="Recommendations"
+          description="Review suggested actions before anything changes in the simulation."
           badge={
-            <Badge variant="healthy" size="sm" className="font-mono text-[10px] uppercase font-bold">
-              Human-in-the-Loop Queue
+            <Badge variant="neutral" size="sm">
+              Operator approval required
             </Badge>
           }
           actions={
             <div className="flex items-center gap-2">
-              <Badge variant="warning" size="sm" className="font-mono text-[10px] uppercase font-bold">
-                Deterministic Optimization
-              </Badge>
               <Button
                 size="sm"
                 variant="outline"

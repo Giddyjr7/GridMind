@@ -71,7 +71,7 @@ export function OverviewClient({
 
   return (
     <PageContainer>
-      <div className="space-y-6">
+      <div className="space-y-5">
         {/* 1. Dashboard Header */}
         <DashboardHeader
           site={activeMetrics.site}
@@ -86,42 +86,44 @@ export function OverviewClient({
           <OperationalRiskCard riskSummary={riskSummary} />
         )}
 
-        {/* 2. Key Metric Cards */}
+        {/* Essential metrics only */}
         <MetricCardsRow metrics={activeMetrics} />
 
-        {/* 3. 5-Stage Agent Decision Pipeline */}
-        {agentPipeline && (
-          <AgentPipelineWorkflow pipeline={agentPipeline} />
-        )}
-
-        {/* 4. Power Source Overview */}
-        <PowerSourcesOverview
-          grid={activeMetrics.grid}
-          solar={activeMetrics.solar}
-          battery={activeMetrics.battery}
-          generator={activeMetrics.generator}
-          totalLoadKw={activeMetrics.telemetry.currentLoadKw}
-        />
-
-        {/* 4. Main Two-Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Left Column (8 cols): Energy Usage Chart & Equipment Status */}
-          <div className="lg:col-span-8 space-y-6">
-            <EnergyUsageChart telemetry={telemetry} />
-            <EquipmentStatusTable appliances={activeAppliances} />
-          </div>
-
-          {/* Right Column (4 cols): AI Recommendation & Active Alerts */}
-          <div className="lg:col-span-4 space-y-6">
+        {/* The two things an operator needs to act on */}
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-5 items-start">
+          <div className="lg:col-span-3">
             {activeRecommendations.length > 0 && (
               <CurrentRecommendationCard
                 initialRecommendation={activeRecommendations[0]}
                 totalPendingCount={pendingRecommendationsCount}
               />
             )}
+          </div>
+          <div className="lg:col-span-2">
             <ActiveAlertsCard initialAlerts={activeEvents} />
           </div>
         </div>
+
+        {/* Technical information is available without dominating the page */}
+        <details className="group rounded-2xl border border-slate-200 bg-white">
+          <summary className="cursor-pointer list-none px-5 py-4 text-sm font-semibold text-slate-800 flex items-center justify-between">
+            <span>System details</span>
+            <span className="text-xs font-normal text-slate-500 group-open:hidden">View charts, sources and workflow</span>
+            <span className="hidden text-xs font-normal text-slate-500 group-open:inline">Hide details</span>
+          </summary>
+          <div className="space-y-5 border-t border-slate-100 p-4 sm:p-5">
+            <PowerSourcesOverview
+              grid={activeMetrics.grid}
+              solar={activeMetrics.solar}
+              battery={activeMetrics.battery}
+              generator={activeMetrics.generator}
+              totalLoadKw={activeMetrics.telemetry.currentLoadKw}
+            />
+            <EnergyUsageChart telemetry={telemetry} />
+            <EquipmentStatusTable appliances={activeAppliances} />
+            {agentPipeline && <AgentPipelineWorkflow pipeline={agentPipeline} />}
+          </div>
+        </details>
       </div>
     </PageContainer>
   );

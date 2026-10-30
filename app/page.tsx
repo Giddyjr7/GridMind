@@ -14,7 +14,7 @@ import {
   CheckCircle2,
   BarChart3,
   Sliders,
-  Sparkles,
+  Lightbulb,
   Layers,
   ThermometerSnowflake,
   Pill,
@@ -245,7 +245,7 @@ export default function MarketingLandingPage() {
               {/* Feature D */}
               <div className="p-7 rounded-2xl border border-slate-200/90 bg-[#fdfefe] space-y-3.5 hover:shadow-md transition-shadow">
                 <div className="h-11 w-11 rounded-xl bg-brand-950 text-emerald-400 flex items-center justify-center">
-                  <Sparkles className="h-5 w-5" />
+                  <Lightbulb className="h-5 w-5" />
                 </div>
                 <h3 className="text-lg font-bold text-slate-900">
                   D. AI-Assisted Recommendations

@@ -7,8 +7,7 @@ import {
   AlertTriangle,
   Info,
   ArrowRight,
-  Sparkles,
-  Layers,
+  Lightbulb,
 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -32,8 +31,8 @@ export function OperationalRiskCard({
           label: "NORMAL",
           badgeVariant: "healthy" as const,
           borderClass: "border-emerald-200",
-          bgGradient: "from-emerald-50/40 via-white to-white",
-          iconBg: "bg-emerald-100 text-emerald-800 border-emerald-200",
+          bgGradient: "bg-white",
+          iconBg: "bg-brand-50 text-brand-800 border-brand-100",
           scoreColor: "text-emerald-700",
           Icon: ShieldCheck,
         };
@@ -42,7 +41,7 @@ export function OperationalRiskCard({
           label: "ELEVATED RISK",
           badgeVariant: "warning" as const,
           borderClass: "border-amber-200",
-          bgGradient: "from-amber-50/40 via-white to-white",
+          bgGradient: "bg-white",
           iconBg: "bg-amber-100 text-amber-900 border-amber-200",
           scoreColor: "text-amber-700",
           Icon: AlertTriangle,
@@ -52,7 +51,7 @@ export function OperationalRiskCard({
           label: "CRITICAL RISK",
           badgeVariant: "critical" as const,
           borderClass: "border-rose-200",
-          bgGradient: "from-rose-50/40 via-white to-white",
+          bgGradient: "bg-white",
           iconBg: "bg-rose-100 text-rose-900 border-rose-200",
           scoreColor: "text-rose-700",
           Icon: ShieldAlert,
@@ -63,7 +62,7 @@ export function OperationalRiskCard({
           label: "DATA PENDING",
           badgeVariant: "neutral" as const,
           borderClass: "border-slate-200",
-          bgGradient: "from-slate-50/40 via-white to-white",
+          bgGradient: "bg-white",
           iconBg: "bg-slate-100 text-slate-800 border-slate-200",
           scoreColor: "text-slate-700",
           Icon: Info,
@@ -76,10 +75,10 @@ export function OperationalRiskCard({
 
   return (
     <Card
-      className={`border ${config.borderClass} bg-gradient-to-r ${config.bgGradient} shadow-xs ${className}`}
+      className={`border-slate-200/80 ${config.bgGradient} ${className}`}
     >
       <CardContent className="p-4 sm:p-5">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           {/* Left section: Icon + Score + Title & Description */}
           <div className="flex items-start gap-3.5 flex-1 min-w-0">
             <div
@@ -93,67 +92,41 @@ export function OperationalRiskCard({
                 <Badge variant={config.badgeVariant} size="sm" className="font-bold">
                   {config.label}
                 </Badge>
-                <span className="text-xs font-semibold text-slate-500">
-                  Risk Score:{" "}
-                  <span className={`font-bold ${config.scoreColor}`}>
-                    {riskSummary.score}/100
-                  </span>
-                </span>
-                <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold tracking-wider uppercase bg-slate-100 text-slate-700 border border-slate-200">
-                  Demo Simulation
-                </span>
               </div>
 
               <h3 className="text-base font-bold text-slate-900 leading-snug">
                 {riskSummary.title}
               </h3>
 
-              <p className="text-xs text-slate-600 leading-relaxed max-w-3xl">
+              <p className="text-sm text-slate-600 leading-relaxed max-w-2xl">
                 {riskSummary.description}
               </p>
 
-              {/* Primary Risk Factors */}
               {riskSummary.primaryRiskFactors &&
                 riskSummary.primaryRiskFactors.length > 0 && (
-                  <div className="pt-1.5 flex flex-wrap items-center gap-1.5">
-                    <span className="text-[11px] font-semibold text-slate-500">
-                      Drivers:
-                    </span>
-                    {riskSummary.primaryRiskFactors.map((factor, idx) => (
-                      <span
-                        key={idx}
-                        className="inline-flex items-center text-[11px] text-slate-700 bg-white px-2 py-0.5 rounded border border-slate-200 font-medium"
-                      >
-                        {factor}
-                      </span>
-                    ))}
-                  </div>
+                  <details className="pt-1 text-[11px] text-slate-500">
+                    <summary className="cursor-pointer font-medium hover:text-slate-700">
+                      Why this status
+                    </summary>
+                    <ul className="mt-2 list-disc space-y-1 pl-4 text-slate-600">
+                      {riskSummary.primaryRiskFactors.map((factor) => <li key={factor}>{factor}</li>)}
+                    </ul>
+                  </details>
                 )}
             </div>
           </div>
 
           {/* Right section: Recommended Posture & Fast Navigation */}
-          <div className="lg:border-l lg:border-slate-200/80 lg:pl-5 flex flex-col justify-between sm:flex-row lg:flex-col gap-3 shrink-0">
-            <div>
-              <div className="text-[10px] uppercase font-bold tracking-wider text-slate-500 mb-1">
-                Recommended Action
-              </div>
-              <p className="text-xs font-medium text-slate-800 max-w-xs leading-snug">
-                {riskSummary.recommendedAction}
-              </p>
-            </div>
+          <div className="sm:border-l sm:border-slate-200/80 sm:pl-5 flex flex-col gap-3 shrink-0">
+            <p className="text-sm font-medium text-slate-800 max-w-xs leading-snug">
+              {riskSummary.recommendedAction}
+            </p>
 
-            <div className="flex items-center gap-2 pt-1">
-              <Link href="/dashboard/simulator">
-                <Button size="sm" variant="outline" className="text-xs h-8">
-                  <Layers className="w-3.5 h-3.5 mr-1.5 text-slate-600" />
-                  Open Simulator
-                </Button>
-              </Link>
+            <div>
               <Link href="/dashboard/recommendations">
-                <Button size="sm" className="text-xs h-8 bg-brand-950 hover:bg-brand-900 text-white">
-                  <Sparkles className="w-3.5 h-3.5 mr-1.5 text-emerald-300" />
-                  Review Action
+                <Button size="sm" className="text-xs h-9 bg-brand-950 hover:bg-brand-900 text-white">
+                  <Lightbulb className="w-3.5 h-3.5 mr-1.5 text-emerald-300" />
+                  Review recommendation
                   <ArrowRight className="w-3 h-3 ml-1" />
                 </Button>
               </Link>

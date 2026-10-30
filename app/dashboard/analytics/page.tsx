@@ -41,11 +41,11 @@ export default function AnalyticsPage() {
       {/* Header with Title and Action Controls */}
       <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
         <SectionHeading
-          title="Analytics, Cost Comparison & Performance"
-          description="Deterministic 24-hour energy modeling, levelized cost of energy (LCOE) accounting, and transparent baseline comparison for Krystal Ice Cold Storage Ltd."
+          title="Analytics"
+          description="Compare cost, runtime and critical-load protection across outage scenarios."
           badge={
-            <Badge variant="healthy" size="sm" className="font-mono text-[10px]">
-              DETERMINISTIC SIMULATION
+            <Badge variant="neutral" size="sm">
+              Simulated data
             </Badge>
           }
         />

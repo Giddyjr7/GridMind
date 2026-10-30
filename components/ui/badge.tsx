@@ -39,7 +39,7 @@ export function Badge({
     brand: "bg-brand-950 text-white border-brand-800 shadow-xs font-semibold",
 
     // Success / Protected / Online (Green/Emerald)
-    healthy: "bg-emerald-100 text-emerald-950 border-emerald-300 font-semibold",
+    healthy: "bg-brand-50 text-brand-950 border-brand-200 font-semibold",
     "healthy-high": "bg-emerald-700 text-white border-emerald-800 font-semibold shadow-xs",
     "solid-healthy": "bg-emerald-700 text-white border-emerald-800 font-semibold shadow-xs",
 
@@ -54,12 +54,12 @@ export function Badge({
     "solid-critical": "bg-rose-700 text-white border-rose-800 font-semibold shadow-xs",
 
     // Info / Mode / Status (Sky/Navy)
-    info: "bg-sky-100 text-sky-950 border-sky-300 font-semibold",
+    info: "bg-slate-100 text-slate-800 border-slate-200 font-semibold",
     "info-high": "bg-sky-800 text-white border-sky-900 font-semibold shadow-xs",
     "solid-info": "bg-sky-800 text-white border-sky-900 font-semibold shadow-xs",
 
     // Neutral / Standby / Holding (Slate/Zinc)
-    neutral: "bg-slate-100 text-slate-900 border-slate-300 font-semibold",
+    neutral: "bg-slate-100 text-slate-700 border-slate-200 font-semibold",
     "neutral-high": "bg-slate-800 text-white border-slate-900 font-semibold shadow-xs",
     "solid-neutral": "bg-slate-800 text-white border-slate-900 font-semibold shadow-xs",
 

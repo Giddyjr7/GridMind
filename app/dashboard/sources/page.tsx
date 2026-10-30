@@ -16,7 +16,7 @@ import {
   CheckCircle2,
   AlertTriangle,
   RotateCcw,
-  Sparkles,
+  Lightbulb,
 } from "lucide-react";
 import { PageContainer } from "@/components/ui/page-container";
 import { SectionHeading } from "@/components/ui/section-heading";
@@ -58,16 +58,16 @@ export default function EnergySourcesPage() {
         {/* Section Heading */}
         <SectionHeading
           title="Energy Sources & Storage Assets"
-          description="Real-time physical asset telemetry and commercial configuration across the national utility feeder, rooftop solar array, battery storage system, and diesel backup."
+          description="Monitor grid, solar, battery and generator availability from one place."
           badge={
-            <Badge variant="healthy" size="sm" className="font-mono text-[10px] uppercase font-bold">
-              4 Physical Assets Monitored
+            <Badge variant="neutral" size="sm">
+              4 sources
             </Badge>
           }
           actions={
             <div className="flex items-center gap-2">
-              <Badge variant="warning" size="sm" className="font-mono text-[10px] uppercase font-bold">
-                Continuous Telemetry Ingest
+              <Badge variant="healthy" size="sm">
+                Live telemetry
               </Badge>
               <Button
                 size="sm"
@@ -120,28 +120,28 @@ export default function EnergySourcesPage() {
             {gridPct > 0 && (
               <div
                 style={{ width: `${gridPct}%` }}
-                className="bg-blue-600 h-full transition-all duration-300"
+                className="bg-brand-950 h-full transition-all duration-300"
                 title={`Grid: ${gridPct}% (${flows.gridContributionKw} kW)`}
               />
             )}
             {solarPct > 0 && (
               <div
                 style={{ width: `${solarPct}%` }}
-                className="bg-amber-400 h-full transition-all duration-300"
+                className="bg-brand-400 h-full transition-all duration-300"
                 title={`Solar: ${solarPct}% (${flows.solarContributionKw} kW)`}
               />
             )}
             {batteryPct > 0 && (
               <div
                 style={{ width: `${batteryPct}%` }}
-                className="bg-emerald-500 h-full transition-all duration-300"
+                className="bg-brand-600 h-full transition-all duration-300"
                 title={`Battery: ${batteryPct}% (${flows.batteryContributionKw} kW)`}
               />
             )}
             {genPct > 0 && (
               <div
                 style={{ width: `${genPct}%` }}
-                className="bg-amber-700 h-full transition-all duration-300"
+                className="bg-slate-500 h-full transition-all duration-300"
                 title={`Generator: ${genPct}% (${flows.generatorContributionKw} kW)`}
               />
             )}
@@ -151,19 +151,19 @@ export default function EnergySourcesPage() {
           <div className="flex items-center justify-between text-xs text-slate-600 pt-1 flex-wrap gap-2">
             <div className="flex items-center gap-4 flex-wrap">
               <span className="flex items-center gap-1.5 font-mono text-[11px]">
-                <span className="w-2.5 h-2.5 rounded-full bg-blue-600 inline-block" />
+                <span className="w-2.5 h-2.5 rounded-full bg-brand-950 inline-block" />
                 Grid ({gridPct}%)
               </span>
               <span className="flex items-center gap-1.5 font-mono text-[11px]">
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block" />
+                <span className="w-2.5 h-2.5 rounded-full bg-brand-400 inline-block" />
                 Solar ({solarPct}%)
               </span>
               <span className="flex items-center gap-1.5 font-mono text-[11px]">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" />
+                <span className="w-2.5 h-2.5 rounded-full bg-brand-600 inline-block" />
                 Battery ({batteryPct}%)
               </span>
               <span className="flex items-center gap-1.5 font-mono text-[11px]">
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-700 inline-block" />
+                <span className="w-2.5 h-2.5 rounded-full bg-slate-500 inline-block" />
                 Generator ({genPct}%)
               </span>
             </div>
@@ -182,7 +182,7 @@ export default function EnergySourcesPage() {
               <div className="flex items-center gap-2.5">
                 <div className={`p-2 rounded-xl flex items-center justify-center shrink-0 ${
                   params.gridAvailable
-                    ? "bg-blue-50 text-blue-700 border border-blue-200"
+                    ? "bg-brand-50 text-brand-800 border border-brand-100"
                     : "bg-rose-50 text-rose-700 border border-rose-200"
                 }`}>
                   <Zap className="w-5 h-5" />
@@ -250,7 +250,7 @@ export default function EnergySourcesPage() {
                 size="sm"
                 variant="outline"
                 onClick={() => setConfigSource("grid")}
-                className="text-xs h-8 text-blue-700 border-blue-200 hover:bg-blue-50"
+                className="text-xs h-8 text-brand-800 border-brand-200 hover:bg-brand-50"
               >
                 <Settings className="w-3.5 h-3.5 mr-1" />
                 Configure Feeder
@@ -262,7 +262,7 @@ export default function EnergySourcesPage() {
           <Card className="border border-slate-200 bg-white shadow-xs">
             <CardHeader className="pb-3 border-b border-slate-100 flex flex-row items-center justify-between space-y-0">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-xl bg-amber-50 text-amber-600 border border-amber-200 flex items-center justify-center shrink-0">
+                <div className="p-2 rounded-xl bg-brand-50 text-brand-800 border border-brand-100 flex items-center justify-center shrink-0">
                   <Sun className="w-5 h-5" />
                 </div>
                 <div>
@@ -329,7 +329,7 @@ export default function EnergySourcesPage() {
                 size="sm"
                 variant="outline"
                 onClick={() => setConfigSource("solar")}
-                className="text-xs h-8 text-amber-700 border-amber-200 hover:bg-amber-50"
+                className="text-xs h-8 text-brand-800 border-brand-200 hover:bg-brand-50"
               >
                 <Settings className="w-3.5 h-3.5 mr-1" />
                 Configure Solar Array
@@ -341,7 +341,7 @@ export default function EnergySourcesPage() {
           <Card className="border border-slate-200 bg-white shadow-xs">
             <CardHeader className="pb-3 border-b border-slate-100 flex flex-row items-center justify-between space-y-0">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center shrink-0">
+                <div className="p-2 rounded-xl bg-brand-50 text-brand-800 border border-brand-100 flex items-center justify-center shrink-0">
                   <BatteryCharging className="w-5 h-5" />
                 </div>
                 <div>
@@ -408,7 +408,7 @@ export default function EnergySourcesPage() {
                 size="sm"
                 variant="outline"
                 onClick={() => setConfigSource("battery")}
-                className="text-xs h-8 text-emerald-800 border-emerald-200 hover:bg-emerald-50"
+                className="text-xs h-8 text-brand-800 border-brand-200 hover:bg-brand-50"
               >
                 <Settings className="w-3.5 h-3.5 mr-1" />
                 Configure Battery ESS
@@ -420,7 +420,7 @@ export default function EnergySourcesPage() {
           <Card className="border border-slate-200 bg-white shadow-xs">
             <CardHeader className="pb-3 border-b border-slate-100 flex flex-row items-center justify-between space-y-0">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-xl bg-amber-100 text-amber-800 border border-amber-300 flex items-center justify-center shrink-0">
+                <div className="p-2 rounded-xl bg-brand-50 text-brand-800 border border-brand-100 flex items-center justify-center shrink-0">
                   <Power className="w-5 h-5" />
                 </div>
                 <div>
@@ -485,7 +485,7 @@ export default function EnergySourcesPage() {
                 size="sm"
                 variant="outline"
                 onClick={() => setConfigSource("generator")}
-                className="text-xs h-8 text-amber-800 border-amber-300 hover:bg-amber-50"
+                className="text-xs h-8 text-brand-800 border-brand-200 hover:bg-brand-50"
               >
                 <Settings className="w-3.5 h-3.5 mr-1" />
                 Configure Genset

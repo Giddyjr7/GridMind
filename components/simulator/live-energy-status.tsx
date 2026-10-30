@@ -41,7 +41,7 @@ export function LiveEnergyStatus() {
   return (
     <div className="space-y-4">
       {/* 1. Primary Calculated KPI Strip */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {/* Total Active Load */}
         <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-xs space-y-2">
           <div className="flex items-center justify-between text-xs font-semibold text-slate-500 uppercase tracking-wider">
@@ -107,8 +107,8 @@ export function LiveEnergyStatus() {
           </p>
         </div>
 
-        {/* Operating Cost Rate */}
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-xs space-y-2">
+        {/* Operating cost remains available in the comparison panel. */}
+        <div className="hidden">
           <div className="flex items-center justify-between text-xs font-semibold text-slate-500 uppercase tracking-wider">
             <span className="flex items-center gap-1.5">
               <Coins className="w-3.5 h-3.5 text-amber-600" />
@@ -174,12 +174,12 @@ export function LiveEnergyStatus() {
             {/* Grid Supply */}
             <div className={`p-3 rounded-lg border transition-colors ${
               flows.gridContributionKw > 0
-                ? "bg-blue-50/70 border-blue-200"
+                ? "bg-brand-50/60 border-brand-200"
                 : "bg-slate-50 border-slate-200 opacity-60"
             }`}>
               <div className="flex items-center justify-between text-xs font-semibold text-slate-700">
                 <span className="flex items-center gap-1">
-                  <Zap className="w-3 h-3 text-blue-600" />
+                  <Zap className="w-3 h-3 text-brand-700" />
                   Grid
                 </span>
                 <span className="text-[10px] uppercase font-mono">
@@ -197,12 +197,12 @@ export function LiveEnergyStatus() {
             {/* Solar Supply */}
             <div className={`p-3 rounded-lg border transition-colors ${
               flows.solarContributionKw > 0
-                ? "bg-amber-50/70 border-amber-200"
+                ? "bg-brand-50/60 border-brand-200"
                 : "bg-slate-50 border-slate-200 opacity-60"
             }`}>
               <div className="flex items-center justify-between text-xs font-semibold text-slate-700">
                 <span className="flex items-center gap-1">
-                  <Sun className="w-3 h-3 text-amber-500" />
+                  <Sun className="w-3 h-3 text-brand-700" />
                   Solar PV
                 </span>
                 <span className="text-[10px] uppercase font-mono">
@@ -220,9 +220,9 @@ export function LiveEnergyStatus() {
             {/* Battery Net Flow */}
             <div className={`p-3 rounded-lg border transition-colors ${
               flows.batteryContributionKw > 0
-                ? "bg-emerald-50/70 border-emerald-200"
+                ? "bg-brand-50/60 border-brand-200"
                 : flows.batteryContributionKw < 0
-                ? "bg-teal-50/70 border-teal-200"
+                ? "bg-brand-50/60 border-brand-200"
                 : "bg-slate-50 border-slate-200 opacity-60"
             }`}>
               <div className="flex items-center justify-between text-xs font-semibold text-slate-700">

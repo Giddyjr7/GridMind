@@ -8,7 +8,7 @@ import {
   Power,
   Sliders,
   AlertTriangle,
-  Sparkles,
+  Lightbulb,
   CheckCircle2,
   Clock,
   Coins,
@@ -298,7 +298,7 @@ export function InteractiveSimulatorPreview() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className="h-7 w-7 rounded-lg bg-emerald-900/80 text-emerald-300 flex items-center justify-center">
-                        <Sparkles className="h-4 w-4" />
+                        <Lightbulb className="h-4 w-4" />
                       </div>
                       <span className="text-xs font-bold text-white">Continuity Optimization</span>
                     </div>

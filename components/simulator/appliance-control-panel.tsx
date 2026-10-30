@@ -9,7 +9,6 @@ import {
   ShieldAlert,
   Sliders,
   CheckCircle2,
-  Sparkles,
   Info,
   User,
   Cpu,
@@ -109,7 +108,7 @@ export function ApplianceControlPanel() {
                 className="text-[10px] font-bold text-emerald-950 bg-emerald-100 hover:bg-emerald-200 px-2.5 py-1 rounded-full border border-emerald-300 transition-colors inline-flex items-center gap-1 shadow-2xs"
                 title={`Click to apply AI recommendation: ${aiSuggestedState}`}
               >
-                <Sparkles className="w-3 h-3 text-emerald-800" />
+                <Lightbulb className="w-3 h-3 text-emerald-800" />
                 AI Suggests: {aiSuggestedState}
               </button>
             )}

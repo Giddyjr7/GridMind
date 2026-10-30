@@ -15,7 +15,7 @@ import {
   Info,
   CheckCircle2,
   Sliders,
-  Sparkles,
+  Lightbulb,
   BookmarkCheck,
   Settings2,
 } from "lucide-react";

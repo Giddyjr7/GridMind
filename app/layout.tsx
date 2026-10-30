@@ -5,6 +5,7 @@ export const metadata: Metadata = {
   title: "GridMind: Smarter Energy. Uninterrupted Business.",
   description:
     "AI-assisted energy management and continuity intelligence for businesses balancing national grid, generators, solar, and battery storage.",
+  icons: { icon: "/brand/gridmind-mark.png" },
 };
 
 export default function RootLayout({

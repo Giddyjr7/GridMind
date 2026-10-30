@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import {
-  Sparkles,
+  Lightbulb,
   TrendingDown,
   Leaf,
   CheckCircle2,
@@ -62,7 +62,7 @@ export function CurrentRecommendationCard({
       <CardHeader className="pb-3 border-b border-emerald-100 flex flex-row items-center justify-between space-y-0">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-emerald-100 border border-emerald-200 flex items-center justify-center text-emerald-800">
-            <Sparkles className="w-4 h-4 text-emerald-700" />
+            <Lightbulb className="w-4 h-4 text-emerald-700" />
           </div>
           <div>
             <div className="flex items-center gap-2">

@@ -2,9 +2,10 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Zap, Menu, X, ArrowRight, ShieldCheck } from "lucide-react";
+import { Menu, X, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { GridMindLogo } from "@/components/brand/gridmind-logo";
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
@@ -37,22 +38,7 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
         {/* Logo / Wordmark */}
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="h-10 w-10 rounded-xl bg-brand-950 flex items-center justify-center text-white shadow-sm ring-1 ring-brand-800 transition-transform group-hover:scale-105">
-            <Zap className="h-5 w-5 text-emerald-400 fill-emerald-400/20" />
-          </div>
-          <div className="flex flex-col">
-            <div className="flex items-center gap-1.5">
-              <span className="font-bold text-lg tracking-tight text-slate-900 group-hover:text-brand-950 transition-colors">
-                GridMind
-              </span>
-              <span className="text-[10px] font-bold tracking-wider uppercase text-emerald-950 bg-emerald-100 px-1.5 py-0.5 rounded border border-emerald-300">
-                Intelligence
-              </span>
-            </div>
-            <span className="text-[11px] text-slate-500 font-medium hidden sm:block">
-              Energy Continuity Platform
-            </span>
-          </div>
+          <GridMindLogo markClassName="h-10 w-10" />
         </Link>
 
         {/* Desktop Navigation Links */}

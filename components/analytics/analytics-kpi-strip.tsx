@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Coins, Zap, Fuel, BatteryCharging, ShieldCheck, TrendingDown } from "lucide-react";
+import { Coins, Fuel, ShieldCheck, TrendingDown } from "lucide-react";
 import { MetricCard } from "@/components/ui/metric-card";
 import { Badge } from "@/components/ui/badge";
 import { AnalyticsSummary } from "@/lib/analytics-engine";
@@ -31,7 +31,7 @@ export function AnalyticsKpiStrip({ summary }: AnalyticsKpiStripProps) {
         </span>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {/* 1. Total Operating Cost */}
         <MetricCard
           label="24h Operating Cost"
@@ -40,17 +40,6 @@ export function AnalyticsKpiStrip({ summary }: AnalyticsKpiStripProps) {
           badgeText={costSavingsPct > 0 ? `-${costSavingsPct}%` : "Parity"}
           badgeVariant={costSavingsPct > 0 ? "healthy" : "neutral"}
           icon={<Coins className="h-4 w-4" />}
-        />
-
-        {/* 2. Total Energy Demand */}
-        <MetricCard
-          label="24h Energy Demand"
-          value={summary.totalEnergyDemandKwh.toLocaleString()}
-          unit="kWh"
-          subValue={`Critical: ${summary.criticalDemandKwh} kWh (${Math.round((summary.criticalDemandKwh / summary.totalEnergyDemandKwh) * 100)}%)`}
-          badgeText="Cold Chain"
-          badgeVariant="info"
-          icon={<Zap className="h-4 w-4" />}
         />
 
         {/* 3. Generator Operating Hours */}
@@ -62,17 +51,6 @@ export function AnalyticsKpiStrip({ summary }: AnalyticsKpiStripProps) {
           badgeText={avoidedGenHours > 0 ? `${avoidedGenHours}h Avoided` : "Standby"}
           badgeVariant={avoidedGenHours > 0 ? "healthy" : "neutral"}
           icon={<Fuel className="h-4 w-4" />}
-        />
-
-        {/* 4. Battery ESS Utilization */}
-        <MetricCard
-          label="Battery Throughput"
-          value={gridmind.batteryThroughputKwh.toString()}
-          unit="kWh"
-          subValue={`End SOC: ${gridmind.endSocPct}% • Violations: 0`}
-          badgeText="Reserve Safe"
-          badgeVariant="healthy"
-          icon={<BatteryCharging className="h-4 w-4" />}
         />
 
         {/* 5. Critical Cold-Chain Uptime */}

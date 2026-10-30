@@ -5,7 +5,7 @@ import {
   Activity,
   TrendingUp,
   Cpu,
-  Sparkles,
+  Lightbulb,
   UserCheck,
   ChevronDown,
   ChevronUp,
@@ -70,7 +70,7 @@ export function AgentPipelineWorkflow({
       index: 4,
       title: "AI Recommendation",
       stage: pipeline.recommendationStage,
-      icon: Sparkles,
+      icon: Lightbulb,
     },
     {
       index: 5,
@@ -152,63 +152,52 @@ export function AgentPipelineWorkflow({
 
   return (
     <Card className={`border-slate-200/90 bg-white shadow-xs ${className}`}>
-      <CardHeader className="pb-3 border-b border-slate-100">
+      <CardHeader className="p-4 border-b border-slate-100">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <CardTitle className="text-base font-bold text-slate-900 flex items-center gap-2">
                 <Database className="w-4 h-4 text-emerald-700" />
-                Data-to-Decision Agent Pipeline
+                Decision flow
               </CardTitle>
-              <Badge variant="healthy" size="sm" className="font-semibold text-[11px]">
-                5-Stage Flow
-              </Badge>
             </div>
-            <p className="text-xs text-slate-500">
-              The Data Powering AI Agents: telemetry ingestion, dynamic forecasting, constraint solving, and human dispatch
-            </p>
+            <p className="text-xs text-slate-500">How GridMind reached its current recommendation</p>
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-600 font-medium">
-              Pipeline Status:
-            </span>
             {getStatusBadge(pipeline.overallStatus)}
           </div>
         </div>
       </CardHeader>
 
-      <CardContent className="p-4 sm:p-5 space-y-4">
+      <CardContent className="p-4 space-y-4">
         {/* 5-Step Pipeline Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-5 gap-2">
           {stages.map(({ index, title, stage, icon: Icon }) => {
             const isExpanded = expandedStage === index;
             const isAttention = stage.status === "needs_attention";
             const isCompleted = stage.status === "completed";
 
             return (
-              <div
+              <button
+                type="button"
                 key={index}
-                className={`relative rounded-xl border p-3.5 transition-all cursor-pointer flex flex-col justify-between ${
+                className={`relative rounded-xl border p-3 text-left transition-colors ${
                   isAttention
-                    ? "border-amber-300 bg-amber-50/30 ring-1 ring-amber-200"
+                    ? "border-amber-300 bg-amber-50/40"
                     : isCompleted
-                    ? "border-emerald-200/80 bg-emerald-50/20 hover:border-emerald-300"
+                    ? "border-slate-200 bg-white hover:border-brand-300"
                     : "border-slate-200 bg-white hover:border-slate-300"
                 }`}
                 onClick={() => toggleExpand(index)}
               >
                 <div>
                   {/* Step header */}
-                  <div className="flex items-center justify-between gap-1 mb-2">
+                  <div className="flex items-center justify-between gap-1">
                     <div className="flex items-center gap-1.5">
                       <div
                         className={`w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold ${
-                          isAttention
-                            ? "bg-amber-100 text-amber-900"
-                            : isCompleted
-                            ? "bg-emerald-100 text-emerald-800"
-                            : "bg-slate-100 text-slate-700"
+                          isAttention ? "bg-amber-100 text-amber-900" : isCompleted ? "bg-brand-50 text-brand-800" : "bg-slate-100 text-slate-700"
                         }`}
                       >
                         {index}
@@ -220,33 +209,19 @@ export function AgentPipelineWorkflow({
                     <Icon className="w-3.5 h-3.5 text-slate-500 shrink-0" />
                   </div>
 
-                  {/* Status badge */}
-                  <div className="mb-2">
-                    {getStatusBadge(stage.status)}
-                  </div>
-
-                  {/* Summary */}
-                  <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
-                    {stage.summary}
-                  </p>
+                  <p className="mt-2 text-[11px] text-slate-500">{stage.status === "completed" ? "Complete" : stage.status === "needs_attention" ? "Action needed" : "Ready"}</p>
                 </div>
 
-                {/* Footer with provenance & toggle */}
-                <div className="pt-3 mt-2 border-t border-slate-100 flex items-center justify-between gap-1">
-                  <div>{getProvenanceBadge(stage.provenance)}</div>
-                  <button
-                    type="button"
-                    className="text-slate-500 hover:text-slate-800 p-0.5"
-                    aria-label={isExpanded ? "Collapse step details" : "Expand step details"}
-                  >
+                <div className="absolute bottom-2.5 right-2.5">
+                  <span className="text-slate-400 p-0.5" aria-hidden="true">
                     {isExpanded ? (
                       <ChevronUp className="w-3.5 h-3.5" />
                     ) : (
                       <ChevronDown className="w-3.5 h-3.5" />
                     )}
-                  </button>
+                  </span>
                 </div>
-              </div>
+              </button>
             );
           })}
         </div>

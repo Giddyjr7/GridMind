@@ -37,11 +37,11 @@ export default function SettingsPage() {
   return (
     <PageContainer>
       <SectionHeading
-        title="Facility Settings & API Integration"
-        description="Site registration profile, active microgrid physical thresholds, backend FastAPI endpoint bindings, and hackathon demo reset mechanism."
+        title="Facility settings"
+        description="Review site details, operating limits and backend connection status."
         badge={
-          <Badge variant="healthy" size="sm" className="font-mono text-[10px]">
-            ACTIVE CONFIGURATION
+          <Badge variant="neutral" size="sm">
+            Demo configuration
           </Badge>
         }
       />
@@ -192,7 +192,7 @@ export default function SettingsPage() {
                 <Database className="h-5 w-5 text-brand-800" />
                 <div>
                   <CardTitle className="text-base font-bold text-slate-900">
-                    FastAPI Backend Readiness & Service Boundary
+                    NestJS Backend Readiness & Service Boundary
                   </CardTitle>
                   <CardDescription className="text-xs text-slate-500">
                     Typed service interfaces, environment toggles, and proposed backend integration contracts
@@ -238,13 +238,13 @@ export default function SettingsPage() {
             </div>
 
             {/* Backend Integration Checklist */}
-            <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/30 space-y-3">
-              <span className="font-bold text-slate-900 text-xs flex items-center gap-1.5">
+            <details className="rounded-xl border border-slate-200 bg-slate-50/30 p-4">
+              <summary className="cursor-pointer font-bold text-slate-900 text-xs flex items-center gap-1.5">
                 <FileCode2 className="w-4 h-4 text-emerald-600" />
-                Backend Engineer Integration Checklist (Proposed Contracts)
-              </span>
+                View connected API endpoints
+              </summary>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-slate-600">
+              <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-2 text-slate-600">
                 <div className="flex items-start gap-2">
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
                   <span><code>GET /site/profile</code>: Returns BusinessSite (name, tariff, capacity).</span>
@@ -270,7 +270,7 @@ export default function SettingsPage() {
                   <span><code>GET /forecast/today</code>: 24h solar potential & outage probability points.</span>
                 </div>
               </div>
-            </div>
+            </details>
           </CardContent>
         </Card>
       </div>

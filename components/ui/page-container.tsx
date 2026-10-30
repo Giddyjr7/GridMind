@@ -12,7 +12,7 @@ export function PageContainer({
 }: PageContainerProps) {
   return (
     <div
-      className={cn("max-w-7xl mx-auto space-y-6 pb-12", className)}
+      className={cn("max-w-6xl mx-auto space-y-5 pb-10", className)}
       {...props}
     >
       {children}

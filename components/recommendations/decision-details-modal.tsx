@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import {
-  Sparkles,
+  Lightbulb,
   TrendingDown,
   Clock,
   Leaf,
@@ -107,7 +107,7 @@ export function DecisionDetailsModal({
         {/* 1. Proposed Action */}
         <div className="space-y-1.5 p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/40">
           <h4 className="text-xs font-bold text-emerald-950 flex items-center gap-1.5 uppercase tracking-wide">
-            <Sparkles className="w-4 h-4 text-emerald-700" />
+            <Lightbulb className="w-4 h-4 text-emerald-700" />
             Proposed Action
           </h4>
           <p className="text-slate-800 font-semibold leading-relaxed">

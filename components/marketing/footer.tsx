@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Zap, ShieldCheck } from "lucide-react";
+import { GridMindLogo } from "@/components/brand/gridmind-logo";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -14,10 +14,7 @@ export function Footer() {
           {/* Brand & Description */}
           <div className="md:col-span-1 space-y-4">
             <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="h-8 w-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-                <Zap className="h-4 w-4 fill-emerald-400/20" />
-              </div>
-              <span className="font-bold text-lg text-white tracking-tight">GridMind</span>
+              <GridMindLogo inverse markClassName="h-9 w-9" />
             </Link>
             <p className="text-xs text-slate-400 leading-relaxed">
               AI-assisted energy management and continuity intelligence for businesses balancing national grid, generators, solar, and battery storage.

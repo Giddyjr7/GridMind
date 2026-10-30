@@ -54,16 +54,16 @@ export default function EquipmentPage() {
         {/* Section Heading */}
         <SectionHeading
           title="Equipment & Load Hierarchy"
-          description="Establish physical appliance dispatch priorities, rated capacities, and thermal boundaries. During grid blackouts, deferrable loads are shed first to guarantee continuous power to frozen cold chains."
+          description="Set load priorities and control which equipment can be reduced during an outage."
           badge={
-            <Badge variant="healthy" size="sm" className="font-mono text-[10px] uppercase font-bold">
-              {appliances.length} Assets Synchronized
+            <Badge variant="neutral" size="sm">
+              {appliances.length} assets
             </Badge>
           }
           actions={
             <div className="flex items-center gap-2">
-              <Badge variant="warning" size="sm" className="font-mono text-[10px] uppercase font-bold">
-                Automated Shedding Active
+              <Badge variant="healthy" size="sm">
+                Protection active
               </Badge>
               <Button
                 size="sm"
@@ -109,41 +109,41 @@ export default function EquipmentPage() {
             </p>
           </div>
 
-          <div className="p-3.5 rounded-xl border border-rose-200 bg-rose-50/30 shadow-2xs space-y-1">
-            <span className="text-[10px] uppercase font-bold text-rose-700 tracking-wider flex items-center gap-1">
+          <div className="p-3.5 rounded-xl border border-slate-200 bg-white shadow-none space-y-1">
+            <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider flex items-center gap-1">
               <ShieldAlert className="w-3 h-3" />
               Critical Cold Chain
             </span>
-            <div className="text-xl font-extrabold text-rose-950 font-mono">
+            <div className="text-xl font-extrabold text-slate-900 font-mono">
               {formatPower(flows.criticalDemandKw)}
             </div>
-            <p className="text-[11px] text-rose-700 font-medium">
+            <p className="text-[11px] text-slate-500 font-medium">
               3 Assets Protected (0% Spoilage)
             </p>
           </div>
 
-          <div className="p-3.5 rounded-xl border border-amber-200 bg-amber-50/30 shadow-2xs space-y-1">
-            <span className="text-[10px] uppercase font-bold text-amber-700 tracking-wider flex items-center gap-1">
+          <div className="p-3.5 rounded-xl border border-slate-200 bg-white shadow-none space-y-1">
+            <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider flex items-center gap-1">
               <Lightbulb className="w-3 h-3" />
               Important Infrastructure
             </span>
-            <div className="text-xl font-extrabold text-amber-950 font-mono">
+            <div className="text-xl font-extrabold text-slate-900 font-mono">
               {formatPower(flows.importantDemandKw)}
             </div>
-            <p className="text-[11px] text-amber-700 font-medium">
+            <p className="text-[11px] text-slate-500 font-medium">
               2 Assets (Warehouse LED + IT)
             </p>
           </div>
 
-          <div className="p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/30 shadow-2xs space-y-1">
-            <span className="text-[10px] uppercase font-bold text-emerald-700 tracking-wider flex items-center gap-1">
+          <div className="p-3.5 rounded-xl border border-slate-200 bg-white shadow-none space-y-1">
+            <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider flex items-center gap-1">
               <Power className="w-3 h-3" />
               Sheddable Deferrable
             </span>
-            <div className="text-xl font-extrabold text-emerald-950 font-mono">
+            <div className="text-xl font-extrabold text-slate-900 font-mono">
               {formatPower(flows.deferrableDemandKw)}
             </div>
-            <p className="text-[11px] text-emerald-700 font-medium">
+            <p className="text-[11px] text-slate-500 font-medium">
               HVAC & Admin Air Conditioning
             </p>
           </div>
@@ -152,7 +152,7 @@ export default function EquipmentPage() {
         {/* 1. Critical Refrigeration Appliances */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold text-rose-900 uppercase tracking-wider flex items-center gap-1.5">
+            <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
               <ShieldAlert className="w-4 h-4 text-rose-600" />
               Critical Refrigeration Circuits (Zero Curtailment Tolerance)
             </h3>
@@ -176,7 +176,7 @@ export default function EquipmentPage() {
         {/* 2. Important Appliances */}
         <div className="space-y-3 pt-2">
           <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold text-amber-900 uppercase tracking-wider flex items-center gap-1.5">
+            <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
               <Lightbulb className="w-4 h-4 text-amber-600" />
               Important Operational Assets (Warehouse Lighting & Security Rack)
             </h3>
@@ -200,7 +200,7 @@ export default function EquipmentPage() {
         {/* 3. Deferrable Air Conditioners & HVAC */}
         <div className="space-y-3 pt-2">
           <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold text-emerald-900 uppercase tracking-wider flex items-center gap-1.5">
+            <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
               <Power className="w-4 h-4 text-emerald-600" />
               Deferrable Loads (Sheddable during Grid Failure)
             </h3>

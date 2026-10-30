@@ -36,16 +36,16 @@ export default function SimulatorPage() {
         {/* Header with Title, Badges and Actions */}
         <SectionHeading
           title="Energy Crisis Simulator"
-          description="Interactive microgrid resilience testing sandbox. Model national grid disturbances, test peak solar thermal buffering, simulate battery discharge curves, and verify critical refrigeration continuity."
+          description="Test outages and see how GridMind protects critical loads."
           badge={
-            <Badge variant="warning" size="sm" className="font-mono text-[10px] uppercase font-bold">
-              Simulated Benchmark
+            <Badge variant="neutral" size="sm">
+              Demo
             </Badge>
           }
           actions={
             <div className="flex items-center gap-2">
-              <Badge variant="healthy" size="sm" className="font-mono text-[10px] uppercase font-bold">
-                Deterministic Engine Active
+              <Badge variant="healthy" size="sm">
+                Engine active
               </Badge>
             </div>
           }
@@ -56,7 +56,18 @@ export default function SimulatorPage() {
 
         {/* 2. Before-and-After Strategy Comparison */}
         {strategyComparison && (
-          <StrategyComparisonCard comparison={strategyComparison} />
+          <details className="group rounded-2xl border border-slate-200/80 bg-white">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-4">
+              <div>
+                <h3 className="text-sm font-semibold text-slate-900">Compare GridMind with the baseline</h3>
+                <p className="mt-1 text-xs text-slate-500">Open the detailed cost and runtime comparison</p>
+              </div>
+              <Badge variant="healthy" size="sm">{strategyComparison.costReductionPercentage}% lower cost</Badge>
+            </summary>
+            <div className="border-t border-slate-100 p-4">
+              <StrategyComparisonCard comparison={strategyComparison} />
+            </div>
+          </details>
         )}
 
         {/* 3. 5-Stage Agent Decision Pipeline */}
@@ -79,7 +90,11 @@ export default function SimulatorPage() {
             <SimulationEventsLog />
 
             {/* Benchmark Site Parameters Card */}
-            <Card className="border-slate-200 shadow-xs bg-slate-50/50">
+            <details className="rounded-2xl border border-slate-200/80 bg-white">
+              <summary className="cursor-pointer list-none px-4 py-3 text-xs font-semibold text-slate-700">
+                Facility technical details
+              </summary>
+            <Card className="rounded-none border-0 border-t border-slate-100 shadow-none">
               <CardHeader className="py-3 px-4 border-b border-slate-100">
                 <CardTitle className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
                   <Building2 className="w-3.5 h-3.5 text-slate-500" />
@@ -137,6 +152,7 @@ export default function SimulatorPage() {
                 </div>
               </CardContent>
             </Card>
+            </details>
           </div>
         </div>
       </div>

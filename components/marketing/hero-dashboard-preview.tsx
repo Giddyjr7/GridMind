@@ -7,7 +7,7 @@ import {
   BatteryCharging,
   Cpu,
   Clock,
-  Sparkles,
+  Lightbulb,
   ShieldAlert,
   ShieldCheck,
   CheckCircle2,
@@ -172,7 +172,7 @@ export function HeroDashboardPreview() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="p-1 rounded-md bg-emerald-600 text-white">
-                <Sparkles className="h-3.5 w-3.5" />
+                <Lightbulb className="h-3.5 w-3.5" />
               </div>
               <span className="text-xs font-bold text-emerald-950">
                 AI Optimization Recommendation

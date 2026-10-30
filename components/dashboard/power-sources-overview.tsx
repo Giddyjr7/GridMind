@@ -42,10 +42,8 @@ export function PowerSourcesOverview({
       <CardHeader>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
-            <CardTitle>Power Source Dispatch & Generation</CardTitle>
-            <CardDescription>
-              Real-time operational distribution across utility feeder, solar PV, battery ESS, and standby generator
-            </CardDescription>
+            <CardTitle>Energy sources</CardTitle>
+            <CardDescription>Where the facility&apos;s power is coming from right now</CardDescription>
           </div>
           <Badge variant="outline" size="sm" className="font-mono text-[10px]">
             Total Supply: {formatPower(totalLoadKw)}
@@ -53,7 +51,7 @@ export function PowerSourcesOverview({
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-4">
         {/* Visual Supply Distribution Bar */}
         <div className="space-y-1.5">
           <div className="flex items-center justify-between text-xs font-semibold text-slate-700">
@@ -115,9 +113,9 @@ export function PowerSourcesOverview({
         </div>
 
         {/* 4 Source Detail Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {/* 1. National Grid */}
-          <div className="p-4 rounded-xl border border-slate-200/80 bg-slate-50/60 space-y-3">
+          <div className="p-3 rounded-xl border border-slate-200/80 bg-white space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Zap className="h-4 w-4 text-brand-800" />
@@ -133,7 +131,7 @@ export function PowerSourcesOverview({
               </span>
               <span className="text-xs text-slate-500 ml-1 font-medium">kW</span>
             </div>
-            <div className="space-y-1 text-[11px] text-slate-500 border-t border-slate-200/60 pt-2 font-mono">
+            <div className="hidden">
               <div className="flex justify-between">
                 <span>Voltage:</span>
                 <span className="font-semibold text-slate-700">{grid.voltageV} V</span>
@@ -150,7 +148,7 @@ export function PowerSourcesOverview({
           </div>
 
           {/* 2. Solar PV */}
-          <div className="p-4 rounded-xl border border-slate-200/80 bg-slate-50/60 space-y-3">
+          <div className="p-3 rounded-xl border border-slate-200/80 bg-white space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Sun className="h-4 w-4 text-amber-500" />
@@ -166,7 +164,7 @@ export function PowerSourcesOverview({
               </span>
               <span className="text-xs text-slate-500 ml-1 font-medium">kW</span>
             </div>
-            <div className="space-y-1 text-[11px] text-slate-500 border-t border-slate-200/60 pt-2 font-mono">
+            <div className="hidden">
               <div className="flex justify-between">
                 <span>Irradiance:</span>
                 <span className="font-semibold text-slate-700">{solar.irradianceWm2} W/m²</span>
@@ -183,7 +181,7 @@ export function PowerSourcesOverview({
           </div>
 
           {/* 3. Battery ESS */}
-          <div className="p-4 rounded-xl border border-slate-200/80 bg-slate-50/60 space-y-3">
+          <div className="p-3 rounded-xl border border-slate-200/80 bg-white space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <BatteryCharging className="h-4 w-4 text-emerald-600" />
@@ -199,7 +197,7 @@ export function PowerSourcesOverview({
               </span>
               <span className="text-xs text-slate-500 ml-1 font-medium">% SOC</span>
             </div>
-            <div className="space-y-1 text-[11px] text-slate-500 border-t border-slate-200/60 pt-2 font-mono">
+            <div className="hidden">
               <div className="flex justify-between">
                 <span>Stored Energy:</span>
                 <span className="font-semibold text-slate-700">{formatEnergy(battery.currentStoredKwh)}</span>
@@ -216,7 +214,7 @@ export function PowerSourcesOverview({
           </div>
 
           {/* 4. Diesel Generator */}
-          <div className="p-4 rounded-xl border border-slate-200/80 bg-slate-50/60 space-y-3">
+          <div className="p-3 rounded-xl border border-slate-200/80 bg-white space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Power className="h-4 w-4 text-slate-400" />
@@ -232,7 +230,7 @@ export function PowerSourcesOverview({
               </span>
               <span className="text-xs text-slate-400 ml-1 font-medium">kW</span>
             </div>
-            <div className="space-y-1 text-[11px] text-slate-500 border-t border-slate-200/60 pt-2 font-mono">
+            <div className="hidden">
               <div className="flex justify-between">
                 <span>Fuel Level:</span>
                 <span className="font-semibold text-slate-700">{generator.fuelLevelPct}% ({generator.fuelCurrentLiters}L)</span>
