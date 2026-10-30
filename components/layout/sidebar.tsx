@@ -4,29 +4,25 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Zap,
   LayoutDashboard,
   Cpu,
-  Lightbulb,
+  ShieldCheck,
   Sliders,
   BarChart3,
-  History,
-  Settings,
-  Building2,
-  ChevronDown,
   X,
-  Check,
+  Layers,
   ArrowLeft,
+  Activity,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { DropdownMenu, DropdownItem, DropdownHeader, DropdownDivider } from "@/components/ui/dropdown-menu";
-import { MOCK_SITE_PROFILE } from "@/mocks/demo-business";
 import { GridMindLogo } from "@/components/brand/gridmind-logo";
+import { useWorkspace } from "@/context/workspace-context";
 
-interface NavItem {
+export interface NavItem {
   title: string;
   href: string;
   icon: React.ElementType;
+  badge?: string;
 }
 
 export const navItems: NavItem[] = [
@@ -36,39 +32,24 @@ export const navItems: NavItem[] = [
     icon: LayoutDashboard,
   },
   {
-    title: "Simulator",
+    title: "Scenarios",
     href: "/dashboard/simulator",
     icon: Cpu,
   },
   {
-    title: "Recommendations",
-    href: "/dashboard/recommendations",
-    icon: Lightbulb,
+    title: "Decisions",
+    href: "/dashboard/decisions",
+    icon: ShieldCheck,
+  },
+  {
+    title: "Devices",
+    href: "/dashboard/devices",
+    icon: Sliders,
   },
   {
     title: "Analytics",
     href: "/dashboard/analytics",
     icon: BarChart3,
-  },
-  {
-    title: "Equipment",
-    href: "/dashboard/equipment",
-    icon: Sliders,
-  },
-  {
-    title: "Power sources",
-    href: "/dashboard/sources",
-    icon: Zap,
-  },
-  {
-    title: "History",
-    href: "/dashboard/history",
-    icon: History,
-  },
-  {
-    title: "Settings",
-    href: "/dashboard/settings",
-    icon: Settings,
   },
 ];
 
@@ -79,44 +60,30 @@ export interface SidebarProps {
 
 export function Sidebar({ onClose, className }: SidebarProps) {
   const pathname = usePathname();
-  const [selectedSiteId, setSelectedSiteId] = React.useState(MOCK_SITE_PROFILE.id);
+  const { workspace } = useWorkspace();
 
-  const demoFacilities = [
-    {
-      id: "site_krystal_ikeja_01",
-      name: "Krystal Ice Cold Storage Ltd.",
-      location: "Ikeja Industrial, Lagos",
-      type: "Cold Storage & Blast Depot (150 kW)",
-    },
-    {
-      id: "site_kano_hub_02",
-      name: "Savannah Cold Chain Logistics",
-      location: "Challawa Industrial, Kano",
-      type: "Produce Cold Hub (200 kW)",
-    },
-  ];
-
-  const currentFacility =
-    demoFacilities.find((f) => f.id === selectedSiteId) || demoFacilities[0];
+  const businessName = workspace?.name || "Krystal Ice Cold Storage Ltd.";
+  const businessLocation = workspace?.location || "Ikeja Industrial, Lagos";
+  const workspaceLetter = businessName.charAt(0).toUpperCase();
 
   return (
     <aside
       className={cn(
-        "w-60 border-r border-slate-200/80 bg-white flex flex-col h-full shrink-0 select-none",
+        "w-64 border-r border-white/[0.08] bg-[#0c1410] flex flex-col h-full shrink-0 select-none",
         className
       )}
     >
       {/* Brand Header */}
-      <div className="h-16 flex items-center justify-between px-4 border-b border-slate-100">
-        <Link href="/dashboard" className="group">
-          <GridMindLogo markClassName="h-9 w-9" />
+      <div className="h-16 flex items-center justify-between px-4 border-b border-white/[0.08]">
+        <Link href="/dashboard" className="group flex items-center gap-2">
+          <GridMindLogo markClassName="h-8 w-8" />
         </Link>
 
         {onClose && (
           <button
             type="button"
             onClick={onClose}
-            className="md:hidden p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100"
+            className="md:hidden p-1.5 text-slate-400 hover:text-slate-200 rounded-lg hover:bg-white/[0.06] transition-colors"
             aria-label="Close menu"
           >
             <X className="h-4 w-4" />
@@ -124,104 +91,104 @@ export function Sidebar({ onClose, className }: SidebarProps) {
         )}
       </div>
 
-      {/* Business / Site Selector Dropdown */}
-      <div className="p-3 border-b border-slate-100">
-        <DropdownMenu
-          width="w-60"
-          align="left"
-          trigger={
-            <div className="p-2.5 rounded-xl border border-slate-200/80 bg-slate-50/60 hover:bg-slate-100/70 transition-colors">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 min-w-0">
-                  <Building2 className="h-4 w-4 text-brand-800 shrink-0" />
-                  <div className="min-w-0 text-left">
-                    <p className="text-xs font-semibold text-slate-900 truncate">
-                      {currentFacility.name}
-                    </p>
-                    <p className="text-[10px] text-slate-500 truncate">
-                      {currentFacility.location}
-                    </p>
-                  </div>
-                </div>
-                <ChevronDown className="h-3.5 w-3.5 text-slate-400 shrink-0 ml-1" />
-              </div>
-            </div>
-          }
+      {/* Workspace Context Chip */}
+      <div className="p-3 border-b border-white/[0.08]">
+        <Link
+          href="/workspace"
+          className="flex items-center gap-3 p-2 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.06] transition-colors group"
         >
-          <DropdownHeader>Select Managed Facility</DropdownHeader>
-          {demoFacilities.map((facility) => (
-            <DropdownItem
-              key={facility.id}
-              onClick={() => setSelectedSiteId(facility.id)}
-              className={selectedSiteId === facility.id ? "bg-brand-50/70 text-brand-950 font-semibold" : ""}
-            >
-              <div className="flex items-center justify-between w-full">
-                <div className="truncate">
-                  <p className="truncate">{facility.name}</p>
-                  <p className="text-[10px] text-slate-400 font-normal">{facility.location}</p>
-                </div>
-                {selectedSiteId === facility.id && (
-                  <Check className="h-3.5 w-3.5 text-emerald-600 shrink-0 ml-2" />
-                )}
-              </div>
-            </DropdownItem>
-          ))}
-          <DropdownDivider />
-          <div className="px-3 py-2 text-[10px] text-slate-400">
-            Contracted Limit: 150 kW · 11kV Feeder
+          <div className="h-8 w-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center font-semibold text-xs shrink-0 group-hover:border-emerald-500/40 transition-colors">
+            {workspaceLetter}
           </div>
-        </DropdownMenu>
+          <div className="min-w-0 flex-1 text-left">
+            <p className="text-xs font-medium text-slate-200 truncate">
+              {businessName}
+            </p>
+            <p className="text-[10px] text-slate-400 truncate">
+              {businessLocation}
+            </p>
+          </div>
+        </Link>
       </div>
 
-      {/* Navigation Links */}
+      {/* Primary Navigation Links */}
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
         <div className="px-3 pb-2">
-          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
-            Workspace
+          <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
+            Console
           </p>
         </div>
 
-        {navItems.map((item, index) => {
-          const isActive = pathname === item.href;
+        {navItems.map((item) => {
+          const isActive =
+            pathname === item.href ||
+            (item.href !== "/dashboard" && pathname.startsWith(item.href));
           const Icon = item.icon;
 
           return (
-            <React.Fragment key={item.href}>
-              {index === 4 && (
-                <div className="px-3 pb-1 pt-4 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
-                  Manage
-                </div>
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={onClose}
+              className={cn(
+                "flex items-center justify-between px-3 py-2 text-xs font-medium rounded-xl transition-colors group",
+                isActive
+                  ? "bg-emerald-500/10 text-emerald-300 font-semibold border border-emerald-500/20"
+                  : "text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] border border-transparent"
               )}
-              <Link
-                href={item.href}
-                onClick={onClose}
-                className={cn(
-                  "flex items-center justify-between px-3 py-2.5 text-xs font-medium rounded-xl transition-colors group",
-                  isActive
-                    ? "bg-brand-50 text-brand-950 font-semibold"
-                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80"
-                )}
-              >
-                <div className="flex items-center gap-2.5">
-                  <Icon
-                    className={cn(
-                      "h-4 w-4 shrink-0 transition-colors",
-                      isActive ? "text-brand-900" : "text-slate-400 group-hover:text-slate-600"
-                    )}
-                  />
-                  <span>{item.title}</span>
-                </div>
-              </Link>
-            </React.Fragment>
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                <Icon
+                  className={cn(
+                    "h-4 w-4 shrink-0 transition-colors",
+                    isActive
+                      ? "text-emerald-400"
+                      : "text-slate-400 group-hover:text-slate-300"
+                  )}
+                />
+                <span className="truncate">{item.title}</span>
+              </div>
+            </Link>
           );
         })}
 
-        {/* Back to Public Marketing Website link */}
-        <div className="pt-4 mt-3 border-t border-slate-100">
+        {/* Workspace Hub & Digital Twin links */}
+        <div className="pt-4 mt-4 border-t border-white/[0.08] space-y-1">
+          <div className="px-3 pb-2">
+            <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
+              Connected Hub
+            </p>
+          </div>
+          <Link
+            href="/workspace"
+            onClick={onClose}
+            className="flex items-center gap-3 px-3 py-2 text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] rounded-xl transition-colors"
+          >
+            <Layers className="h-4 w-4 text-slate-400" />
+            <span>Workspace Devices</span>
+          </Link>
+
+          <Link
+            href="/twin"
+            onClick={onClose}
+            className="flex items-center gap-3 px-3 py-2 text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] rounded-xl transition-colors"
+          >
+            <Activity className="h-4 w-4 text-emerald-400" />
+            <div className="flex items-center justify-between flex-1">
+              <span>Digital Twin</span>
+              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                MQTT
+              </span>
+            </div>
+          </Link>
+        </div>
+
+        {/* Back to Public Landing Page */}
+        <div className="pt-3 mt-3 border-t border-white/[0.08]">
           <Link
             href="/"
             onClick={onClose}
-            className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
+            className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-slate-500 hover:text-slate-300 hover:bg-white/[0.03] rounded-lg transition-colors"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             <span>Public Landing Page</span>
@@ -229,9 +196,12 @@ export function Sidebar({ onClose, className }: SidebarProps) {
         </div>
       </nav>
 
-      {/* Bottom Status / Mode Panel */}
-      <div className="px-5 py-3 border-t border-slate-100">
-        <p className="text-[10px] text-slate-400">Demo data · No live controls</p>
+      {/* Bottom Status */}
+      <div className="p-3 border-t border-white/[0.08]">
+        <div className="px-2 py-1.5 rounded-lg bg-black/40 border border-white/[0.05] text-[10px] text-slate-400 flex items-center justify-between">
+          <span className="truncate">Advisory Engine</span>
+          <span className="text-emerald-400 font-mono">v2.4</span>
+        </div>
       </div>
     </aside>
   );

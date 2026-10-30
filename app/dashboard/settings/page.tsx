@@ -3,277 +3,253 @@
 import * as React from "react";
 import Link from "next/link";
 import {
-  Building2,
-  Sliders,
+  Settings,
   Database,
-  RefreshCw,
-  ExternalLink,
-  Zap,
-  Cpu,
-  FileCode2,
-  CheckCircle2,
+  Sliders,
   RotateCcw,
-  AlertCircle,
+  Check,
+  Activity,
+  ExternalLink,
+  Shield,
 } from "lucide-react";
-import { PageContainer } from "@/components/ui/page-container";
-import { SectionHeading } from "@/components/ui/section-heading";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { envConfig } from "@/config/env";
-import { useSimulation } from "@/context/simulation-context";
-import { formatCurrency } from "@/lib/formatters";
+import { useScenario } from "@/context/scenario-context";
+import { useWorkspace } from "@/context/workspace-context";
+import { DEFAULT_ENGINE_CONFIG } from "@/lib/calculation-engine";
 
 export default function SettingsPage() {
-  const { params, resetToDefaultScenario, feedbackMessage } = useSimulation();
-  const [resetDone, setResetDone] = React.useState(false);
+  const {
+    config,
+    transportStatus,
+    updateEngineConfig,
+    resetToDemoDefaults,
+  } = useScenario();
+  const { workspace } = useWorkspace();
+
+  const [tariff, setTariff] = React.useState(config.gridTariffNgnPerKwh.toString());
+  const [dieselPrice, setDieselPrice] = React.useState(config.dieselPriceNgnPerLiter.toString());
+  const [reserveFloor, setReserveFloor] = React.useState(config.batteryReserveFloorPct.toString());
+  const [efficiency, setEfficiency] = React.useState((config.batteryRoundtripEfficiency * 100).toString());
+
+  const [saveFeedback, setSaveFeedback] = React.useState(false);
+
+  const handleSave = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateEngineConfig({
+      gridTariffNgnPerKwh: Math.max(1, Number(tariff) || 206),
+      dieselPriceNgnPerLiter: Math.max(1, Number(dieselPrice) || 1250),
+      batteryReserveFloorPct: Math.min(50, Math.max(5, Number(reserveFloor) || 15)),
+      batteryRoundtripEfficiency: Math.min(1, Math.max(0.5, (Number(efficiency) || 92) / 100)),
+    });
+    setSaveFeedback(true);
+    setTimeout(() => setSaveFeedback(false), 3000);
+  };
 
   const handleReset = () => {
-    resetToDefaultScenario();
-    setResetDone(true);
-    setTimeout(() => setResetDone(false), 2500);
+    resetToDemoDefaults();
+    setTariff(DEFAULT_ENGINE_CONFIG.gridTariffNgnPerKwh.toString());
+    setDieselPrice(DEFAULT_ENGINE_CONFIG.dieselPriceNgnPerLiter.toString());
+    setReserveFloor(DEFAULT_ENGINE_CONFIG.batteryReserveFloorPct.toString());
+    setEfficiency((DEFAULT_ENGINE_CONFIG.batteryRoundtripEfficiency * 100).toString());
+    setSaveFeedback(true);
+    setTimeout(() => setSaveFeedback(false), 3000);
   };
 
   return (
-    <PageContainer>
-      <SectionHeading
-        title="Facility settings"
-        description="Review site details, operating limits and backend connection status."
-        badge={
-          <Badge variant="neutral" size="sm">
-            Demo configuration
-          </Badge>
-        }
-      />
-
-      {feedbackMessage && (
-        <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-900 flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-          <span>{feedbackMessage}</span>
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* 1. Facility Metadata & Profile */}
-        <Card className="border-slate-200">
-          <CardHeader className="pb-3 bg-slate-50/50 border-b border-slate-100">
-            <div className="flex items-center gap-2">
-              <Building2 className="h-5 w-5 text-brand-800" />
-              <div>
-                <CardTitle className="text-base font-bold text-slate-900">
-                  Site Identity & Grid Connection
-                </CardTitle>
-                <CardDescription className="text-xs text-slate-500">
-                  Industrial cold chain depot registration metadata
-                </CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="pt-4 space-y-3 text-xs">
-            <div className="p-3.5 bg-slate-50/70 rounded-xl border border-slate-200/80 space-y-2.5">
-              <div className="flex justify-between items-center">
-                <span className="text-slate-500 font-medium">Facility Name:</span>
-                <span className="font-bold text-slate-900">Krystal Ice Cold Storage Ltd.</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-slate-500 font-medium">Industry Classification:</span>
-                <span className="font-semibold text-slate-800 uppercase font-mono text-[10px] bg-slate-200/70 px-2 py-0.5 rounded">
-                  COLD STORAGE / BLAST FREEZING
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-slate-500 font-medium">Geographic Location:</span>
-                <span className="font-semibold text-slate-800">
-                  Ikeja Industrial Zone, Lagos State, Nigeria
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-slate-500 font-medium">Distribution Feeder:</span>
-                <span className="font-semibold text-slate-800">
-                  Ikeja Electric (IE) Band A (₦206.00/kWh)
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-slate-500 font-medium">Contracted Maximum Demand:</span>
-                <span className="font-mono font-bold text-slate-900">
-                  {params.contractedDemandLimitKw ?? 150} kW
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-end pt-1">
-              <Link
-                href="/dashboard/sources"
-                className="text-xs font-semibold text-emerald-700 hover:text-emerald-800 flex items-center gap-1 hover:underline"
-              >
-                <span>Edit Source Capacities & Tariffs</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* 2. Operational Thresholds & Simulation Defaults */}
-        <Card className="border-slate-200">
-          <CardHeader className="pb-3 bg-slate-50/50 border-b border-slate-100">
-            <div className="flex items-center gap-2">
-              <Sliders className="h-5 w-5 text-brand-800" />
-              <div>
-                <CardTitle className="text-base font-bold text-slate-900">
-                  Active Simulation Parameters
-                </CardTitle>
-                <CardDescription className="text-xs text-slate-500">
-                  Real-time microgrid physics and financial dispatch rules
-                </CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="pt-4 space-y-3 text-xs">
-            <div className="p-3.5 bg-slate-50/70 rounded-xl border border-slate-200/80 space-y-2.5">
-              <div className="flex justify-between items-center">
-                <span className="text-slate-500 font-medium">Grid Tariff:</span>
-                <span className="font-mono font-bold text-slate-900">
-                  {formatCurrency(params.gridTariffPerKwhNgn, "NGN")}/kWh
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-slate-500 font-medium">Diesel Fuel Rate:</span>
-                <span className="font-mono font-bold text-slate-900">
-                  {formatCurrency(params.fuelCostPerLiterNgn, "NGN")}/L
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-slate-500 font-medium">Battery Reserve Floor:</span>
-                <span className="font-mono font-bold text-emerald-700">
-                  {params.batteryReserveFloorPct}% SOC (Guarded)
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-slate-500 font-medium">Inverter Efficiency:</span>
-                <span className="font-mono font-bold text-slate-900">
-                  {params.inverterEfficiencyPct}%
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-slate-500 font-medium">Solar Array Capacity:</span>
-                <span className="font-mono font-bold text-slate-900">
-                  {params.solarInstalledCapacityKwp ?? 75} kWp
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between pt-1">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handleReset}
-                className="text-xs h-8 text-slate-700 hover:bg-slate-100 flex items-center gap-1.5"
-              >
-                <RotateCcw className={`w-3.5 h-3.5 text-slate-500 ${resetDone ? "animate-spin" : ""}`} />
-                <span>{resetDone ? "Benchmark Restored!" : "Reset Demo Benchmark"}</span>
-              </Button>
-
-              <Link
-                href="/dashboard/simulator"
-                className="text-xs font-semibold text-emerald-700 hover:text-emerald-800 flex items-center gap-1 hover:underline"
-              >
-                <span>Open Simulator Controls</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* 3. Data Mode & API Readiness Boundary */}
-        <Card className="border-slate-200 lg:col-span-2">
-          <CardHeader className="pb-3 bg-slate-50/50 border-b border-slate-100">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Database className="h-5 w-5 text-brand-800" />
-                <div>
-                  <CardTitle className="text-base font-bold text-slate-900">
-                    NestJS Backend Readiness & Service Boundary
-                  </CardTitle>
-                  <CardDescription className="text-xs text-slate-500">
-                    Typed service interfaces, environment toggles, and proposed backend integration contracts
-                  </CardDescription>
-                </div>
-              </div>
-              <Badge variant={envConfig.isMock ? "warning" : "healthy"} size="sm" className="font-mono text-[10px]">
-                MODE: {envConfig.dataMode.toUpperCase()}
-              </Badge>
-            </div>
-          </CardHeader>
-          <CardContent className="pt-4 space-y-4 text-xs">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <div className="p-3 rounded-xl border border-slate-200 bg-slate-50/60 space-y-1">
-                <span className="text-slate-500 font-medium">Service Architecture:</span>
-                <p className="font-bold text-slate-900 font-mono text-[11px]">
-                  Decoupled Factory Pattern
-                </p>
-                <span className="text-[10px] text-slate-400">
-                  Swappable mock/API clients via <code>services/index.ts</code>
-                </span>
-              </div>
-
-              <div className="p-3 rounded-xl border border-slate-200 bg-slate-50/60 space-y-1">
-                <span className="text-slate-500 font-medium">API Base URL:</span>
-                <p className="font-bold text-slate-900 font-mono text-[11px] truncate">
-                  {envConfig.apiBaseUrl}
-                </p>
-                <span className="text-[10px] text-slate-400">
-                  Configured via <code>NEXT_PUBLIC_API_BASE_URL</code>
-                </span>
-              </div>
-
-              <div className="p-3 rounded-xl border border-slate-200 bg-slate-50/60 space-y-1">
-                <span className="text-slate-500 font-medium">Client Security:</span>
-                <p className="font-bold text-emerald-700 font-mono text-[11px]">
-                  Zero Secrets Exposed
-                </p>
-                <span className="text-[10px] text-slate-400">
-                  No private keys or tokens bundled in client JS
-                </span>
-              </div>
-            </div>
-
-            {/* Backend Integration Checklist */}
-            <details className="rounded-xl border border-slate-200 bg-slate-50/30 p-4">
-              <summary className="cursor-pointer font-bold text-slate-900 text-xs flex items-center gap-1.5">
-                <FileCode2 className="w-4 h-4 text-emerald-600" />
-                View connected API endpoints
-              </summary>
-
-              <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-2 text-slate-600">
-                <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                  <span><code>GET /site/profile</code>: Returns BusinessSite (name, tariff, capacity).</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                  <span><code>GET /telemetry/dashboard-metrics</code>: Returns live load kW, SOC %, grid status.</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                  <span><code>GET /appliances</code> & <code>PATCH /appliances/:id/state</code>: Circuit control.</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                  <span><code>GET /recommendations</code> & <code>POST /recommendations/:id/approve</code>.</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                  <span><code>GET /audit/events</code>: System disturbance and operator decision history.</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                  <span><code>GET /forecast/today</code>: 24h solar potential & outage probability points.</span>
-                </div>
-              </div>
-            </details>
-          </CardContent>
-        </Card>
+    <div className="space-y-6 max-w-4xl mx-auto select-none">
+      {/* Header */}
+      <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.08]">
+        <h2 className="text-base font-semibold text-white tracking-tight">
+          System Settings & Calculation Parameters
+        </h2>
+        <p className="text-xs text-slate-400 mt-0.5">
+          Configure baseline financial assumptions, telemetry transport, and site metadata
+        </p>
       </div>
-    </PageContainer>
+
+      {/* Section 1: Data Source & Telemetry */}
+      <div className="rounded-2xl bg-white/[0.02] border border-white/[0.08] p-5 space-y-4">
+        <div className="flex items-center gap-2">
+          <Database className="h-4 w-4 text-emerald-400" />
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-300">
+            Telemetry Transport & Source
+          </h3>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+          <div className="p-3.5 rounded-xl bg-black/40 border border-white/[0.04] space-y-1">
+            <span className="text-[10px] text-slate-400 block">Current Transport Mode</span>
+            <div className="flex items-center gap-2">
+              <span
+                className={`h-2 w-2 rounded-full ${
+                  transportStatus === "digital_twin_connected"
+                    ? "bg-emerald-400 animate-pulse"
+                    : transportStatus === "digital_twin_offline"
+                    ? "bg-amber-400"
+                    : "bg-emerald-500"
+                }`}
+              />
+              <span className="font-medium text-white capitalize">
+                {transportStatus === "digital_twin_connected"
+                  ? "Digital Twin Connected"
+                  : transportStatus === "digital_twin_offline"
+                  ? "Digital Twin Offline"
+                  : "Simulated Telemetry"}
+              </span>
+            </div>
+            <p className="text-[10px] text-slate-500 mt-1">
+              Deterministic calculations driven by local simulation engine or live MQTT broker.
+            </p>
+          </div>
+
+          <div className="p-3.5 rounded-xl bg-black/40 border border-white/[0.04] space-y-2 flex flex-col justify-between">
+            <div>
+              <span className="text-[10px] text-slate-400 block">Digital Twin Console</span>
+              <p className="text-slate-300 text-xs">
+                Launch the twin control console to publish live edge telemetry over WebSockets.
+              </p>
+            </div>
+            <Link
+              href="/twin"
+              className="inline-flex items-center gap-1.5 text-xs text-emerald-400 hover:text-emerald-300 font-medium pt-1"
+            >
+              <Activity className="h-3.5 w-3.5" />
+              <span>Open Digital Twin Console</span>
+              <ExternalLink className="h-3 w-3" />
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Section 2: Financial & Physical Calculation Engine Parameters */}
+      <form onSubmit={handleSave} className="rounded-2xl bg-white/[0.02] border border-white/[0.08] p-5 space-y-5">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Sliders className="h-4 w-4 text-emerald-400" />
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-300">
+              Deterministic Engine Inputs
+            </h3>
+          </div>
+          <button
+            type="button"
+            onClick={handleReset}
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs text-slate-400 hover:text-white hover:bg-white/[0.04] transition-colors"
+          >
+            <RotateCcw className="h-3 w-3" />
+            <span>Reset Demo Defaults</span>
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+          {/* Grid Tariff */}
+          <div className="space-y-1.5">
+            <label className="text-slate-300 font-medium">
+              Grid Tariff (₦/kWh)
+            </label>
+            <input
+              type="number"
+              value={tariff}
+              onChange={(e) => setTariff(e.target.value)}
+              className="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/[0.08] text-white font-mono focus:outline-none focus:border-emerald-500/50"
+            />
+            <p className="text-[10px] text-slate-500">
+              Ikeja Electric Band A benchmark rate (default ₦206/kWh)
+            </p>
+          </div>
+
+          {/* Diesel Fuel Price */}
+          <div className="space-y-1.5">
+            <label className="text-slate-300 font-medium">
+              Diesel Fuel Price (₦/Liter)
+            </label>
+            <input
+              type="number"
+              value={dieselPrice}
+              onChange={(e) => setDieselPrice(e.target.value)}
+              className="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/[0.08] text-white font-mono focus:outline-none focus:border-emerald-500/50"
+            />
+            <p className="text-[10px] text-slate-500">
+              Bulk AGO depot procurement rate (default ₦1,250/L)
+            </p>
+          </div>
+
+          {/* Battery Reserve Floor */}
+          <div className="space-y-1.5">
+            <label className="text-slate-300 font-medium">
+              Battery Reserve Floor (%)
+            </label>
+            <input
+              type="number"
+              min="5"
+              max="50"
+              value={reserveFloor}
+              onChange={(e) => setReserveFloor(e.target.value)}
+              className="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/[0.08] text-white font-mono focus:outline-none focus:border-emerald-500/50"
+            />
+            <p className="text-[10px] text-slate-500">
+              Minimum capacity reserved for cold-chain safety cutoff (default 15%)
+            </p>
+          </div>
+
+          {/* Round-trip Efficiency */}
+          <div className="space-y-1.5">
+            <label className="text-slate-300 font-medium">
+              Round-trip Efficiency (%)
+            </label>
+            <input
+              type="number"
+              min="50"
+              max="100"
+              value={efficiency}
+              onChange={(e) => setEfficiency(e.target.value)}
+              className="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/[0.08] text-white font-mono focus:outline-none focus:border-emerald-500/50"
+            />
+            <p className="text-[10px] text-slate-500">
+              LiFePO4 battery and hybrid inverter combined efficiency (default 92%)
+            </p>
+          </div>
+        </div>
+
+        <div className="pt-2 border-t border-white/[0.06] flex items-center justify-between">
+          <p className="text-[11px] text-slate-500">
+            Changes immediately update all dashboard metrics, charts, and recommendations.
+          </p>
+          <div className="flex items-center gap-2">
+            {saveFeedback && (
+              <span className="text-xs text-emerald-400 flex items-center gap-1 font-medium">
+                <Check className="h-3.5 w-3.5" />
+                <span>Saved successfully</span>
+              </span>
+            )}
+            <button
+              type="submit"
+              className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold text-xs transition-colors"
+            >
+              Save Parameters
+            </button>
+          </div>
+        </div>
+      </form>
+
+      {/* Section 3: Facility Metadata */}
+      <div className="rounded-2xl bg-white/[0.02] border border-white/[0.08] p-5 space-y-3">
+        <div className="flex items-center gap-2">
+          <Shield className="h-4 w-4 text-emerald-400" />
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-300">
+            Facility Metadata
+          </h3>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+          <div className="p-3 rounded-xl bg-black/40 border border-white/[0.04]">
+            <span className="text-[10px] text-slate-400 block">Workspace Name</span>
+            <span className="text-white font-medium">{workspace?.name || "Krystal Ice Cold Storage Ltd."}</span>
+          </div>
+          <div className="p-3 rounded-xl bg-black/40 border border-white/[0.04]">
+            <span className="text-[10px] text-slate-400 block">Location</span>
+            <span className="text-white font-medium">{workspace?.location || "Ikeja Industrial, Lagos"}</span>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

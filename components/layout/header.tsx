@@ -2,26 +2,20 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Bell,
   Menu,
-  CheckCheck,
-  AlertTriangle,
   Settings,
   LogOut,
-  ShieldCheck,
+  Layers,
+  ArrowLeft,
+  X,
+  ExternalLink,
+  Activity,
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import {
-  DropdownMenu,
-  DropdownItem,
-  DropdownHeader,
-  DropdownDivider,
-} from "@/components/ui/dropdown-menu";
-import { envConfig } from "@/config/env";
-import { MOCK_DASHBOARD_METRICS } from "@/mocks/demo-business";
-import { useSimulation } from "@/context/simulation-context";
+import { useScenario } from "@/context/scenario-context";
+import { useWorkspace } from "@/context/workspace-context";
 
 interface HeaderProps {
   onOpenMobileSidebar?: () => void;
@@ -30,220 +24,336 @@ interface HeaderProps {
 const routeTitles: Record<string, { title: string; subtitle: string }> = {
   "/dashboard": {
     title: "Overview",
-    subtitle: "Real-time energy continuity & microgrid orchestration",
+    subtitle: "Real-time energy continuity and asset telemetry",
   },
   "/dashboard/simulator": {
-    title: "Simulator",
-    subtitle: "What-if grid outage scenario modeling & load shedding",
+    title: "Scenarios",
+    subtitle: "What-if outage stress-testing and load shedding",
   },
-  "/dashboard/recommendations": {
-    title: "Recommendations",
-    subtitle: "Algorithmic dispatch guidance & operator approvals",
+  "/dashboard/decisions": {
+    title: "Decisions & History",
+    subtitle: "Operator actions, dispatch guidance, and verified audit log",
   },
-  "/dashboard/equipment": {
-    title: "Equipment",
-    subtitle: "Critical, important and deferrable asset prioritization",
-  },
-  "/dashboard/sources": {
-    title: "Power sources",
-    subtitle: "National grid, solar array, battery ESS & diesel generators",
+  "/dashboard/devices": {
+    title: "Devices & Sources",
+    subtitle: "Active power sources and prioritized facility loads",
   },
   "/dashboard/analytics": {
     title: "Analytics",
-    subtitle: "Tariff efficiency, diesel avoidance & carbon abatement",
-  },
-  "/dashboard/history": {
-    title: "History",
-    subtitle: "Operator actions, approvals, and verified outcomes",
+    subtitle: "Continuous tariff efficiency, fuel avoidance, and cost modeling",
   },
   "/dashboard/settings": {
     title: "Settings",
-    subtitle: "Tariff rules, site metadata and integration preferences",
+    subtitle: "Tariff rules, baseline assumptions, and telemetry endpoints",
   },
 };
 
 export function Header({ onOpenMobileSidebar }: HeaderProps) {
   const pathname = usePathname();
-  const sim = useSimulation();
+  const router = useRouter();
+  const { outputs, transportStatus, auditTrail } = useScenario();
+  const { profile, signOut } = useWorkspace();
 
-  const telemetry = sim?.derivedDashboardMetrics?.telemetry ?? MOCK_DASHBOARD_METRICS.telemetry;
-  const events = sim?.events ?? [];
-  const [unreadCount, setUnreadCount] = React.useState(2);
+  const [notificationsOpen, setNotificationsOpen] = React.useState(false);
+  const [userMenuOpen, setUserMenuOpen] = React.useState(false);
 
   const routeInfo = routeTitles[pathname] || {
     title: "Operations Console",
-    subtitle: "Commercial microgrid management",
+    subtitle: "Commercial energy continuity management",
   };
 
-  const markAllRead = () => {
-    setUnreadCount(0);
+  const isGridAvailable = outputs.dispatch.gridKw > 0 || (outputs.riskLevel !== "critical" && outputs.backupRuntimeHours === null);
+  const userInitials = profile?.firstName && profile?.lastName
+    ? `${profile.firstName.charAt(0)}${profile.lastName.charAt(0)}`.toUpperCase()
+    : "OP";
+
+  const handleSignOut = () => {
+    signOut();
+    router.push("/login");
   };
 
   return (
-    <header className="h-16 border-b border-slate-200 bg-white sticky top-0 z-20 flex items-center justify-between px-4 sm:px-6">
-      {/* Left: Mobile Navigation Button & Page Title / Breadcrumbs */}
-      <div className="flex items-center gap-3">
-        {onOpenMobileSidebar && (
-          <button
-            type="button"
-            onClick={onOpenMobileSidebar}
-            className="md:hidden p-2 -ml-1 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-100 transition-colors"
-            aria-label="Open navigation sidebar"
-          >
-            <Menu className="h-5 w-5" />
-          </button>
-        )}
+    <>
+      <header className="h-16 border-b border-white/[0.08] bg-[#070c0a]/90 backdrop-blur-md sticky top-0 z-20 flex items-center justify-between px-4 sm:px-6 select-none">
+        {/* Left: Mobile Sidebar Toggle & Page Title */}
+        <div className="flex items-center gap-3 min-w-0">
+          {onOpenMobileSidebar && (
+            <button
+              type="button"
+              onClick={onOpenMobileSidebar}
+              className="md:hidden p-2 -ml-1 text-slate-400 hover:text-slate-200 rounded-lg hover:bg-white/[0.06] transition-colors"
+              aria-label="Open navigation sidebar"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+          )}
 
-        <div>
-          <h1 className="text-sm sm:text-base font-semibold text-slate-900 leading-none truncate max-w-xs sm:max-w-md">
-            {routeInfo.title}
-          </h1>
+          <div className="min-w-0">
+            <h1 className="text-sm sm:text-base font-semibold text-white tracking-tight leading-none truncate">
+              {routeInfo.title}
+            </h1>
+            <p className="text-[11px] text-slate-400 mt-1 hidden sm:block truncate">
+              {routeInfo.subtitle}
+            </p>
+          </div>
         </div>
-      </div>
 
-      {/* Right: Telemetry Ribbon, Notifications, Site Context & Profile */}
-      <div className="flex items-center gap-2 sm:gap-3">
-        <div className="hidden xl:flex items-center gap-2 pr-3 border-r border-slate-200">
-          <div className="flex items-center gap-2 text-xs text-slate-600">
+        {/* Right: Data Transport Chip, Notifications & Profile Menu */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Data Source Chip */}
+          <div className="flex items-center gap-2 px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.08] text-xs">
             <span className="relative flex h-2 w-2">
               <span
                 className={`relative inline-flex rounded-full h-2 w-2 ${
-                  telemetry.gridOnline ? "bg-emerald-500" : "bg-rose-500"
+                  transportStatus === "digital_twin_connected"
+                    ? "bg-emerald-400 animate-pulse"
+                    : transportStatus === "digital_twin_offline"
+                    ? "bg-amber-400"
+                    : "bg-emerald-500"
                 }`}
               />
             </span>
-            <span className={telemetry.gridOnline ? "text-slate-700" : "text-rose-700"}>
-              {telemetry.gridOnline ? "Online" : "Grid outage"}
+            <span className="text-[11px] text-slate-300 font-medium">
+              {transportStatus === "digital_twin_connected"
+                ? "Digital twin connected"
+                : transportStatus === "digital_twin_offline"
+                ? "Digital twin offline"
+                : "Simulated"}
             </span>
           </div>
-        </div>
 
-        {/* Notifications Dropdown */}
-        <DropdownMenu
-          width="w-80 sm:w-96"
-          align="right"
-          trigger={
-            <div
-              className="relative p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors select-none"
-              title="Recent Operational Alerts"
+          {/* Grid Status Pill */}
+          <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.08] text-[11px]">
+            <span
+              className={`h-1.5 w-1.5 rounded-full ${
+                outputs.dispatch.gridKw > 0 || outputs.backupRuntimeHours === null
+                  ? "bg-emerald-400"
+                  : "bg-rose-400"
+              }`}
+            />
+            <span className="text-slate-300 font-medium">
+              {outputs.dispatch.gridKw > 0 || outputs.backupRuntimeHours === null
+                ? "Grid Online"
+                : "Grid Outage"}
+            </span>
+          </div>
+
+          {/* Notifications Drawer Toggle */}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setNotificationsOpen(!notificationsOpen)}
+              className="relative p-2 text-slate-400 hover:text-slate-200 hover:bg-white/[0.06] rounded-lg transition-colors"
+              aria-label="View recent operational alerts"
             >
               <Bell className="h-4 w-4" />
-              {unreadCount > 0 && (
+              {outputs.riskLevel !== "normal" && (
                 <span className="absolute top-1.5 right-1.5 flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500" />
                 </span>
               )}
-            </div>
-          }
-        >
-          <div className="flex items-center justify-between px-3 py-2 border-b border-slate-100">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-slate-900">System Notifications</span>
-              {unreadCount > 0 && (
-                <Badge variant="warning" size="sm" className="text-[10px] py-0 px-1.5">
-                  {unreadCount} new
-                </Badge>
-              )}
-            </div>
-            {unreadCount > 0 && (
-              <button
-                type="button"
-                onClick={markAllRead}
-                className="text-[11px] text-emerald-700 hover:text-emerald-900 font-semibold"
-              >
-                Mark read
-              </button>
-            )}
+            </button>
           </div>
 
-          <div className="max-h-72 overflow-y-auto divide-y divide-slate-100">
-            {events.map((evt) => (
-              <div key={evt.id} className="p-3 hover:bg-slate-50/80 transition-colors space-y-1">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-slate-800">{evt.title}</span>
-                  <Badge
-                    variant={evt.severity === "warning" ? "warning" : "info"}
-                    size="sm"
-                    className="capitalize text-[9px] py-0 px-1"
-                  >
-                    {evt.severity}
-                  </Badge>
-                </div>
-                <p className="text-[11px] text-slate-500 leading-relaxed">{evt.details}</p>
-                <p className="text-[10px] text-slate-400 font-mono">
-                  {new Date(evt.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          <DropdownDivider />
-          <div className="p-1">
-            <Link
-              href="/dashboard/history"
-              className="w-full flex items-center justify-center p-2 text-xs font-medium text-emerald-800 hover:text-emerald-950 hover:bg-slate-50 rounded-lg transition-colors"
+          {/* Profile Dropdown Toggle */}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setUserMenuOpen(!userMenuOpen)}
+              className="flex items-center gap-2 p-1 pl-2 hover:bg-white/[0.06] rounded-xl transition-colors border border-transparent hover:border-white/[0.08]"
             >
-              View Full Audit Log
-            </Link>
-          </div>
-        </DropdownMenu>
-
-        {/* User / Profile Menu */}
-        <DropdownMenu
-          width="w-64"
-          align="right"
-          trigger={
-            <div className="flex items-center gap-2 p-1 pl-2 hover:bg-slate-100/80 rounded-lg transition-colors select-none">
-              <div className="h-8 w-8 rounded-full bg-brand-950 text-emerald-400 flex items-center justify-center font-bold text-xs shadow-sm ring-1 ring-brand-800">
-                TA
+              <div className="h-8 w-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 flex items-center justify-center font-semibold text-xs">
+                {userInitials}
               </div>
-              <div className="hidden lg:block text-left pr-1">
-                <p className="text-xs font-semibold text-slate-900 leading-tight">
-                  Engr. T. Adeyemi
+              <div className="hidden xl:block text-left pr-1">
+                <p className="text-xs font-medium text-slate-200 truncate max-w-[120px]">
+                  {profile?.displayName || "Operator"}
                 </p>
-                <p className="text-[10px] text-slate-500 leading-none">
+                <p className="text-[10px] text-slate-400 truncate">
                   Facility Lead
                 </p>
               </div>
+            </button>
+
+            {/* Profile Dropdown Menu */}
+            {userMenuOpen && (
+              <>
+                <div
+                  className="fixed inset-0 z-30"
+                  onClick={() => setUserMenuOpen(false)}
+                />
+                <div className="absolute right-0 mt-2 w-56 rounded-xl bg-[#0c1410] border border-white/[0.1] shadow-2xl py-1 z-40 text-xs animate-in fade-in-50 zoom-in-95">
+                  <div className="px-3 py-2 border-b border-white/[0.08]">
+                    <p className="font-medium text-white truncate">
+                      {profile?.displayName || "Facility Operator"}
+                    </p>
+                    <p className="text-[10px] text-slate-400 truncate mt-0.5">
+                      {profile?.email || "operator@gridmind.internal"}
+                    </p>
+                  </div>
+
+                  <div className="py-1">
+                    <Link
+                      href="/dashboard/settings"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex items-center gap-2.5 px-3 py-2 text-slate-300 hover:text-white hover:bg-white/[0.06] transition-colors"
+                    >
+                      <Settings className="h-4 w-4 text-slate-400" />
+                      <span>Settings</span>
+                    </Link>
+
+                    <Link
+                      href="/workspace"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex items-center gap-2.5 px-3 py-2 text-slate-300 hover:text-white hover:bg-white/[0.06] transition-colors"
+                    >
+                      <Layers className="h-4 w-4 text-slate-400" />
+                      <span>Workspace Devices</span>
+                    </Link>
+
+                    <Link
+                      href="/twin"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex items-center gap-2.5 px-3 py-2 text-slate-300 hover:text-white hover:bg-white/[0.06] transition-colors"
+                    >
+                      <Activity className="h-4 w-4 text-emerald-400" />
+                      <span>Digital Twin Console</span>
+                    </Link>
+
+                    <Link
+                      href="/"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex items-center gap-2.5 px-3 py-2 text-slate-300 hover:text-white hover:bg-white/[0.06] transition-colors"
+                    >
+                      <ArrowLeft className="h-4 w-4 text-slate-400" />
+                      <span>Public Landing Page</span>
+                    </Link>
+                  </div>
+
+                  <div className="border-t border-white/[0.08] pt-1">
+                    <button
+                      type="button"
+                      onClick={handleSignOut}
+                      className="w-full flex items-center gap-2.5 px-3 py-2 text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 transition-colors text-left"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      <span>Sign Out</span>
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </header>
+
+      {/* Notifications Slide-over Drawer */}
+      {notificationsOpen && (
+        <div className="fixed inset-0 z-50 overflow-hidden">
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+            onClick={() => setNotificationsOpen(false)}
+          />
+          <div className="absolute inset-y-0 right-0 max-w-full flex pl-10">
+            <div className="w-screen max-w-sm bg-[#0c1410] border-l border-white/[0.1] shadow-2xl flex flex-col">
+              {/* Header */}
+              <div className="h-16 px-4 border-b border-white/[0.08] flex items-center justify-between">
+                <div>
+                  <h2 className="text-sm font-semibold text-white">
+                    Operational Alerts
+                  </h2>
+                  <p className="text-[11px] text-slate-400">
+                    Active conditions and recommendations
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setNotificationsOpen(false)}
+                  className="p-1.5 text-slate-400 hover:text-slate-200 rounded-lg hover:bg-white/[0.06]"
+                  aria-label="Close notifications"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+
+              {/* List */}
+              <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                {/* Active Advisory Card */}
+                <div className="p-3.5 rounded-xl bg-white/[0.04] border border-white/[0.08] space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-white">
+                      {outputs.recommendation.title}
+                    </span>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                      Advisory
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    {outputs.recommendation.reason}
+                  </p>
+                  <Link
+                    href="/dashboard/decisions"
+                    onClick={() => setNotificationsOpen(false)}
+                    className="inline-flex items-center gap-1.5 text-xs text-emerald-400 hover:text-emerald-300 pt-1 font-medium"
+                  >
+                    <span>Review in Decisions</span>
+                    <ExternalLink className="h-3 w-3" />
+                  </Link>
+                </div>
+
+                {/* Audit Trail List */}
+                <div className="pt-2">
+                  <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                    Recent Operator Decisions
+                  </p>
+                  <div className="space-y-2">
+                    {auditTrail.slice(0, 4).map((item) => (
+                      <div
+                        key={item.id}
+                        className="p-3 rounded-lg bg-black/40 border border-white/[0.05] space-y-1"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-medium text-slate-200 truncate">
+                            {item.title}
+                          </span>
+                          <span
+                            className={`text-[9px] font-mono px-1.5 py-0.5 rounded capitalize ${
+                              item.actionTaken === "approved"
+                                ? "bg-emerald-500/10 text-emerald-400"
+                                : "bg-rose-500/10 text-rose-400"
+                            }`}
+                          >
+                            {item.actionTaken}
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-slate-400">
+                          {new Date(item.timestamp).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}{" "}
+                          by {item.actor}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="p-3 border-t border-white/[0.08]">
+                <Link
+                  href="/dashboard/decisions"
+                  onClick={() => setNotificationsOpen(false)}
+                  className="w-full flex items-center justify-center p-2 text-xs font-medium text-emerald-400 hover:text-emerald-300 rounded-lg hover:bg-emerald-500/10 transition-colors"
+                >
+                  View Full Audit Log
+                </Link>
+              </div>
             </div>
-          }
-        >
-          <div className="p-3 border-b border-slate-100">
-            <p className="text-xs font-bold text-slate-900">Engr. Tunde Adeyemi</p>
-            <p className="text-[11px] text-slate-500">operator@krystalice.ng</p>
-            <div className="mt-1.5 flex items-center gap-1.5">
-              <Badge variant="healthy" size="sm" className="text-[9px] py-0 px-1 font-mono">
-                FACILITY MANAGER
-              </Badge>
-              <span className="text-[10px] text-slate-400 font-mono">Demo Session</span>
-            </div>
           </div>
-
-          <div className="p-1">
-            <Link href="/dashboard/settings">
-              <DropdownItem icon={<Settings className="h-4 w-4" />}>
-                Facility Configuration
-              </DropdownItem>
-            </Link>
-            <Link href="/dashboard/history">
-              <DropdownItem icon={<ShieldCheck className="h-4 w-4" />}>
-                Operator Approvals
-              </DropdownItem>
-            </Link>
-          </div>
-
-          <DropdownDivider />
-
-          <div className="p-1">
-            <Link href="/login">
-              <DropdownItem danger icon={<LogOut className="h-4 w-4" />}>
-                Sign Out
-              </DropdownItem>
-            </Link>
-          </div>
-        </DropdownMenu>
-      </div>
-    </header>
+        </div>
+      )}
+    </>
   );
 }
