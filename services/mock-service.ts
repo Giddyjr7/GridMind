@@ -3,6 +3,7 @@ import {
   IApplianceService,
   IRecommendationService,
   IAuditService,
+  IDeviceService,
   IGridMindServices,
 } from "./interfaces";
 import { mockAuthService } from "./auth-service";
@@ -26,6 +27,8 @@ import {
   EnergyRecommendation,
   ApprovalRecord,
   EnergyEventRecord,
+  DeviceCommand,
+  DeviceGatewayStatus,
 } from "@/types/energy";
 
 // Simulated network delay for realistic async behavior in mock mode
@@ -75,6 +78,12 @@ export class MockApplianceService implements IApplianceService {
 export class MockRecommendationService implements IRecommendationService {
   private recommendations: EnergyRecommendation[] = [...MOCK_RECOMMENDATIONS];
   private approvalHistory: ApprovalRecord[] = [...MOCK_APPROVAL_HISTORY];
+
+  async evaluate(): Promise<{ recommendation: EnergyRecommendation | null }> {
+    return simulateLatency({
+      recommendation: this.recommendations.find((item) => item.status === "pending") ?? null,
+    });
+  }
 
   async getRecommendations(): Promise<EnergyRecommendation[]> {
     return simulateLatency(this.recommendations);
@@ -131,9 +140,36 @@ export class MockRecommendationService implements IRecommendationService {
     return simulateLatency(record);
   }
 
+  async dismissRecommendation(id: string): Promise<EnergyRecommendation> {
+    const rec = this.recommendations.find((item) => item.id === id);
+    if (!rec) throw new Error(`Recommendation "${id}" not found.`);
+    rec.status = "expired";
+    return simulateLatency(rec);
+  }
+
   async getApprovalHistory(): Promise<ApprovalRecord[]> {
     return simulateLatency(this.approvalHistory);
   }
+}
+
+export class MockDeviceService implements IDeviceService {
+  async getGatewayStatus(): Promise<DeviceGatewayStatus> {
+    return simulateLatency({
+      id: "gateway_mock_01",
+      name: "GridMind Mock Gateway",
+      protocol: "virtual",
+      connection: "online",
+      mode: "digital_twin",
+      lastHeartbeatAt: new Date().toISOString(),
+      connectedApplianceIds: ["app_freezer_01"],
+      connectedAssetIds: ["app_freezer_01", "src_grid_main", "src_solar_rooftop", "src_battery_ess", "src_gen_cummins"],
+      activeCommandCount: 0,
+    });
+  }
+
+  async getCommands(): Promise<DeviceCommand[]> { return simulateLatency([]); }
+  async getCommand(): Promise<DeviceCommand> { throw new Error("No mock device command exists."); }
+  async cancelCommand(): Promise<DeviceCommand> { throw new Error("No mock device command exists."); }
 }
 
 export class MockAuditService implements IAuditService {
@@ -147,5 +183,6 @@ export const mockServices: IGridMindServices = {
   appliances: new MockApplianceService(),
   recommendations: new MockRecommendationService(),
   audit: new MockAuditService(),
+  devices: new MockDeviceService(),
   auth: mockAuthService,
 };

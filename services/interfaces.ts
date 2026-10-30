@@ -8,6 +8,8 @@ import {
   EnergyRecommendation,
   ApprovalRecord,
   EnergyEventRecord,
+  DeviceCommand,
+  DeviceGatewayStatus,
 } from "@/types/energy";
 
 import { IAuthService } from "@/types/auth";
@@ -26,6 +28,7 @@ export interface IApplianceService {
 }
 
 export interface IRecommendationService {
+  evaluate(input?: Record<string, unknown>): Promise<{ recommendation: EnergyRecommendation | null }>;
   getRecommendations(): Promise<EnergyRecommendation[]>;
   approveRecommendation(
     id: string,
@@ -37,7 +40,15 @@ export interface IRecommendationService {
     approver: string,
     reason?: string
   ): Promise<ApprovalRecord>;
+  dismissRecommendation(id: string): Promise<EnergyRecommendation>;
   getApprovalHistory(): Promise<ApprovalRecord[]>;
+}
+
+export interface IDeviceService {
+  getGatewayStatus(): Promise<DeviceGatewayStatus>;
+  getCommands(): Promise<DeviceCommand[]>;
+  getCommand(id: string): Promise<DeviceCommand>;
+  cancelCommand(id: string, cancelledBy: string): Promise<DeviceCommand>;
 }
 
 export interface IAuditService {
@@ -49,5 +60,6 @@ export interface IGridMindServices {
   appliances: IApplianceService;
   recommendations: IRecommendationService;
   audit: IAuditService;
+  devices: IDeviceService;
   auth: IAuthService;
 }

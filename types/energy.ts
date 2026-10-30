@@ -133,6 +133,9 @@ export interface Appliance {
     targetCelsius: number;
   };
   notes?: string;
+  telemetryStatus?: "online" | "stale" | "offline";
+  lastTelemetryAt?: string;
+  healthPct?: number;
 }
 
 // ==========================================
@@ -292,6 +295,52 @@ export interface ApprovalRecord {
   timestamp: string;
   notes?: string;
   savingsRealizedEstimateNgn?: number;
+  deviceCommandId?: string;
+}
+
+export type DeviceCommandStatus =
+  | "queued"
+  | "validating"
+  | "dispatched"
+  | "acknowledged"
+  | "active"
+  | "completed"
+  | "failed"
+  | "cancelled";
+
+export interface DeviceCommand {
+  id: string;
+  recommendationId: string;
+  applianceId: string;
+  applianceName: string;
+  commandType: "set_temperature_setpoint";
+  protocol: "virtual" | "modbus" | "mqtt";
+  status: DeviceCommandStatus;
+  requestedBy: string;
+  requestedAt: string;
+  activatedAt?: string;
+  completedAt?: string;
+  durationMinutes: number;
+  targetSetpointCelsius: number;
+  previousSetpointCelsius: number;
+  currentTemperatureCelsius: number;
+  restoreAt: string;
+  gatewayId: string;
+  gatewayMessage?: string;
+  error?: string;
+  isSimulation: true;
+}
+
+export interface DeviceGatewayStatus {
+  id: string;
+  name: string;
+  protocol: "virtual" | "modbus" | "mqtt";
+  connection: "online" | "offline";
+  mode: "digital_twin";
+  lastHeartbeatAt: string;
+  connectedApplianceIds: string[];
+  connectedAssetIds: string[];
+  activeCommandCount: number;
 }
 
 // ==========================================

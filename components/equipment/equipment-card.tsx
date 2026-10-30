@@ -63,6 +63,11 @@ export function EquipmentCard({
               <h4 className="text-sm font-bold text-slate-900 leading-tight">
                 {appliance.name}
               </h4>
+              {appliance.telemetryStatus === "online" && (
+                <Badge variant="healthy" size="sm" className="font-mono text-[10px] uppercase">
+                  MQTT live
+                </Badge>
+              )}
               {isCritical && (
                 <Badge variant="critical" size="sm" className="font-mono text-[10px] uppercase font-bold">
                   Zero Spoilage Tolerance

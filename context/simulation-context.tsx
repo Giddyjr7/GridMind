@@ -8,7 +8,17 @@ import {
   DashboardMetrics,
   EnergyEventRecord,
   EnergyRecommendation,
+  DeviceCommand,
+  DeviceGatewayStatus,
 } from "@/types/energy";
+import { envConfig } from "@/config/env";
+import {
+  applianceService,
+  auditService,
+  deviceService,
+  energyService,
+  recommendationService,
+} from "@/services";
 import {
   OperationalRiskSummary,
   StrategyComparison,
@@ -55,6 +65,9 @@ export interface SimulationContextValue {
   recommendations: EnergyRecommendation[];
   activeRecommendation: EnergyRecommendation;
   approvalHistory: ApprovalRecord[];
+  deviceCommands: DeviceCommand[];
+  gatewayStatus: DeviceGatewayStatus | null;
+  backendConnectionError: string | null;
   isSimulating: boolean;
   lastSimulatedTick: string;
   feedbackMessage: string | null;
@@ -86,6 +99,7 @@ export interface SimulationContextValue {
   approveRecommendation: (id: string, notes?: string) => void;
   rejectRecommendation: (id: string, reason?: string) => void;
   dismissRecommendation: (id: string) => void;
+  cancelDeviceCommand: (id: string) => void;
   toggleSimulationRunning: () => void;
   stepSimulationHour: () => void;
   resetToDefaultScenario: () => void;
@@ -117,6 +131,9 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
     React.useState<EnergyRecommendation[]>(MOCK_RECOMMENDATIONS);
   const [approvalHistory, setApprovalHistory] =
     React.useState<ApprovalRecord[]>(MOCK_APPROVAL_HISTORY);
+  const [deviceCommands, setDeviceCommands] = React.useState<DeviceCommand[]>([]);
+  const [gatewayStatus, setGatewayStatus] = React.useState<DeviceGatewayStatus | null>(null);
+  const [backendConnectionError, setBackendConnectionError] = React.useState<string | null>(null);
   const [isSimulating, setIsSimulating] = React.useState<boolean>(false);
   const [lastSimulatedTick, setLastSimulatedTick] = React.useState<string>(
     MOCK_DASHBOARD_METRICS.lastTelemetryTimestamp
@@ -131,6 +148,62 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
   const notifyFeedback = (msg: string) => {
     setFeedbackMessage(msg);
   };
+
+  const refreshBackendState = React.useCallback(async () => {
+    if (!envConfig.isApi) return;
+    const [backendDashboard, backendRecommendations, backendAppliances, backendApprovals, backendEvents, gateway, commands] =
+      await Promise.all([
+        energyService.getDashboardMetrics(),
+        recommendationService.getRecommendations(),
+        applianceService.getAppliances(),
+        recommendationService.getApprovalHistory(),
+        auditService.getEvents(100),
+        deviceService.getGatewayStatus(),
+        deviceService.getCommands(),
+      ]);
+    setRecommendations(backendRecommendations);
+    setAppliances(backendAppliances.map((app) => ({ ...app, isManualOverride: false })));
+    setApprovalHistory(backendApprovals);
+    setEvents(backendEvents);
+    setGatewayStatus(gateway);
+    setDeviceCommands(commands);
+    setParams((current) => ({
+      ...current,
+      gridAvailable: backendDashboard.telemetry.gridOnline,
+      solarGenerationKw: backendDashboard.telemetry.solarGenerationKw,
+      batterySocPct: backendDashboard.telemetry.batterySocPct,
+      generatorMode: backendDashboard.telemetry.generatorOnline ? "running" : "standby",
+    }));
+    setLastSimulatedTick(backendDashboard.lastTelemetryTimestamp);
+    setBackendConnectionError(null);
+  }, []);
+
+  React.useEffect(() => {
+    if (!envConfig.isApi) return;
+    let active = true;
+    const synchronize = async () => {
+      try {
+        await recommendationService.evaluate({
+          gridAvailable: DEFAULT_SIMULATION_PARAMS.gridAvailable,
+          batterySocPct: DEFAULT_SIMULATION_PARAMS.batterySocPct,
+          solarGenerationKw: DEFAULT_SIMULATION_PARAMS.solarGenerationKw,
+        });
+        if (active) await refreshBackendState();
+      } catch (error) {
+        if (active) setBackendConnectionError(error instanceof Error ? error.message : "Backend synchronization failed.");
+      }
+    };
+    void synchronize();
+    const interval = window.setInterval(() => {
+      void refreshBackendState().catch((error: unknown) => {
+        if (active) setBackendConnectionError(error instanceof Error ? error.message : "Backend synchronization failed.");
+      });
+    }, envConfig.refreshIntervalMs);
+    return () => {
+      active = false;
+      window.clearInterval(interval);
+    };
+  }, [refreshBackendState]);
 
   const addEvent = React.useCallback((evt: Partial<EnergyEventRecord>) => {
     const newRecord: EnergyEventRecord = {
@@ -156,7 +229,9 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
 
   // 2. Dynamically re-evaluate explainable recommendations
   const dynamicRecommendations = React.useMemo(() => {
-    return evaluateDynamicRecommendations(params, flows, appliances, recommendations);
+    return envConfig.isApi
+      ? recommendations
+      : evaluateDynamicRecommendations(params, flows, appliances, recommendations);
   }, [params, flows, appliances, recommendations]);
 
   // Primary recommendation that drives dashboard & agent pipeline
@@ -281,6 +356,18 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
     state: ApplianceState,
     isManual: boolean = true
   ) => {
+    if (envConfig.isApi) {
+      void applianceService
+        .updateApplianceState(id, state)
+        .then(async (updated) => {
+          await refreshBackendState();
+          notifyFeedback(`${updated.name} set to ${state}.`);
+        })
+        .catch((error: unknown) => {
+          setBackendConnectionError(error instanceof Error ? error.message : "Equipment command failed.");
+        });
+      return;
+    }
     setAppliances((prev) =>
       prev.map((app) => {
         if (app.id !== id) return app;
@@ -312,7 +399,7 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
       });
       notifyFeedback(`${target.name} set to ${state}.`);
     }
-  }, [appliances, addEvent]);
+  }, [appliances, addEvent, refreshBackendState]);
 
   const setAppliancePower = React.useCallback((id: string, powerKw: number) => {
     const bounded = Math.max(0, Math.round(powerKw * 10) / 10);
@@ -446,6 +533,23 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
       return;
     }
 
+    if (envConfig.isApi) {
+      void recommendationService
+        .approveRecommendation(recId, "Operations Lead", notes)
+        .then(async (approval) => {
+          await refreshBackendState();
+          notifyFeedback(
+            approval.deviceCommandId
+              ? `Approved and acknowledged by the digital-twin gateway (${approval.deviceCommandId}).`
+              : `Approved: "${rec.title}"`,
+          );
+        })
+        .catch((error: unknown) => {
+          notifyFeedback(error instanceof Error ? error.message : "Approval failed.");
+        });
+      return;
+    }
+
     // 1. Apply explicit simulated state changes
     if (rec.actionType === "curtail_deferrable" && rec.targetApplianceId) {
       setApplianceState(rec.targetApplianceId, "curtailed", false);
@@ -503,7 +607,7 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
     });
 
     notifyFeedback(`Approved: "${rec.title}"`);
-  }, [dynamicRecommendations, recommendations, setApplianceState, addEvent]);
+  }, [dynamicRecommendations, recommendations, setApplianceState, addEvent, refreshBackendState]);
 
   const rejectRecommendation = React.useCallback((
     recId: string,
@@ -514,6 +618,19 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
 
     if (rec.status === "rejected") {
       notifyFeedback(`Recommendation "${rec.title}" has already been rejected.`);
+      return;
+    }
+
+    if (envConfig.isApi) {
+      void recommendationService
+        .rejectRecommendation(recId, "Operations Lead", reason)
+        .then(async () => {
+          await refreshBackendState();
+          notifyFeedback(`Declined: "${rec.title}"`);
+        })
+        .catch((error: unknown) => {
+          notifyFeedback(error instanceof Error ? error.message : "Decline failed.");
+        });
       return;
     }
 
@@ -555,16 +672,40 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
     });
 
     notifyFeedback(`Declined: "${rec.title}"`);
-  }, [dynamicRecommendations, recommendations, addEvent]);
+  }, [dynamicRecommendations, recommendations, addEvent, refreshBackendState]);
 
   const dismissRecommendation = React.useCallback((recId: string) => {
+    if (envConfig.isApi) {
+      void recommendationService
+        .dismissRecommendation(recId)
+        .then(async () => {
+          await refreshBackendState();
+          notifyFeedback("Recommendation dismissed from active queue.");
+        })
+        .catch((error: unknown) => {
+          notifyFeedback(error instanceof Error ? error.message : "Dismissal failed.");
+        });
+      return;
+    }
     setRecommendations((prev) =>
       prev.map((r) =>
         r.id === recId ? { ...r, status: "expired" } : r
       )
     );
     notifyFeedback("Recommendation dismissed from active queue.");
-  }, []);
+  }, [refreshBackendState]);
+
+  const cancelDeviceCommand = React.useCallback((commandId: string) => {
+    void deviceService
+      .cancelCommand(commandId, "Operations Lead")
+      .then(async () => {
+        await refreshBackendState();
+        notifyFeedback("Device command cancelled and the original setpoint was restored.");
+      })
+      .catch((error: unknown) => {
+        setBackendConnectionError(error instanceof Error ? error.message : "Command cancellation failed.");
+      });
+  }, [refreshBackendState]);
 
   const applyAiRecommendation = approveRecommendation;
 
@@ -692,6 +833,9 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
         recommendations: dynamicRecommendations,
         activeRecommendation,
         approvalHistory,
+        deviceCommands,
+        gatewayStatus,
+        backendConnectionError,
         isSimulating,
         lastSimulatedTick,
         feedbackMessage,
@@ -716,6 +860,7 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
         approveRecommendation,
         rejectRecommendation,
         dismissRecommendation,
+        cancelDeviceCommand,
         toggleSimulationRunning,
         stepSimulationHour,
         resetToDefaultScenario,

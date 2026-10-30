@@ -5,6 +5,7 @@ import {
   IApplianceService,
   IRecommendationService,
   IAuditService,
+  IDeviceService,
   IGridMindServices,
 } from "./interfaces";
 import {
@@ -17,11 +18,12 @@ import {
   EnergyRecommendation,
   ApprovalRecord,
   EnergyEventRecord,
+  DeviceCommand,
+  DeviceGatewayStatus,
 } from "@/types/energy";
 
 /**
- * ApiEnergyService is the future integration layer targeting the FastAPI backend.
- * Endpoints are stubbed to safely notify engineers until contracts are signed off.
+ * API clients for the GridMind NestJS backend.
  */
 
 class ApiServiceBase {
@@ -55,7 +57,7 @@ class ApiServiceBase {
     } catch (err: unknown) {
       const error = err as Error;
       throw new Error(
-        `FastAPI Backend Request Failed [${endpoint}]: ${error.message}. Verify that the backend is running at ${this.baseUrl} and CORS is configured.`
+        `GridMind Backend Request Failed [${endpoint}]: ${error.message}. Verify that the backend is running at ${this.baseUrl} and CORS is configured.`
       );
     }
   }
@@ -93,6 +95,12 @@ export class ApiApplianceService extends ApiServiceBase implements IApplianceSer
 }
 
 export class ApiRecommendationService extends ApiServiceBase implements IRecommendationService {
+  async evaluate(input: Record<string, unknown> = {}): Promise<{ recommendation: EnergyRecommendation | null }> {
+    return this.fetchJson<{ recommendation: EnergyRecommendation | null }>("/agents/evaluate", {
+      method: "POST",
+      body: JSON.stringify(input),
+    });
+  }
   async getRecommendations(): Promise<EnergyRecommendation[]> {
     return this.fetchJson<EnergyRecommendation[]>("/recommendations");
   }
@@ -119,8 +127,33 @@ export class ApiRecommendationService extends ApiServiceBase implements IRecomme
     });
   }
 
+  async dismissRecommendation(id: string): Promise<EnergyRecommendation> {
+    return this.fetchJson<EnergyRecommendation>(`/recommendations/${id}/dismiss`, { method: "POST" });
+  }
+
   async getApprovalHistory(): Promise<ApprovalRecord[]> {
     return this.fetchJson<ApprovalRecord[]>("/recommendations/history");
+  }
+}
+
+export class ApiDeviceService extends ApiServiceBase implements IDeviceService {
+  async getGatewayStatus(): Promise<DeviceGatewayStatus> {
+    return this.fetchJson<DeviceGatewayStatus>("/device-gateway/status");
+  }
+
+  async getCommands(): Promise<DeviceCommand[]> {
+    return this.fetchJson<DeviceCommand[]>("/device-commands");
+  }
+
+  async getCommand(id: string): Promise<DeviceCommand> {
+    return this.fetchJson<DeviceCommand>(`/device-commands/${id}`);
+  }
+
+  async cancelCommand(id: string, cancelledBy: string): Promise<DeviceCommand> {
+    return this.fetchJson<DeviceCommand>(`/device-commands/${id}/cancel`, {
+      method: "POST",
+      body: JSON.stringify({ cancelledBy }),
+    });
   }
 }
 
@@ -135,5 +168,6 @@ export const apiServices: IGridMindServices = {
   appliances: new ApiApplianceService(),
   recommendations: new ApiRecommendationService(),
   audit: new ApiAuditService(),
+  devices: new ApiDeviceService(),
   auth: apiAuthService,
 };

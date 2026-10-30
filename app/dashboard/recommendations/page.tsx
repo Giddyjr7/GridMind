@@ -12,6 +12,8 @@ import {
   Layers,
   HelpCircle,
   RotateCcw,
+  Wifi,
+  Thermometer,
 } from "lucide-react";
 import { PageContainer } from "@/components/ui/page-container";
 import { SectionHeading } from "@/components/ui/section-heading";
@@ -37,7 +39,13 @@ export default function RecommendationsPage() {
     feedbackMessage,
     clearFeedback,
     resetToDefaultScenario,
+    deviceCommands,
+    gatewayStatus,
+    backendConnectionError,
+    cancelDeviceCommand,
   } = useSimulation();
+
+  const activeDeviceCommand = deviceCommands.find((command) => command.status === "active");
 
   const [statusFilter, setStatusFilter] = React.useState<
     "all" | "pending" | "approved" | "rejected"
@@ -114,6 +122,43 @@ export default function RecommendationsPage() {
             </div>
           }
         />
+
+        {backendConnectionError && (
+          <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-xs text-rose-800">
+            Backend connection unavailable: {backendConnectionError}
+          </div>
+        )}
+
+        {gatewayStatus && (
+          <div className="flex flex-col gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-xs sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-2 text-slate-700">
+              <Wifi className="h-4 w-4 text-emerald-600" />
+              <span className="font-semibold">{gatewayStatus.protocol.toUpperCase()} digital twin gateway</span>
+              <Badge variant="healthy" size="sm">{gatewayStatus.connection}</Badge>
+              <span className="text-slate-500">{gatewayStatus.connectedAssetIds.length} assets reporting</span>
+            </div>
+            {activeDeviceCommand ? (
+              <div className="flex items-center gap-2 text-slate-600">
+                <Thermometer className="h-4 w-4 text-emerald-600" />
+                <span>
+                  {activeDeviceCommand.applianceName}: {activeDeviceCommand.currentTemperatureCelsius}°C
+                  {" → "}{activeDeviceCommand.targetSetpointCelsius}°C
+                </span>
+                <Badge variant="neutral" size="sm">{activeDeviceCommand.status}</Badge>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-7 text-xs text-rose-700"
+                  onClick={() => cancelDeviceCommand(activeDeviceCommand.id)}
+                >
+                  Cancel command
+                </Button>
+              </div>
+            ) : (
+              <span className="text-slate-500">No active device command</span>
+            )}
+          </div>
+        )}
 
         {/* Global Action Confirmation Toast */}
         {feedbackMessage && (
