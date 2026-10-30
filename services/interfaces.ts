@@ -10,6 +10,7 @@ import {
   EnergyEventRecord,
   DeviceCommand,
   DeviceGatewayStatus,
+  WorkspaceState,
 } from "@/types/energy";
 
 import { IAuthService } from "@/types/auth";
@@ -55,6 +56,11 @@ export interface IAuditService {
   getEvents(limit?: number): Promise<EnergyEventRecord[]>;
 }
 
+export interface IWorkspaceService {
+  getWorkspaceState(): Promise<WorkspaceState>;
+  saveWorkspaceState(state: WorkspaceState): Promise<boolean>;
+}
+
 export interface IGridMindServices {
   energy: IEnergyDataService;
   appliances: IApplianceService;
@@ -62,4 +68,5 @@ export interface IGridMindServices {
   audit: IAuditService;
   devices: IDeviceService;
   auth: IAuthService;
+  workspace: IWorkspaceService;
 }

@@ -26,3 +26,4 @@ export const deviceService: IDeviceService = services.devices;
 export const authService: IAuthService = services.auth;
 
 export * from "./interfaces";
+export const workspaceService = services.workspace;

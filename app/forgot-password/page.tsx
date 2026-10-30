@@ -3,15 +3,16 @@ import { AuthLayout } from "@/components/auth/auth-layout";
 import { ForgotPasswordForm } from "@/components/auth/forgot-password-form";
 
 export const metadata: Metadata = {
-  title: "Reset Password | GridMind Energy Intelligence",
+  title: "Reset Password | GridMind",
   description: "Reset your GridMind account password.",
 };
 
 export default function ForgotPasswordPage() {
   return (
     <AuthLayout
-      heading="Reset your password."
-      supportingText="Enter your work email address and we'll send you instructions to reset your password."
+      heading="Reset password"
+      supportingText="Enter your work email address to receive password reset instructions."
+      backHref="/login"
     >
       <ForgotPasswordForm />
     </AuthLayout>

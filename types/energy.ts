@@ -422,3 +422,66 @@ export interface DashboardMetrics {
   pendingRecommendationsCount: number;
   lastTelemetryTimestamp: string;
 }
+
+// ==========================================
+// 11. USER PROFILE, WORKSPACE & CONNECTED DEVICES
+// ==========================================
+
+export interface UserProfile {
+  id: string;
+  firstName: string;
+  lastName: string;
+  displayName: string;
+  email: string;
+  avatarDataUrl?: string;
+  role?: string;
+  createdAt: string;
+}
+
+export type BusinessTypeOption =
+  | "cold_storage"
+  | "pharmacy"
+  | "supermarket"
+  | "clinic"
+  | "other";
+
+export interface Workspace {
+  id: string;
+  name: string;
+  handle: string;
+  businessType: BusinessTypeOption;
+  businessTypeLabel?: string;
+  location: string;
+  logoDataUrl?: string;
+  createdAt: string;
+}
+
+export type DevicePriority = "critical" | "important" | "nonessential";
+
+export type DeviceCategory =
+  | "cooling"
+  | "power_sources"
+  | "climate"
+  | "operations";
+
+export interface ConnectedDevice {
+  id: string;
+  name: string;
+  deviceTypeId: string;
+  category: DeviceCategory;
+  ratedPowerKw: number;
+  priority: DevicePriority;
+  connectionState: "simulated" | "not_connected";
+  source: "onboarding" | "manual" | "demo";
+  createdAt: string;
+  notes?: string;
+}
+
+export interface WorkspaceState {
+  profile: UserProfile | null;
+  workspace: Workspace | null;
+  devices: ConnectedDevice[];
+  invitedMembers?: { email: string; role: "member" | "admin" }[];
+  welcomeDismissed: boolean;
+  version: number;
+}

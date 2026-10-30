@@ -2,156 +2,161 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { ArrowLeft, ShieldCheck } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { ArrowLeft, Check } from "lucide-react";
 import { GridMindLogo } from "@/components/brand/gridmind-logo";
+import { cn } from "@/lib/utils";
+
+export interface StepItem {
+  id: string;
+  label: string;
+}
 
 interface AuthLayoutProps {
   children: React.ReactNode;
-  heading: string;
-  supportingText: string;
+  heading?: string;
+  supportingText?: string;
+  backHref?: string;
+  onBack?: () => void;
+  steps?: StepItem[];
+  currentStepIndex?: number;
 }
 
-export function AuthLayout({ children, heading, supportingText }: AuthLayoutProps) {
+export function AuthLayout({
+  children,
+  heading,
+  supportingText,
+  backHref,
+  onBack,
+  steps,
+  currentStepIndex = 0,
+}: AuthLayoutProps) {
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col lg:flex-row">
-      {/* ========================================================= */}
-      {/* LEFT COLUMN: BRANDED VISUAL PANEL (Desktop Only)          */}
-      {/* ========================================================= */}
-      <div className="hidden lg:flex lg:w-1/2 bg-brand-950 text-white relative overflow-hidden flex-col justify-between p-12 select-none">
-        {/* Background decorative subtle microgrid pattern */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(16,185,129,0.18),rgba(255,255,255,0))] pointer-events-none" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e372d_1px,transparent_1px),linear-gradient(to_bottom,#1e372d_1px,transparent_1px)] bg-[size:3.5rem_3.5rem] opacity-20 pointer-events-none" />
+    <div className="min-h-screen bg-[#070c0a] text-slate-100 flex flex-col relative overflow-x-hidden selection:bg-emerald-500/20 selection:text-emerald-300">
+      {/* Subtle radial glow and grid pattern masked out at top */}
+      <div
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_0%,rgba(16,185,129,0.12),transparent_70%)]"
+        aria-hidden="true"
+      />
+      <div
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#0e1f18_1px,transparent_1px),linear-gradient(to_bottom,#0e1f18_1px,transparent_1px)] bg-[size:3.5rem_3.5rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_20%,transparent_100%)] opacity-35"
+        aria-hidden="true"
+      />
 
-        {/* Top: Brand Header & Return Link */}
-        <div className="relative z-10 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <GridMindLogo inverse markClassName="h-9 w-9" />
-          </Link>
+      {/* Top bar */}
+      <header className="relative z-20 w-full border-b border-white/[0.06] bg-[#070c0a]/80 backdrop-blur-md">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+          {/* Logo & Product Name */}
+          <div className="flex items-center gap-3">
+            {onBack ? (
+              <button
+                type="button"
+                onClick={onBack}
+                aria-label="Go to previous step"
+                className="inline-flex items-center justify-center h-9 w-9 rounded-lg border border-white/10 bg-white/[0.03] text-slate-400 hover:text-white hover:bg-white/[0.06] transition-colors"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </button>
+            ) : backHref ? (
+              <Link
+                href={backHref}
+                aria-label="Back"
+                className="inline-flex items-center justify-center h-9 w-9 rounded-lg border border-white/10 bg-white/[0.03] text-slate-400 hover:text-white hover:bg-white/[0.06] transition-colors"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </Link>
+            ) : null}
 
-          <Link
-            href="/"
-            className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            Back to Public Website
-          </Link>
-        </div>
-
-        {/* Center: Hero Branding & Microgrid Telemetry Preview */}
-        <div className="relative z-10 space-y-8 my-auto py-8">
-          <div className="space-y-3 max-w-lg">
-            <Badge variant="healthy" size="sm" className="bg-emerald-950 text-emerald-400 border-emerald-800">
-              Commercial Energy Intelligence
-            </Badge>
-            <h2 className="text-3xl font-extrabold tracking-tight text-white leading-snug">
-              Uninterrupted Power for Critical Commercial Infrastructure.
-            </h2>
-            <p className="text-sm text-slate-300 leading-relaxed">
-              GridMind balances national grid, diesel generators, rooftop solar, and LiFePO4 batteries so cold rooms, pharmacies, and supermarkets stay running at lowest operating cost.
-            </p>
+            <Link href="/" className="flex items-center gap-2.5 group">
+              <GridMindLogo inverse markClassName="h-8 w-8" />
+            </Link>
           </div>
 
-          {/* Micro Telemetry Status Card */}
-          <div className="rounded-xl border border-brand-800/80 bg-brand-900/40 p-4 backdrop-blur-sm max-w-md space-y-3">
-            <div className="flex items-center justify-between border-b border-brand-800/60 pb-2.5">
-              <div className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-xs font-semibold text-slate-200">
-                  Krystal Ice Cold Storage, Ikeja Industrial
-                </span>
-              </div>
-              <span className="text-[10px] font-mono text-emerald-400">DEMO BENCHMARK</span>
-            </div>
+          {/* Centred slim breadcrumb for multi-step onboarding */}
+          {steps && steps.length > 0 && (
+            <nav
+              aria-label="Progress"
+              className="hidden md:flex items-center gap-1.5 text-xs text-slate-400"
+            >
+              {steps.map((step, idx) => {
+                const isCompleted = idx < currentStepIndex;
+                const isCurrent = idx === currentStepIndex;
 
-            <div className="grid grid-cols-3 gap-2 text-xs">
-              <div className="p-2 rounded bg-brand-950/60 border border-brand-800/40">
-                <span className="text-[10px] text-slate-400 block">Utility Grid</span>
-                <span className="font-bold text-white font-mono">42.5 kW</span>
-                <span className="text-[9px] text-emerald-400 block">Band A Stable</span>
-              </div>
+                return (
+                  <React.Fragment key={step.id}>
+                    <div
+                      className={cn(
+                        "flex items-center gap-1.5 px-2.5 py-1 rounded-full transition-colors",
+                        isCurrent && "bg-white/[0.06] text-white font-medium border border-white/10",
+                        isCompleted && "text-emerald-400",
+                        !isCurrent && !isCompleted && "text-slate-500 opacity-60"
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          "flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-mono",
+                          isCompleted && "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40",
+                          isCurrent && "bg-white/10 text-white",
+                          !isCurrent && !isCompleted && "border border-white/10 text-slate-500"
+                        )}
+                      >
+                        {isCompleted ? <Check className="h-2.5 w-2.5 stroke-[3]" /> : idx + 1}
+                      </span>
+                      <span>{step.label}</span>
+                    </div>
+                    {idx < steps.length - 1 && (
+                      <span className="text-white/15 select-none font-mono">/</span>
+                    )}
+                  </React.Fragment>
+                );
+              })}
+            </nav>
+          )}
 
-              <div className="p-2 rounded bg-brand-950/60 border border-brand-800/40">
-                <span className="text-[10px] text-slate-400 block">Solar PV</span>
-                <span className="font-bold text-white font-mono">38.4 kW</span>
-                <span className="text-[9px] text-amber-400 block">Peak Irradiance</span>
-              </div>
-
-              <div className="p-2 rounded bg-brand-950/60 border border-brand-800/40">
-                <span className="text-[10px] text-slate-400 block">Battery ESS</span>
-                <span className="font-bold text-white font-mono">68% SOC</span>
-                <span className="text-[9px] text-emerald-400 block">81.6 kWh Stored</span>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between text-[11px] text-slate-300 pt-1">
-              <span className="flex items-center gap-1.5">
-                <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
-                Blast Freezers (-21.4°C): Protected
-              </span>
-              <span className="text-emerald-400 font-mono">Clean Run: 5h 20m</span>
-            </div>
+          {/* Right helper info */}
+          <div className="flex items-center gap-3">
+            <span className="text-[11px] font-mono text-emerald-400/90 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 hidden sm:inline-block">
+              Demo Mode
+            </span>
           </div>
         </div>
+      </header>
 
-        {/* Bottom: Prototype Environment Disclaimer */}
-        <div className="relative z-10 pt-4 border-t border-brand-900/80 flex items-center justify-between text-xs text-slate-400">
-          <p>© {new Date().getFullYear()} GridMind Platform.</p>
-          <span className="text-[11px] font-mono text-slate-500">
-            Phase 2 Authentication UI
-          </span>
-        </div>
-      </div>
+      {/* Main Content Area: Centred, Apple/Tesla-grade spacing */}
+      <main className="relative z-10 flex-1 flex flex-col justify-center items-center px-4 py-8 sm:py-14 w-full">
+        <div className="w-full max-w-[480px] mx-auto space-y-6">
+          {(heading || supportingText) && (
+            <div className="text-center space-y-2">
+              {heading && (
+                <h1 className="text-2xl sm:text-3xl font-medium tracking-tight text-white">
+                  {heading}
+                </h1>
+              )}
+              {supportingText && (
+                <p className="text-sm text-slate-400 leading-relaxed max-w-sm mx-auto">
+                  {supportingText}
+                </p>
+              )}
+            </div>
+          )}
 
-      {/* ========================================================= */}
-      {/* RIGHT COLUMN: FOCUSED AUTHENTICATION FORM                 */}
-      {/* ========================================================= */}
-      <div className="flex-1 flex flex-col justify-between p-6 sm:p-10 lg:p-16 overflow-y-auto">
-        {/* Mobile Header */}
-        <div className="flex items-center justify-between lg:hidden mb-8">
-          <Link href="/" className="flex items-center gap-2">
-            <GridMindLogo markClassName="h-8 w-8" />
-          </Link>
-          <Link href="/" className="text-xs text-slate-500 hover:text-slate-900 inline-flex items-center gap-1">
-            <ArrowLeft className="h-3 w-3" />
-            Back to Home
-          </Link>
-        </div>
-
-        {/* Form Container */}
-        <div className="w-full max-w-md mx-auto my-auto space-y-6">
-          <div className="space-y-1.5">
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
-              {heading}
-            </h1>
-            <p className="text-sm text-slate-500 leading-relaxed">
-              {supportingText}
-            </p>
-          </div>
-
-          {/* Form Content */}
           {children}
         </div>
+      </main>
 
-        {/* Bottom Security / Terms Footer */}
-        <div className="w-full max-w-md mx-auto mt-8 pt-6 border-t border-slate-200/80 text-center text-xs text-slate-500 space-y-1">
-          <p className="flex items-center justify-center gap-1.5">
-            <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
-            <span>Encrypted transmission & decoupled session layer</span>
-          </p>
-          <p className="text-[11px] text-slate-400">
-            By accessing GridMind, you agree to our{" "}
-            <Link href="/terms" className="underline hover:text-slate-700">
-              Terms of Service
-            </Link>{" "}
-            and{" "}
-            <Link href="/privacy" className="underline hover:text-slate-700">
-              Privacy Policy
-            </Link>
-            .
-          </p>
+      {/* Minimal Footer */}
+      <footer className="relative z-10 py-6 border-t border-white/[0.04] text-center text-xs text-slate-500">
+        <div className="max-w-md mx-auto flex items-center justify-center gap-4 text-[12px]">
+          <Link href="/terms" className="hover:text-slate-300 transition-colors">
+            Terms of Service
+          </Link>
+          <span className="text-white/10 select-none">•</span>
+          <Link href="/privacy" className="hover:text-slate-300 transition-colors">
+            Privacy Policy
+          </Link>
+          <span className="text-white/10 select-none">•</span>
+          <span className="text-slate-500">Data stored on this device</span>
         </div>
-      </div>
+      </footer>
     </div>
   );
 }

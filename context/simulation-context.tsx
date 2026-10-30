@@ -1,5 +1,7 @@
 "use client";
 
+import { loadStoredWorkspaceState } from "@/lib/workspace-storage";
+
 import * as React from "react";
 import {
   Appliance,
@@ -114,8 +116,25 @@ const SimulationContext = React.createContext<SimulationContextValue | null>(nul
 
 export function SimulationProvider({ children }: { children: React.ReactNode }) {
   const [params, setParams] = React.useState<SimulationParams>(DEFAULT_SIMULATION_PARAMS);
-  const [appliances, setAppliances] = React.useState<ApplianceWithSimMetadata[]>(() =>
-    MOCK_APPLIANCES.map((app) => ({
+  const [appliances, setAppliances] = React.useState<ApplianceWithSimMetadata[]>(() => {
+    const stored = loadStoredWorkspaceState();
+    const sourceList = (stored && stored.devices && stored.devices.length > 0)
+      ? stored.devices.map((d) => ({
+          id: d.id,
+          siteId: stored.workspace?.id || "site_krystal_ikeja_01",
+          name: d.name,
+          category: (d.category === "cooling" ? "refrigeration" : d.category === "climate" ? "cooling_hvac" : d.category === "power_sources" ? "other" : "lighting") as Appliance["category"],
+          priority: (d.priority === "critical" ? "critical" : d.priority === "important" ? "important" : "deferrable") as Appliance["priority"],
+          state: "running" as ApplianceState,
+          ratedPowerKw: d.ratedPowerKw,
+          currentPowerKw: Math.round(d.ratedPowerKw * 0.9 * 10) / 10,
+          dailyConsumptionKwh: Math.round(d.ratedPowerKw * 12),
+          isControllable: d.priority !== "critical",
+          notes: d.notes,
+        }))
+      : MOCK_APPLIANCES;
+
+    return sourceList.map((app) => ({
       ...app,
       isManualOverride: false,
       aiSuggestedState:
@@ -124,8 +143,8 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
           : app.id === "app_ac_packaging" && !DEFAULT_SIMULATION_PARAMS.gridAvailable
           ? "curtailed"
           : "running",
-    }))
-  );
+    }));
+  });
   const [events, setEvents] = React.useState<EnergyEventRecord[]>(MOCK_ENERGY_EVENTS);
   const [recommendations, setRecommendations] =
     React.useState<EnergyRecommendation[]>(MOCK_RECOMMENDATIONS);

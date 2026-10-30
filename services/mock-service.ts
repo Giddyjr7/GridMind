@@ -4,6 +4,7 @@ import {
   IRecommendationService,
   IAuditService,
   IDeviceService,
+  IWorkspaceService,
   IGridMindServices,
 } from "./interfaces";
 import { mockAuthService } from "./auth-service";
@@ -29,6 +30,7 @@ import {
   EnergyEventRecord,
   DeviceCommand,
   DeviceGatewayStatus,
+  WorkspaceState,
 } from "@/types/energy";
 
 // Simulated network delay for realistic async behavior in mock mode
@@ -178,6 +180,18 @@ export class MockAuditService implements IAuditService {
   }
 }
 
+export class MockWorkspaceService implements IWorkspaceService {
+  async getWorkspaceState(): Promise<WorkspaceState> {
+    const { loadStoredWorkspaceState } = await import("@/lib/workspace-storage");
+    return simulateLatency(loadStoredWorkspaceState());
+  }
+
+  async saveWorkspaceState(state: WorkspaceState): Promise<boolean> {
+    const { saveStoredWorkspaceState } = await import("@/lib/workspace-storage");
+    return simulateLatency(saveStoredWorkspaceState(state));
+  }
+}
+
 export const mockServices: IGridMindServices = {
   energy: new MockEnergyDataService(),
   appliances: new MockApplianceService(),
@@ -185,4 +199,7 @@ export const mockServices: IGridMindServices = {
   audit: new MockAuditService(),
   devices: new MockDeviceService(),
   auth: mockAuthService,
+  workspace: new MockWorkspaceService(),
 };
+
+

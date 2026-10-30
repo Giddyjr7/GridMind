@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { WorkspaceProvider } from "@/context/workspace-context";
 
 export const metadata: Metadata = {
   title: "GridMind: Smarter Energy. Uninterrupted Business.",
@@ -16,7 +17,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body className="min-h-screen bg-[#fcfdfc] font-sans antialiased text-slate-900 selection:bg-brand-100 selection:text-brand-950">
-        {children}
+        <WorkspaceProvider>
+          {children}
+        </WorkspaceProvider>
       </body>
     </html>
   );

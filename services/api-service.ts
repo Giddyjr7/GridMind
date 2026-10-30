@@ -6,6 +6,7 @@ import {
   IRecommendationService,
   IAuditService,
   IDeviceService,
+  IWorkspaceService,
   IGridMindServices,
 } from "./interfaces";
 import {
@@ -20,6 +21,7 @@ import {
   EnergyEventRecord,
   DeviceCommand,
   DeviceGatewayStatus,
+  WorkspaceState,
 } from "@/types/energy";
 
 /**
@@ -163,6 +165,16 @@ export class ApiAuditService extends ApiServiceBase implements IAuditService {
   }
 }
 
+export class ApiWorkspaceService extends ApiServiceBase implements IWorkspaceService {
+  async getWorkspaceState(): Promise<WorkspaceState> {
+    throw new Error("Workspace API persistence is not implemented in the backend yet.");
+  }
+
+  async saveWorkspaceState(): Promise<boolean> {
+    throw new Error("Workspace API persistence is not implemented in the backend yet.");
+  }
+}
+
 export const apiServices: IGridMindServices = {
   energy: new ApiEnergyDataService(),
   appliances: new ApiApplianceService(),
@@ -170,4 +182,7 @@ export const apiServices: IGridMindServices = {
   audit: new ApiAuditService(),
   devices: new ApiDeviceService(),
   auth: apiAuthService,
+  workspace: new ApiWorkspaceService(),
 };
+
+
