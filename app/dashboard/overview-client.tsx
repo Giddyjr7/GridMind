@@ -21,6 +21,7 @@ import { CompactEnergyChart } from "@/components/dashboard/compact-energy-chart"
 import { WhyRecommendationDrawer } from "@/components/dashboard/why-recommendation-drawer";
 import { OutageRiskCard } from "@/components/dashboard/outage-risk-card";
 import { EquipmentRiskCard } from "@/components/dashboard/equipment-risk-card";
+import { OperatorAgentCard } from "@/components/dashboard/operator-agent-card";
 
 export function OverviewClient() {
   const {
@@ -83,6 +84,8 @@ export function OverviewClient() {
       <OutageRiskCard />
 
       <EquipmentRiskCard />
+
+      <OperatorAgentCard />
 
       {/* 2. Three Hero Numbers */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
