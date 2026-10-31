@@ -21,7 +21,28 @@ Clone the repository and install dependencies:
 npm install
 ```
 
-### Environment Configuration
+### Progressive Web App & Notifications
+
+GridMind installs as a standalone app and receives Web Push, so outage-risk
+escalations reach an operator with the dashboard closed.
+
+- `public/manifest.webmanifest` declares the installable app (`/dashboard` start
+  URL, standalone display, `#070c0a` theme, any and maskable icons).
+- `public/sw.js` is the service worker. It handles `push` and
+  `notificationclick`, and serves `public/offline.html` when a navigation fails.
+  It deliberately precaches nothing from the build, so a new deploy can never be
+  shadowed by a stale bundle.
+- `components/pwa/notification-controls.tsx` (on Settings) subscribes this
+  device and can send a test. `components/pwa/install-prompt.tsx` surfaces
+  Chrome's install prompt.
+- `lib/push-notifications.ts` wraps permission, subscription and the API calls.
+
+Push needs a secure context: it works on `localhost` and over HTTPS, but not
+from a plain-HTTP LAN address. On iPhone and iPad the app must be added to the
+Home Screen before the browser allows a subscription. A notification only ever
+informs: approving a recommendation still happens in the dashboard.
+
+## Environment Configuration
 Copy the provided `.env.example` file to create your local environment:
 ```bash
 cp .env.example .env.local
@@ -34,7 +55,12 @@ NEXT_PUBLIC_API_BASE_URL=http://localhost:8000/api/v1
 NEXT_PUBLIC_APP_NAME=GridMind
 NEXT_PUBLIC_APP_VERSION=0.1.0-alpha
 NEXT_PUBLIC_REFRESH_INTERVAL_MS=15000
+NEXT_PUBLIC_VAPID_PUBLIC_KEY=
 ```
+
+`NEXT_PUBLIC_VAPID_PUBLIC_KEY` must match `VAPID_PUBLIC_KEY` in the backend `.env`.
+Leave it empty to ship without push notifications; the settings card then explains
+why alerts are unavailable instead of failing.
 
 ### Running Locally
 Start the Next.js development server:

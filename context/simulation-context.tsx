@@ -296,7 +296,7 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
       category: "grid_event",
       severity: "info",
       title: "[SIMULATED] National Grid Feeder Restored",
-      details: "Ikeja 11kV utility supply synchronized (402V, 50.0 Hz). Band A tariff active.",
+      details: "Uyo 11kV utility supply synchronized (402V, 50.0 Hz). Band A tariff active.",
       sourceAsset: "grid",
       resolved: true,
       resolvedAt: new Date().toISOString(),

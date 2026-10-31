@@ -112,7 +112,7 @@ export function HeroDashboardPreview() {
           </span>
           <div className="min-w-0">
             <p className="truncate text-[11px] font-semibold text-white">Krystal Ice · Energy operations</p>
-            <p className="text-[9px] text-slate-600">Ikeja facility · live simulation</p>
+            <p className="text-[9px] text-slate-600">Uyo facility · live simulation</p>
           </div>
         </div>
         <div className="hidden items-center gap-5 text-[9px] text-slate-600 sm:flex">

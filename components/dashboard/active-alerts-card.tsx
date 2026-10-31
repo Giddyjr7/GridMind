@@ -243,7 +243,7 @@ export function ActiveAlertsCard({ initialAlerts }: ActiveAlertsCardProps) {
                 Recommended Operator Protocol:
               </h5>
               <p className="text-emerald-800 leading-relaxed">
-                Ensure Blast Freezer doors remain sealed during peak tariff transitions. If the Ikeja Feeder disconnects, GridMind automated ATS prioritization will safeguard medical biologics and cold room freezers while shedding deferrable packaging ACs.
+                Ensure Blast Freezer doors remain sealed during peak tariff transitions. If the Uyo Feeder disconnects, GridMind automated ATS prioritization will safeguard medical biologics and cold room freezers while shedding deferrable packaging ACs.
               </p>
             </div>
 

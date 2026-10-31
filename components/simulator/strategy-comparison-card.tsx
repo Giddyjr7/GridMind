@@ -259,7 +259,7 @@ export function StrategyComparisonCard({
               </div>
               <ul className="list-disc pl-5 space-y-1.5 text-slate-600 leading-relaxed">
                 <li>
-                  <strong>Utility Tariff:</strong> Ikeja Industrial Band A indexed at ₦206.00/kWh during grid availability periods.
+                  <strong>Utility Tariff:</strong> PHED Band A indexed at ₦206.00/kWh during grid availability periods.
                 </li>
                 <li>
                   <strong>Diesel Generation:</strong> Fuel calculated at ₦1,300/liter based on 0.28 L/kWh specific fuel consumption curve.

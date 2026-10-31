@@ -147,6 +147,7 @@ export class MockAuthService implements IAuthService {
 
 export class ApiAuthService implements IAuthService {
   private baseUrl: string;
+  private readonly tokenKey = "gridmind_api_session_token";
 
   constructor() {
     this.baseUrl = envConfig.apiBaseUrl;
@@ -169,6 +170,7 @@ export class ApiAuthService implements IAuthService {
     }
 
     const data = await response.json();
+    this.storeToken(data.token, Boolean(credentials.rememberMe));
     return {
       success: true,
       user: data.user,
@@ -190,6 +192,7 @@ export class ApiAuthService implements IAuthService {
     }
 
     const data = await response.json();
+    this.storeToken(data.token, false);
     return {
       success: true,
       user: data.user,
@@ -222,21 +225,45 @@ export class ApiAuthService implements IAuthService {
       throw new Error("Unable to request password reset.");
     }
 
-    return {
-      success: true,
-      isMockResponse: false,
-      message: "Password reset instructions sent to your email.",
-    };
+    return response.json();
   }
 
   async getCurrentUser(): Promise<AuthUser | null> {
-    const response = await fetch(`${this.baseUrl}/auth/me`);
+    const token = this.getToken();
+    if (!token) return null;
+    const response = await fetch(`${this.baseUrl}/auth/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
     if (!response.ok) return null;
     return response.json();
   }
 
   async logout(): Promise<void> {
-    await fetch(`${this.baseUrl}/auth/logout`, { method: "POST" });
+    const token = this.getToken();
+    await fetch(`${this.baseUrl}/auth/logout`, {
+      method: "POST",
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    });
+    if (typeof window !== "undefined") {
+      window.sessionStorage.removeItem(this.tokenKey);
+      window.localStorage.removeItem(this.tokenKey);
+    }
+  }
+
+  private storeToken(token: string | undefined, rememberMe: boolean) {
+    if (!token || typeof window === "undefined") return;
+    window.sessionStorage.removeItem(this.tokenKey);
+    window.localStorage.removeItem(this.tokenKey);
+    const storage = rememberMe ? window.localStorage : window.sessionStorage;
+    storage.setItem(this.tokenKey, token);
+  }
+
+  private getToken() {
+    if (typeof window === "undefined") return null;
+    return (
+      window.sessionStorage.getItem(this.tokenKey) ||
+      window.localStorage.getItem(this.tokenKey)
+    );
   }
 }
 

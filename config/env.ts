@@ -13,6 +13,8 @@ export interface AppConfig {
   isMock: boolean;
   isApi: boolean;
   refreshIntervalMs: number;
+  /** VAPID public key for Web Push; empty disables the notification controls. */
+  vapidPublicKey: string;
 }
 
 export const envConfig: AppConfig = {
@@ -27,4 +29,5 @@ export const envConfig: AppConfig = {
     return this.dataMode === "api";
   },
   refreshIntervalMs: Number(process.env.NEXT_PUBLIC_REFRESH_INTERVAL_MS) || 15000,
+  vapidPublicKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || "",
 };

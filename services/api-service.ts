@@ -22,6 +22,8 @@ import {
   DeviceCommand,
   DeviceGatewayStatus,
   WorkspaceState,
+  OutageRiskForecast,
+  EquipmentRiskReport,
 } from "@/types/energy";
 
 /**
@@ -80,6 +82,14 @@ export class ApiEnergyDataService extends ApiServiceBase implements IEnergyDataS
 
   async getDayForecast(): Promise<DayForecast> {
     return this.fetchJson<DayForecast>("/forecast/today");
+  }
+
+  async getOutageRiskForecast(): Promise<OutageRiskForecast> {
+    return this.fetchJson<OutageRiskForecast>("/forecast/outage-risk");
+  }
+
+  async getEquipmentRisk(): Promise<EquipmentRiskReport> {
+    return this.fetchJson<EquipmentRiskReport>("/risk/equipment");
   }
 }
 
@@ -184,5 +194,4 @@ export const apiServices: IGridMindServices = {
   auth: apiAuthService,
   workspace: new ApiWorkspaceService(),
 };
-
 

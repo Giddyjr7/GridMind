@@ -19,6 +19,8 @@ import { useWorkspace } from "@/context/workspace-context";
 import { EnergyFlowDiagram } from "@/components/dashboard/energy-flow-diagram";
 import { CompactEnergyChart } from "@/components/dashboard/compact-energy-chart";
 import { WhyRecommendationDrawer } from "@/components/dashboard/why-recommendation-drawer";
+import { OutageRiskCard } from "@/components/dashboard/outage-risk-card";
+import { EquipmentRiskCard } from "@/components/dashboard/equipment-risk-card";
 
 export function OverviewClient() {
   const {
@@ -33,7 +35,7 @@ export function OverviewClient() {
   const [actionFeedback, setActionFeedback] = React.useState<string | null>(null);
 
   const businessName = workspace?.name || "Krystal Ice Cold Storage Ltd.";
-  const businessLocation = workspace?.location || "Ikeja Industrial, Lagos";
+  const businessLocation = workspace?.location || "Uyo Industrial Layout, Akwa Ibom";
 
   const { recommendation, riskLevel, riskSummary } = outputs;
 
@@ -77,6 +79,10 @@ export function OverviewClient() {
           {riskSummary}
         </p>
       </div>
+
+      <OutageRiskCard />
+
+      <EquipmentRiskCard />
 
       {/* 2. Three Hero Numbers */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

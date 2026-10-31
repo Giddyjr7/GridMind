@@ -12,6 +12,7 @@ import {
 } from "@/lib/calculation-engine";
 import { useWorkspace } from "./workspace-context";
 import { getTwinTransport } from "@/lib/twin/transport";
+import { siteService } from "@/services/site-service";
 import { TelemetryPayload } from "@/lib/twin/schema";
 
 export interface DecisionRecord {
@@ -163,7 +164,7 @@ const INITIAL_AUDIT_TRAIL: DecisionRecord[] = [
 const ScenarioContext = React.createContext<ScenarioContextType | null>(null);
 
 export function ScenarioProvider({ children }: { children: React.ReactNode }) {
-  const { devices, profile } = useWorkspace();
+  const { profile } = useWorkspace();
   const [config, setConfig] = React.useState<EngineConfig>(DEFAULT_ENGINE_CONFIG);
   const [inputs, setInputs] = React.useState<EngineInputs>(INITIAL_INPUTS);
   const [activePresetId, setActivePresetId] = React.useState<string | null>("preset_normal");
@@ -195,31 +196,36 @@ export function ScenarioProvider({ children }: { children: React.ReactNode }) {
           isAvailable: payload.grid.isAvailable,
           tariffPerKwh: payload.grid.tariffPerKwh ?? prev.grid.tariffPerKwh,
         },
+        // Telemetry reports readings for assets that exist. It must not create
+        // them: the twin publishes its own reference equipment, and letting
+        // that replace the inventory put four devices and 95 kW on the
+        // dashboard of a site that had registered nothing.
         solar: {
           ...prev.solar,
-          currentOutputKw: payload.solar.currentOutputKw,
-          isEnabled: payload.solar.isEnabled,
+          ...(prev.solar.installedCapacityKwp > 0 && {
+            currentOutputKw: payload.solar.currentOutputKw,
+            isEnabled: payload.solar.isEnabled,
+          }),
         },
         battery: {
           ...prev.battery,
-          stateOfChargePct: payload.battery.stateOfChargePct,
+          ...(prev.battery.totalCapacityKwh > 0 && {
+            stateOfChargePct: payload.battery.stateOfChargePct,
+          }),
         },
         generator: {
           ...prev.generator,
-          fuelCurrentLiters: payload.generator.fuelCurrentLiters,
-          mode: payload.generator.mode,
+          ...(prev.generator.mode !== "disabled" && {
+            fuelCurrentLiters: payload.generator.fuelCurrentLiters,
+            mode: payload.generator.mode,
+          }),
         },
-        loads:
-          payload.loads && payload.loads.length > 0
-            ? payload.loads.map((l) => ({
-                id: l.id,
-                name: l.name,
-                priority: l.priority,
-                state: l.state,
-                ratedPowerKw: Number((l.currentPowerKw * 1.15).toFixed(1)),
-                currentPowerKw: l.currentPowerKw,
-              }))
-            : prev.loads,
+        loads: prev.loads.map((load) => {
+          const reading = payload.loads?.find((item) => item.id === load.id);
+          return reading
+            ? { ...load, state: reading.state, currentPowerKw: reading.currentPowerKw }
+            : load;
+        }),
       }));
     });
 
@@ -229,32 +235,65 @@ export function ScenarioProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  // Sync workspace connected devices to loads if workspace has custom loads
+  /**
+   * The registered site is the single inventory. These loads and source
+   * ratings used to come from browser state and a hardcoded fallback, which
+   * meant the dashboard could show equipment the backend had never heard of.
+   * If the API is unreachable the built-in reference values stay in place.
+   */
   React.useEffect(() => {
-    if (devices && devices.length > 0) {
-      // Filter out sources and map loads
-      const loadDevices = devices
-        .filter((d) => d.category !== "power_sources")
-        .map((d) => ({
-          id: d.id,
-          name: d.name,
-          priority: (d.priority === "nonessential" ? "deferrable" : d.priority) as
-            | "critical"
-            | "important"
-            | "deferrable",
-          state: "running" as const,
-          ratedPowerKw: d.ratedPowerKw,
-          currentPowerKw: Number((d.ratedPowerKw * 0.85).toFixed(1)),
-        }));
+    let cancelled = false;
 
-      if (loadDevices.length > 0) {
+    void siteService
+      .getRegistration()
+      .then((registration) => {
+        if (cancelled || !registration.isProvisioned) return;
+
         setInputs((prev) => ({
           ...prev,
-          loads: loadDevices,
+          loads: registration.appliances.map((appliance) => ({
+            id: appliance.id,
+            name: appliance.name,
+            priority: appliance.priority,
+            state: appliance.state === "running" ? ("running" as const) : ("curtailed" as const),
+            ratedPowerKw: appliance.ratedPowerKw,
+            currentPowerKw: appliance.currentPowerKw,
+          })),
+          ...(registration.sources && {
+            grid: { ...prev.grid, tariffPerKwh: registration.sources.gridTariffPerKwhNgn },
+            // A source with no declared capacity does not exist, so its runtime
+            // values are zeroed too. Leaving the defaults in place produced a
+            // state of charge for a battery nobody owns and a dispatch figure
+            // for an inverter that was never installed.
+            solar: {
+              ...prev.solar,
+              installedCapacityKwp: registration.sources.solarCapacityKwp,
+              isEnabled: registration.sources.solarCapacityKwp > 0 && prev.solar.isEnabled,
+              currentOutputKw:
+                registration.sources.solarCapacityKwp > 0 ? prev.solar.currentOutputKw : 0,
+            },
+            battery: {
+              ...prev.battery,
+              totalCapacityKwh: registration.sources.batteryCapacityKwh,
+              reserveFloorPct: registration.sources.batteryReservePct,
+              stateOfChargePct:
+                registration.sources.batteryCapacityKwh > 0 ? prev.battery.stateOfChargePct : 0,
+            },
+            generator: {
+              ...prev.generator,
+              fuelCurrentLiters: registration.sources.generatorFuelLiters,
+              fuelCostPerLiter: registration.sources.dieselPricePerLiterNgn,
+              mode: registration.sources.generatorCapacityKva > 0 ? prev.generator.mode : "disabled",
+            },
+          }),
         }));
-      }
-    }
-  }, [devices]);
+      })
+      .catch(() => undefined);
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // Recalculate outputs deterministically via pure calculation engine
   const outputs = React.useMemo(() => {

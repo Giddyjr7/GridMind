@@ -15,6 +15,7 @@ import {
   Upload,
   ArrowRight,
   Sparkles,
+  AlertCircle,
 } from "lucide-react";
 import { AuthCard, AuthCardBody, AuthCardFooter } from "@/components/auth/auth-card";
 import { PremiumInput } from "@/components/auth/premium-input";
@@ -40,7 +41,7 @@ export type Step1FormValues = z.infer<typeof step1Schema>;
 
 interface Step1AccountProps {
   initialValues: Partial<Step1FormValues> & { avatarDataUrl?: string };
-  onNext: (values: Step1FormValues & { avatarDataUrl?: string }) => void;
+  onNext: (values: Step1FormValues & { avatarDataUrl?: string }) => void | Promise<void>;
 }
 
 export function Step1Account({ initialValues, onNext }: Step1AccountProps) {
@@ -48,6 +49,7 @@ export function Step1Account({ initialValues, onNext }: Step1AccountProps) {
   const [avatarDataUrl, setAvatarDataUrl] = React.useState<string | undefined>(
     initialValues.avatarDataUrl
   );
+  const [serverError, setServerError] = React.useState<string | null>(null);
 
   const isGoogleAvailable = authService.isGoogleConfigured();
 
@@ -96,11 +98,18 @@ export function Step1Account({ initialValues, onNext }: Step1AccountProps) {
     reader.readAsDataURL(file);
   };
 
-  const onSubmit = (values: Step1FormValues) => {
-    onNext({
-      ...values,
-      avatarDataUrl,
-    });
+  const onSubmit = async (values: Step1FormValues) => {
+    try {
+      setServerError(null);
+      await onNext({
+        ...values,
+        avatarDataUrl,
+      });
+    } catch (error: unknown) {
+      setServerError(
+        error instanceof Error ? error.message : "Unable to create your account."
+      );
+    }
   };
 
   return (
@@ -268,6 +277,12 @@ export function Step1Account({ initialValues, onNext }: Step1AccountProps) {
 
           {/* Primary Action Button */}
           <div className="pt-2">
+            {serverError && (
+              <div className="mb-3 flex items-start gap-2 rounded-xl border border-rose-500/25 bg-rose-500/10 p-3 text-xs text-rose-300">
+                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                <span>{serverError}</span>
+              </div>
+            )}
             <button
               type="submit"
               disabled={isSubmitting}

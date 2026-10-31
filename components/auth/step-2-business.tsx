@@ -30,7 +30,7 @@ const step2Schema = z.object({
       required_error: "Please select your business type.",
     }
   ),
-  location: z.string().min(1, "Location is required (e.g. Ikeja, Lagos)."),
+  location: z.string().min(1, "Location is required (e.g. Uyo, Akwa Ibom)."),
   handle: z
     .string()
     .min(2, "Workspace handle must be at least 2 characters.")
@@ -182,7 +182,7 @@ export function Step2Business({
           {/* Business Name */}
           <PremiumInput
             label="Business name"
-            placeholder="e.g. Ikeja Cold Storage Ltd"
+            placeholder="e.g. Uyo Cold Storage Ltd"
             autoComplete="organization"
             leftIcon={<Building2 className="h-4 w-4" />}
             error={errors.name?.message}
@@ -225,7 +225,7 @@ export function Step2Business({
           {/* Location */}
           <PremiumInput
             label="Location"
-            placeholder="City and state, e.g. Ikeja, Lagos"
+            placeholder="City and state, e.g. Uyo, Akwa Ibom"
             leftIcon={<MapPin className="h-4 w-4" />}
             error={errors.location?.message}
             isValidated={Boolean(locationValue && !errors.location)}

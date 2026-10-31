@@ -201,7 +201,7 @@ export default function TermsOfServicePage() {
             <span>Essential Evaluation Caveat</span>
           </div>
           <p className="leading-relaxed">
-            You expressly acknowledge that the current build of GridMind utilizes synthetic mathematical models (such as the simulated 150 kW cold-storage facility &quot;Krystal Ice Ltd.&quot; in Ikeja Industrial Estate). Simulated values, including battery runtime hours, grid Band A tariff rates of ₦206/kWh, diesel consumption figures, and avoided generator expenditures, are illustrative benchmarks.
+            You expressly acknowledge that the current build of GridMind utilizes synthetic mathematical models (such as the simulated 150 kW cold-storage facility &quot;Krystal Ice Ltd.&quot; in Uyo Industrial Layout). Simulated values, including battery runtime hours, grid Band A tariff rates of ₦206/kWh, diesel consumption figures, and avoided generator expenditures, are illustrative benchmarks.
           </p>
           <ul className="list-disc pl-5 space-y-1 text-slate-800">
             <li>Demonstration outputs do not guarantee verified financial savings or operational performance in real-world facilities.</li>
@@ -374,7 +374,7 @@ export default function TermsOfServicePage() {
         </div>
 
         <p className="text-xs text-slate-700 leading-relaxed">
-          GridMind may reference or interface with third-party systems, including electricity distribution companies (DisCos such as Ikeja Electric, Eko DisCo, etc.), generator controller manufacturers (e.g., Deep Sea Electronics, ComAp), solar inverter OEMs (e.g., SMA, Victron, Deye), and cloud infrastructure providers.
+          GridMind may reference or interface with third-party systems, including electricity distribution companies (DisCos such as Port Harcourt Electricity Distribution, Ikeja Electric, etc.), generator controller manufacturers (e.g., Deep Sea Electronics, ComAp), solar inverter OEMs (e.g., SMA, Victron, Deye), and cloud infrastructure providers.
         </p>
 
         <p className="text-xs text-slate-700 leading-relaxed">
