@@ -25,6 +25,8 @@ export function AddDeviceModal({
   const [customName, setCustomName] = React.useState("");
   const [customPower, setCustomPower] = React.useState<number>(10);
   const [customPriority, setCustomPriority] = React.useState<DevicePriority>("important");
+  const [customMode, setCustomMode] = React.useState(false);
+  const [customCategory, setCustomCategory] = React.useState<DeviceCategory>("operations");
   const [error, setError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
@@ -33,6 +35,8 @@ export function AddDeviceModal({
       setCustomName("");
       setCustomPower(10);
       setCustomPriority("important");
+      setCustomMode(false);
+      setCustomCategory("operations");
       setError(null);
     }
   }, [isOpen]);
@@ -40,6 +44,7 @@ export function AddDeviceModal({
   if (!isOpen) return null;
 
   const handleSelectTemplate = (item: DeviceCatalogueItem) => {
+    setCustomMode(false);
     setSelectedItem(item);
     setCustomName(item.name);
     setCustomPower(item.defaultPowerKw);
@@ -48,8 +53,8 @@ export function AddDeviceModal({
   };
 
   const handleSave = () => {
-    if (!selectedItem) {
-      setError("Please pick a device type from the catalogue.");
+    if (!selectedItem && !customMode) {
+      setError("Pick a device type, or switch to entering one manually.");
       return;
     }
 
@@ -65,8 +70,8 @@ export function AddDeviceModal({
 
     onAdd({
       name: customName.trim(),
-      deviceTypeId: selectedItem.typeId,
-      category: selectedItem.category,
+      deviceTypeId: selectedItem?.typeId ?? `custom_${customCategory}`,
+      category: selectedItem?.category ?? customCategory,
       ratedPowerKw: customPower,
       priority: customPriority,
       connectionState: "simulated",
@@ -135,11 +140,31 @@ export function AddDeviceModal({
 
           {/* Device catalogue tiles */}
           <div className="space-y-4">
-            <span className="text-xs font-mono uppercase tracking-wider text-slate-400 block">
-              1. Choose equipment type
-            </span>
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-xs font-mono uppercase tracking-wider text-slate-400">
+                1. Choose equipment type
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  // Not every facility's equipment is in the catalogue, so a
+                  // site can describe its own rather than pick the nearest match.
+                  setCustomMode((previous) => !previous);
+                  setSelectedItem(null);
+                  setError(null);
+                }}
+                className={cn(
+                  "text-[11px] rounded-lg border px-2.5 py-1 transition-colors",
+                  customMode
+                    ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
+                    : "border-white/10 text-slate-400 hover:text-white",
+                )}
+              >
+                {customMode ? "Using manual entry" : "Not listed? Enter manually"}
+              </button>
+            </div>
 
-            {categories.map((cat) => {
+            {!customMode && categories.map((cat) => {
               const items = DEVICE_CATALOGUE.filter((d) => d.category === cat);
               return (
                 <div key={cat} className="space-y-2">
@@ -185,8 +210,26 @@ export function AddDeviceModal({
             })}
           </div>
 
+          {customMode && (
+            <div className="space-y-1">
+              <label htmlFor="custom-category" className="text-xs text-slate-400 block">
+                Equipment category
+              </label>
+              <select
+                id="custom-category"
+                value={customCategory}
+                onChange={(event) => setCustomCategory(event.target.value as DeviceCategory)}
+                className="h-10 w-full rounded-xl border border-white/10 bg-[#080f0b] px-3 text-xs text-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              >
+                {categories.map((cat) => (
+                  <option key={cat} value={cat}>{CATEGORY_LABELS[cat]}</option>
+                ))}
+              </select>
+            </div>
+          )}
+
           {/* Form fields for the selected device */}
-          {selectedItem && (
+          {(selectedItem || customMode) && (
             <div className="pt-4 border-t border-white/[0.08] space-y-3">
               <span className="text-xs font-mono uppercase tracking-wider text-slate-400 block">
                 2. Configure specifications
@@ -254,7 +297,7 @@ export function AddDeviceModal({
           <button
             type="button"
             onClick={handleSave}
-            disabled={!selectedItem}
+            disabled={!selectedItem && !customMode}
             className="px-5 h-10 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-medium text-xs flex items-center gap-1.5 transition-colors disabled:opacity-50"
           >
             <Plus className="h-3.5 w-3.5" />

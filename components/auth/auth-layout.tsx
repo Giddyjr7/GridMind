@@ -18,6 +18,7 @@ interface AuthLayoutProps {
   onBack?: () => void;
   steps?: StepItem[];
   currentStepIndex?: number;
+  contentClassName?: string;
 }
 
 export function AuthLayout({
@@ -28,6 +29,7 @@ export function AuthLayout({
   onBack,
   steps,
   currentStepIndex = 0,
+  contentClassName,
 }: AuthLayoutProps) {
   return (
     <div className="min-h-screen bg-[#070c0a] text-slate-100 flex flex-col relative overflow-x-hidden selection:bg-emerald-500/20 selection:text-emerald-300">
@@ -119,7 +121,12 @@ export function AuthLayout({
 
       {/* Main Content Area: Centred, Apple/Tesla-grade spacing */}
       <main className="relative z-10 flex-1 flex flex-col justify-center items-center px-4 py-8 sm:py-14 w-full">
-        <div className="w-full max-w-[480px] mx-auto space-y-6">
+        <div
+          className={cn(
+            "w-full max-w-[480px] mx-auto space-y-6",
+            contentClassName
+          )}
+        >
           {(heading || supportingText) && (
             <div className="text-center space-y-2">
               {heading && (

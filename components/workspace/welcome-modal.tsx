@@ -2,14 +2,7 @@
 
 import * as React from "react";
 import { GridMindLogo } from "@/components/brand/gridmind-logo";
-import {
-  Snowflake,
-  Sun,
-  Flame,
-  BatteryCharging,
-  ArrowRight,
-  ShieldCheck,
-} from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 interface WelcomeModalProps {
   isOpen: boolean;
@@ -33,43 +26,13 @@ export function WelcomeModal({ isOpen, onClose }: WelcomeModalProps) {
         aria-hidden="true"
       />
 
-      {/* Centred Card with soft glow and subtle floating device icons */}
+      {/* Centred Card with a restrained brand glow */}
       <div className="relative w-full max-w-md rounded-[24px] border border-white/10 bg-[#0c1410] p-8 text-center text-white shadow-[0_25px_60px_rgba(0,0,0,0.8)] overflow-hidden z-10 animate-in fade-in zoom-in-95 duration-200">
         {/* Soft radial emerald glow behind logo */}
         <div
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(16,185,129,0.2),transparent_65%)]"
           aria-hidden="true"
         />
-
-        {/* Ambient floating device icons */}
-        <div
-          aria-hidden="true"
-          className="absolute top-6 left-8 h-8 w-8 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center opacity-70 animate-bounce"
-          style={{ animationDuration: "4s" }}
-        >
-          <Snowflake className="h-4 w-4" />
-        </div>
-        <div
-          aria-hidden="true"
-          className="absolute top-8 right-8 h-8 w-8 rounded-xl bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 flex items-center justify-center opacity-70 animate-bounce"
-          style={{ animationDuration: "5s", animationDelay: "1s" }}
-        >
-          <Sun className="h-4 w-4" />
-        </div>
-        <div
-          aria-hidden="true"
-          className="absolute bottom-20 left-6 h-8 w-8 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center opacity-70 animate-bounce"
-          style={{ animationDuration: "4.5s", animationDelay: "0.5s" }}
-        >
-          <Flame className="h-4 w-4" />
-        </div>
-        <div
-          aria-hidden="true"
-          className="absolute bottom-20 right-6 h-8 w-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center opacity-70 animate-bounce"
-          style={{ animationDuration: "5.5s", animationDelay: "1.5s" }}
-        >
-          <BatteryCharging className="h-4 w-4" />
-        </div>
 
         {/* Centred Logo */}
         <div className="relative mx-auto flex items-center justify-center mb-6">

@@ -423,6 +423,86 @@ export interface DashboardMetrics {
   lastTelemetryTimestamp: string;
 }
 
+export type OutageRiskBand = "normal" | "watch" | "elevated" | "critical" | "outage_active";
+
+export interface OutageRiskSignal {
+  code: string;
+  label: string;
+  /** Percentage points this signal adds to probabilityPct. */
+  contribution: number;
+  /** Weight applied on the log-odds scale. */
+  logOddsWeight: number;
+  detail: string;
+}
+
+export interface OutageRiskHorizon {
+  horizonMinutes: number;
+  probabilityPct: number;
+  lowPct: number;
+  highPct: number;
+}
+
+export interface OutageRiskForecast {
+  siteId: string;
+  generatedAt: string;
+  horizonMinutes: 60;
+  probabilityPct: number;
+  /** 80% credible interval around probabilityPct, in percentage points. */
+  probabilityRangePct: { lowPct: number; highPct: number };
+  band: OutageRiskBand;
+  confidencePct: number;
+  provenance: "simulated" | "digital_twin" | "physical_gateway" | "rest_gateway" | "mixed";
+  sampleCount: number;
+  latestTelemetryAt: string;
+  method: string;
+  /** Empirical hourly interruption rate this forecast is calibrated against. */
+  baseRate: {
+    ratePct: number;
+    windowsObserved: number;
+    onsetsObserved: number;
+    lookbackHours: number;
+    estimator: "empirical_bayes" | "prior_only";
+  };
+  /** Constant-hazard expansion of the hourly probability to shorter horizons. */
+  horizons: OutageRiskHorizon[];
+  signals: OutageRiskSignal[];
+  recommendedPreparation: string[];
+  limitations: string[];
+}
+
+export type EquipmentRiskBand = "normal" | "watch" | "elevated" | "critical";
+
+export interface EquipmentRiskFinding {
+  code: string;
+  label: string;
+  /** Percentage points this finding adds to the asset's probability. */
+  contribution: number;
+  logOddsWeight: number;
+  detail: string;
+}
+
+export interface EquipmentRiskAsset {
+  assetId: string;
+  assetName: string;
+  assetType: "battery" | "generator" | "appliance";
+  probabilityPct: number;
+  band: EquipmentRiskBand;
+  findings: EquipmentRiskFinding[];
+  recommendedCheck: string;
+}
+
+export interface EquipmentRiskReport {
+  siteId: string;
+  generatedAt: string;
+  horizonDays: number;
+  assetsAssessed: number;
+  assetsAtRisk: number;
+  highestBand: EquipmentRiskBand;
+  observedDays: number;
+  assets: EquipmentRiskAsset[];
+  limitations: string[];
+}
+
 // ==========================================
 // 11. USER PROFILE, WORKSPACE & CONNECTED DEVICES
 // ==========================================

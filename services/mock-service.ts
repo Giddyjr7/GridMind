@@ -31,6 +31,8 @@ import {
   DeviceCommand,
   DeviceGatewayStatus,
   WorkspaceState,
+  OutageRiskForecast,
+  EquipmentRiskReport,
 } from "@/types/energy";
 
 // Simulated network delay for realistic async behavior in mock mode
@@ -52,6 +54,51 @@ export class MockEnergyDataService implements IEnergyDataService {
 
   async getDayForecast(): Promise<DayForecast> {
     return simulateLatency(MOCK_DAY_FORECAST);
+  }
+
+  async getOutageRiskForecast(): Promise<OutageRiskForecast> {
+    return simulateLatency({
+      siteId: MOCK_SITE_PROFILE.id,
+      generatedAt: new Date().toISOString(),
+      horizonMinutes: 60,
+      probabilityPct: 8,
+      probabilityRangePct: { lowPct: 3, highPct: 21 },
+      band: "normal",
+      confidencePct: 40,
+      provenance: "simulated",
+      sampleCount: 1,
+      latestTelemetryAt: new Date().toISOString(),
+      method: "empirical-bayes base rate with log-odds telemetry signals and constant-hazard horizons",
+      baseRate: {
+        ratePct: 8,
+        windowsObserved: 0,
+        onsetsObserved: 0,
+        lookbackHours: 168,
+        estimator: "prior_only",
+      },
+      horizons: [
+        { horizonMinutes: 15, probabilityPct: 2, lowPct: 1, highPct: 6 },
+        { horizonMinutes: 30, probabilityPct: 4, lowPct: 2, highPct: 11 },
+        { horizonMinutes: 60, probabilityPct: 8, lowPct: 3, highPct: 21 },
+      ],
+      signals: [],
+      recommendedPreparation: ["Continue monitoring feeder quality and backup readiness."],
+      limitations: ["This result uses simulated telemetry and is not a live feeder forecast."],
+    });
+  }
+
+  async getEquipmentRisk(): Promise<EquipmentRiskReport> {
+    return simulateLatency({
+      siteId: MOCK_SITE_PROFILE.id,
+      generatedAt: new Date().toISOString(),
+      horizonDays: 7,
+      assetsAssessed: 2,
+      assetsAtRisk: 0,
+      highestBand: "normal",
+      observedDays: 0,
+      assets: [],
+      limitations: ["Mock data: no telemetry history is available in mock mode."],
+    });
   }
 }
 
@@ -201,5 +248,4 @@ export const mockServices: IGridMindServices = {
   auth: mockAuthService,
   workspace: new MockWorkspaceService(),
 };
-
 

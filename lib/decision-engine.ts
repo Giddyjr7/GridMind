@@ -36,7 +36,7 @@ export const SCENARIO_PRESETS: ScenarioPreset[] = [
   {
     id: "preset_normal",
     name: "Normal Operation (Mains Stable)",
-    shortDescription: "Ikeja 11kV grid synchronized, solar peak buffer, battery holding at 68% SOC.",
+    shortDescription: "Uyo 11kV grid synchronized, solar peak buffer, battery holding at 68% SOC.",
     narrative:
       "Utility grid is delivering continuous 3-phase power under Band A tariff (₦206/kWh). Rooftop solar array supplies facility baseload with surplus solar charging the battery storage bank.",
     tags: ["Grid Stable", "Band A", "Solar Active", "Safe"],
@@ -62,7 +62,7 @@ export const SCENARIO_PRESETS: ScenarioPreset[] = [
     name: "Unexpected Grid Outage (Microgrid Islanded)",
     shortDescription: "11kV utility drops to 0V. Solar + LiFePO4 battery carry active loads.",
     narrative:
-      "Simulates an unexpected utility blackout in Ikeja Industrial. Facility instantly islands into microgrid mode. Solar PV and battery carry critical refrigeration, but uncurtailed packaging HVAC accelerates battery drain.",
+      "Simulates an unexpected utility blackout in Uyo Industrial Layout. Facility instantly islands into microgrid mode. Solar PV and battery carry critical refrigeration, but uncurtailed packaging HVAC accelerates battery drain.",
     tags: ["Utility Blackout", "Islanded", "Battery Discharging", "Elevated Risk"],
     params: {
       gridAvailable: false,
@@ -268,7 +268,7 @@ export function evaluateOperationalRisk(
     description:
       "Utility feeder is stable, solar generation is contributing to baseload, and battery storage holds a safe reserve buffer. Cold chain is 100% protected.",
     primaryRiskFactors: [
-      "Ikeja 11kV Feeder synchronized (Band A tariff active).",
+      "Uyo 11kV Feeder synchronized (Band A tariff active).",
       `Battery reserve healthy at ${params.batterySocPct}% SOC.`,
       "Zero cold-chain temperature excursion alerts.",
     ],

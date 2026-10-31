@@ -5,18 +5,17 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
-  Cpu,
   ShieldCheck,
   Sliders,
   BarChart3,
   X,
   Layers,
-  ArrowLeft,
   Activity,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { GridMindLogo } from "@/components/brand/gridmind-logo";
 import { useWorkspace } from "@/context/workspace-context";
+import { useRegisteredSite } from "@/hooks/use-registered-site";
 
 export interface NavItem {
   title: string;
@@ -30,11 +29,6 @@ export const navItems: NavItem[] = [
     title: "Overview",
     href: "/dashboard",
     icon: LayoutDashboard,
-  },
-  {
-    title: "Scenarios",
-    href: "/dashboard/simulator",
-    icon: Cpu,
   },
   {
     title: "Decisions",
@@ -61,9 +55,14 @@ export interface SidebarProps {
 export function Sidebar({ onClose, className }: SidebarProps) {
   const pathname = usePathname();
   const { workspace } = useWorkspace();
+  const { registration } = useRegisteredSite();
 
-  const businessName = workspace?.name || "Krystal Ice Cold Storage Ltd.";
-  const businessLocation = workspace?.location || "Ikeja Industrial, Lagos";
+  // The registered site wins over browser state: a cleared or different
+  // browser would otherwise show the built-in demo business beside the real
+  // one's equipment.
+  const businessName = registration?.name || workspace?.name || "Krystal Ice Cold Storage Ltd.";
+  const businessLocation =
+    registration?.location || workspace?.location || "Uyo Industrial Layout, Akwa Ibom";
   const workspaceLetter = businessName.charAt(0).toUpperCase();
 
   return (
@@ -180,18 +179,6 @@ export function Sidebar({ onClose, className }: SidebarProps) {
                 MQTT
               </span>
             </div>
-          </Link>
-        </div>
-
-        {/* Back to Public Landing Page */}
-        <div className="pt-3 mt-3 border-t border-white/[0.08]">
-          <Link
-            href="/"
-            onClick={onClose}
-            className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-slate-500 hover:text-slate-300 hover:bg-white/[0.03] rounded-lg transition-colors"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            <span>Public Landing Page</span>
           </Link>
         </div>
       </nav>

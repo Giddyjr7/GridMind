@@ -15,6 +15,9 @@ import {
 import { useScenario } from "@/context/scenario-context";
 import { useWorkspace } from "@/context/workspace-context";
 import { DEFAULT_ENGINE_CONFIG } from "@/lib/calculation-engine";
+import { NotificationControls } from "@/components/pwa/notification-controls";
+import { InstallPrompt } from "@/components/pwa/install-prompt";
+import { PowerSourceSettings } from "@/components/dashboard/power-source-settings";
 
 export default function SettingsPage() {
   const {
@@ -65,6 +68,12 @@ export default function SettingsPage() {
           Configure baseline financial assumptions, telemetry transport, and site metadata
         </p>
       </div>
+
+      <InstallPrompt />
+
+      <NotificationControls />
+
+      <PowerSourceSettings />
 
       {/* Section 1: Data Source & Telemetry */}
       <div className="rounded-2xl bg-white/[0.02] border border-white/[0.08] p-5 space-y-4">
@@ -152,7 +161,7 @@ export default function SettingsPage() {
               className="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/[0.08] text-white font-mono focus:outline-none focus:border-emerald-500/50"
             />
             <p className="text-[10px] text-slate-500">
-              Ikeja Electric Band A benchmark rate (default ₦206/kWh)
+              PHED Band A benchmark rate (default ₦206/kWh)
             </p>
           </div>
 
@@ -246,7 +255,7 @@ export default function SettingsPage() {
           </div>
           <div className="p-3 rounded-xl bg-black/40 border border-white/[0.04]">
             <span className="text-[10px] text-slate-400 block">Location</span>
-            <span className="text-white font-medium">{workspace?.location || "Ikeja Industrial, Lagos"}</span>
+            <span className="text-white font-medium">{workspace?.location || "Uyo Industrial Layout, Akwa Ibom"}</span>
           </div>
         </div>
       </div>

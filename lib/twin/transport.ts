@@ -80,6 +80,11 @@ export class LocalBroadcastTransport implements TelemetryTransport {
 /**
  * Hybrid MQTT Transport with automatic local fallback
  */
+/** The topic a published payload lands on, so the UI can name it accurately. */
+export function topicFor(sessionCode: string): string {
+  return `gridmind/${sessionCode}/system/telemetry`;
+}
+
 export class HybridTwinTransport implements TelemetryTransport {
   public status: TransportStatus = "simulated";
   private localFallback = new LocalBroadcastTransport();
@@ -103,6 +108,8 @@ export class HybridTwinTransport implements TelemetryTransport {
       this.localFallback.subscribe(sessionCode, (payload) => {
         this.messageListeners.forEach((cb) => cb(payload));
       });
+      this.status = "simulated";
+      this.notifyStatus();
 
       // Try connecting to public WebSocket MQTT broker with timeout
       const mqttModule = await import("mqtt");
@@ -119,6 +126,15 @@ export class HybridTwinTransport implements TelemetryTransport {
         client.subscribe(topic);
       });
 
+      client.on("close", () => {
+        // The local channel still carries messages between tabs, so this is a
+        // downgrade to local-only rather than a full outage.
+        if (this.status === "digital_twin_connected") {
+          this.status = "simulated";
+          this.notifyStatus();
+        }
+      });
+
       client.on("message", (topic, message) => {
         try {
           const parsed = JSON.parse(message.toString());
@@ -129,14 +145,15 @@ export class HybridTwinTransport implements TelemetryTransport {
       });
 
       client.on("error", () => {
-        // Fall back to local channel quietly
-        this.status = "digital_twin_connected";
+        // Fall back to the local channel, and say so: reporting a broker
+        // connection that does not exist makes the console untrustworthy.
+        this.status = "simulated";
         this.notifyStatus();
       });
 
       this.mqttClient = client;
     } catch {
-      this.status = "digital_twin_connected";
+      this.status = "simulated";
       this.notifyStatus();
     }
   }
@@ -161,9 +178,13 @@ export class HybridTwinTransport implements TelemetryTransport {
 
     // 2. Publish to MQTT broker if connected
     if (this.mqttClient && this.mqttClient.connected) {
-      const topic = `gridmind/${sessionCode}/system/telemetry`;
-      this.mqttClient.publish(topic, JSON.stringify(payload), { qos: 0 });
+      this.mqttClient.publish(topicFor(sessionCode), JSON.stringify(payload), { qos: 0 });
     }
+  }
+
+  /** True only while a real broker socket is open. */
+  get brokerConnected(): boolean {
+    return Boolean(this.mqttClient?.connected);
   }
 
   subscribe(sessionCode: string, onMessage: (payload: TelemetryPayload) => void): () => void {

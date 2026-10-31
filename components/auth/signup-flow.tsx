@@ -9,6 +9,7 @@ import { Step3Devices } from "@/components/auth/step-3-devices";
 import { Step4Team, TeamMemberInvite } from "@/components/auth/step-4-team";
 import { FullScreenTransition } from "@/components/auth/full-screen-transition";
 import { useWorkspace } from "@/context/workspace-context";
+import { siteService } from "@/services/site-service";
 import { authService } from "@/services";
 import {
   UserProfile,
@@ -66,18 +67,13 @@ export function SignupFlow() {
   ) => {
     setAccountData(data);
 
-    // Call authService signup simulation
-    try {
-      await authService.signup({
-        fullName: `${data.firstName} ${data.lastName}`.trim(),
-        email: data.email,
-        password: data.password,
-        confirmPassword: data.password,
-        agreeToTerms: data.agreeToTerms,
-      });
-    } catch {
-      // Demo fallback continues smoothly
-    }
+    await authService.signup({
+      fullName: `${data.firstName} ${data.lastName}`.trim(),
+      email: data.email,
+      password: data.password,
+      confirmPassword: data.password,
+      agreeToTerms: data.agreeToTerms,
+    });
 
     goToStep("business");
   };
@@ -94,7 +90,7 @@ export function SignupFlow() {
       handle: "krystal-ice-cold-storage",
       businessType: "cold_storage",
       businessTypeLabel: "Cold storage or frozen food",
-      location: "Ikeja, Lagos State",
+      location: "Uyo, Akwa Ibom State",
       createdAt: new Date().toISOString(),
     };
     setWorkspaceData(demoWs);
@@ -136,7 +132,7 @@ export function SignupFlow() {
       name: "My Energy Workspace",
       handle: "my-workspace",
       businessType: "cold_storage",
-      location: "Lagos, Nigeria",
+      location: "Uyo, Nigeria",
       createdAt: new Date().toISOString(),
     };
 
@@ -144,6 +140,30 @@ export function SignupFlow() {
     setWorkspace(finalWorkspace);
     setDevices(devicesData);
     setInvitedMembers(invited);
+
+    // Register the business and its equipment with the API. Until this
+    // existed, signup lived only in localStorage, so the backend, the MQTT
+    // twin and both risk models never saw the equipment a site declared.
+    void siteService
+      .provision({
+        name: finalWorkspace.name,
+        industry: finalWorkspace.businessType,
+        location: finalWorkspace.location,
+        appliances: devicesData
+          .filter((device) => device.category !== "power_sources")
+          .map((device) => ({
+            name: device.name,
+            category: device.category,
+            priority: device.priority === "nonessential" ? ("deferrable" as const) : device.priority,
+            ratedPowerKw: device.ratedPowerKw,
+            notes: device.notes,
+          })),
+        sources: sourcesFromDevices(devicesData),
+      })
+      .catch(() => {
+        // Onboarding must still complete if the API is unreachable; the
+        // dashboard falls back to the locally stored workspace.
+      });
 
     // Stage 1: Setting up your account, please wait...
     setFinishStage("setting_up");
@@ -221,6 +241,7 @@ export function SignupFlow() {
       currentStepIndex={stepIndex}
       onBack={stepIndex > 0 ? handleBack : undefined}
       backHref={stepIndex === 0 ? "/" : undefined}
+      contentClassName={stepIndex === 2 ? "max-w-3xl" : undefined}
     >
       {stepIndex === 0 && (
         <Step1Account initialValues={accountData} onNext={handleStep1Next} />
@@ -251,4 +272,28 @@ export function SignupFlow() {
       )}
     </AuthLayout>
   );
+}
+
+/**
+ * Pulls source ratings out of the devices chosen during onboarding. Solar,
+ * battery and generator arrive as catalogue items, but the backend stores them
+ * as site configuration rather than as loads.
+ */
+function sourcesFromDevices(devices: ConnectedDevice[]) {
+  const find = (fragment: string) =>
+    devices.find(
+      (device) =>
+        device.category === "power_sources" &&
+        device.deviceTypeId.toLowerCase().includes(fragment),
+    );
+
+  const solar = find("solar");
+  const battery = find("batter");
+  const generator = find("gen");
+
+  return {
+    ...(solar && { solarCapacityKwp: solar.ratedPowerKw }),
+    ...(battery && { batteryCapacityKwh: battery.ratedPowerKw }),
+    ...(generator && { generatorCapacityKva: generator.ratedPowerKw }),
+  };
 }

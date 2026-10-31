@@ -19,15 +19,15 @@ export interface AuthUser {
 
 export interface LoginCredentials {
   email: string;
-  password?: string;
+  password: string;
   rememberMe?: boolean;
 }
 
 export interface SignupCredentials {
   fullName: string;
   email: string;
-  password?: string;
-  confirmPassword?: string;
+  password: string;
+  confirmPassword: string;
   agreeToTerms: boolean;
 }
 

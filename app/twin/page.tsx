@@ -19,8 +19,9 @@ import {
   Power,
 } from "lucide-react";
 import { GridMindLogo } from "@/components/brand/gridmind-logo";
-import { getTwinTransport } from "@/lib/twin/transport";
+import { getTwinTransport, topicFor } from "@/lib/twin/transport";
 import { TelemetryPayload } from "@/lib/twin/schema";
+import { BackendIngestBridge, type BackendLinkStatus } from "@/lib/twin/backend-ingest";
 
 interface TwinLoadItem {
   id: string;
@@ -46,6 +47,8 @@ export default function TwinConsolePage() {
   const [autoPublish, setAutoPublish] = React.useState(true);
   const [lastPublished, setLastPublished] = React.useState<TelemetryPayload | null>(null);
   const [publishFeedback, setPublishFeedback] = React.useState(false);
+  const [backendLink, setBackendLink] = React.useState<BackendLinkStatus>("idle");
+  const bridge = React.useRef(new BackendIngestBridge());
 
   // Monitored Loads
   const [loads, setLoads] = React.useState<TwinLoadItem[]>([
@@ -106,14 +109,27 @@ export default function TwinConsolePage() {
     };
   }, [sessionCode, gridAvailable, solarKw, batterySoc, genFuel, genMode, loads]);
 
-  const publishNow = React.useCallback(() => {
-    const transport = getTwinTransport();
-    const payload = buildPayload();
-    transport.publish(sessionCode, payload);
-    setLastPublished(payload);
-    setPublishFeedback(true);
-    setTimeout(() => setPublishFeedback(false), 800);
-  }, [buildPayload, sessionCode]);
+  const publishNow = React.useCallback(
+    (force = false) => {
+      const transport = getTwinTransport();
+      const payload = buildPayload();
+      transport.publish(sessionCode, payload);
+      setLastPublished(payload);
+      setPublishFeedback(true);
+      setTimeout(() => setPublishFeedback(false), 800);
+
+      // The broadcast above only reaches browser tabs. This is what drives the
+      // backend outage-risk model and the operator notifications.
+      void bridge.current.forward(payload, force).then((result) => {
+        if (!result) return;
+        setBackendLink(result);
+        if (result === "linked" && !payload.grid.isAvailable) {
+          void bridge.current.requestNotificationScan();
+        }
+      });
+    },
+    [buildPayload, sessionCode]
+  );
 
   // Auto-publish pulse every 3 seconds if enabled
   React.useEffect(() => {
@@ -174,14 +190,48 @@ export default function TwinConsolePage() {
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3">
-          {/* Status Badge */}
+          {/* Transport status: reports the real transport, not a fixed label */}
           <div className="flex items-center gap-2 px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.08] text-xs">
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+              {connectionStatus === "digital_twin_connected" && (
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              )}
+              <span
+                className={`relative inline-flex rounded-full h-2 w-2 ${
+                  connectionStatus === "digital_twin_connected"
+                    ? "bg-emerald-500"
+                    : connectionStatus === "simulated"
+                    ? "bg-amber-400"
+                    : "bg-rose-500"
+                }`}
+              />
             </span>
             <span className="text-[11px] text-slate-300 font-medium font-mono">
-              Broker Connected
+              {connectionStatus === "digital_twin_connected"
+                ? "Broker Connected"
+                : connectionStatus === "simulated"
+                ? "Local Channel Only"
+                : "Transport Offline"}
+            </span>
+          </div>
+
+          {/* API link: whether pulses are reaching the backend risk model */}
+          <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.08] text-xs">
+            <span
+              className={`inline-flex rounded-full h-2 w-2 ${
+                backendLink === "linked"
+                  ? "bg-emerald-500"
+                  : backendLink === "unreachable"
+                  ? "bg-rose-500"
+                  : "bg-slate-500"
+              }`}
+            />
+            <span className="text-[11px] text-slate-300 font-medium font-mono">
+              {backendLink === "linked"
+                ? "API Linked"
+                : backendLink === "unreachable"
+                ? "API Unreachable"
+                : "API Pending"}
             </span>
           </div>
 
@@ -398,7 +448,7 @@ export default function TwinConsolePage() {
 
               <button
                 type="button"
-                onClick={publishNow}
+                onClick={() => publishNow(true)}
                 className={`w-full py-2.5 px-4 rounded-xl font-semibold text-xs transition-all flex items-center justify-center gap-2 ${
                   publishFeedback
                     ? "bg-emerald-400 text-slate-950 scale-[0.98]"
@@ -417,7 +467,7 @@ export default function TwinConsolePage() {
                   Live MQTT Payload Inspector
                 </span>
                 <span className="text-[10px] font-mono text-emerald-400">
-                  Topic: gridmind/{sessionCode}/system
+                  Topic: {topicFor(sessionCode)}
                 </span>
               </div>
               <pre className="p-3 rounded-xl bg-black/60 border border-white/[0.04] text-[10px] font-mono text-emerald-300 overflow-x-auto max-h-72 leading-relaxed">

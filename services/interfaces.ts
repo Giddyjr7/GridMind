@@ -11,6 +11,8 @@ import {
   DeviceCommand,
   DeviceGatewayStatus,
   WorkspaceState,
+  OutageRiskForecast,
+  EquipmentRiskReport,
 } from "@/types/energy";
 
 import { IAuthService } from "@/types/auth";
@@ -21,6 +23,8 @@ export interface IEnergyDataService {
   getDashboardMetrics(): Promise<DashboardMetrics>;
   getTelemetryHistory(limit?: number): Promise<EnergyReading[]>;
   getDayForecast(): Promise<DayForecast>;
+  getOutageRiskForecast(): Promise<OutageRiskForecast>;
+  getEquipmentRisk(): Promise<EquipmentRiskReport>;
 }
 
 export interface IApplianceService {

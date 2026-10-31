@@ -16,7 +16,7 @@ import {
 
 /**
  * Fictional demonstration dataset for:
- * Krystal Ice Cold Storage Ltd. (Ikeja Industrial Zone, Lagos, Nigeria)
+ * Krystal Ice Cold Storage Ltd. (Uyo Industrial Layout, Akwa Ibom, Nigeria)
  *
  * NOTE: This is synthetic benchmark data used for UI prototyping and simulation validation.
  * It does NOT represent live meter telemetry or verified audited financial savings.
@@ -30,13 +30,13 @@ export const MOCK_SITE_PROFILE: BusinessSite = {
   location: {
     latitude: 6.5965,
     longitude: 3.3421,
-    city: "Ikeja",
-    state: "Lagos State",
+    city: "Uyo",
+    state: "Akwa Ibom State",
     country: "Nigeria",
     timezone: "Africa/Lagos",
   },
   currency: "NGN",
-  gridProvider: "Ikeja Electric (IE) - Industrial Feed",
+  gridProvider: "Port Harcourt Electricity Distribution (PHED) - Industrial Feed",
   tariffBand: "Band A (₦206/kWh - Min. 20h target)",
   contractedDemandKw: 150,
   installedSolarCapacityKwp: 75,
@@ -50,7 +50,7 @@ export const MOCK_SITE_PROFILE: BusinessSite = {
 export const MOCK_GRID_SOURCE: GridSource = {
   id: "src_grid_main",
   type: "grid",
-  name: "National Grid (Ikeja Industrial 11kV Feed)",
+  name: "National Grid (Uyo Industrial 11kV Feed)",
   status: "online",
   currentPowerKw: 42.5,
   ratedCapacityKw: 150,
@@ -320,7 +320,7 @@ export const MOCK_RECOMMENDATIONS: EnergyRecommendation[] = [
     id: "rec_opt_002",
     siteId: "site_krystal_ikeja_01",
     title: "Curtail Packaging Floor AC upon Grid Outage",
-    description: "If Ikeja 11kV feeder drops offline, immediately hold Packaging Floor HVAC (16 kW) rather than starting generator at full load.",
+    description: "If the Uyo 11kV feeder drops offline, immediately hold Packaging Floor HVAC (16 kW) rather than starting generator at full load.",
     actionType: "curtail_deferrable",
     urgency: "critical",
     targetApplianceId: "app_ac_packaging",
@@ -507,7 +507,7 @@ export const MOCK_ENERGY_EVENTS: EnergyEventRecord[] = [
     category: "grid_event",
     severity: "warning",
     title: "Feeder Outage Risk: 16:00 - 18:30 Scheduled Window",
-    details: "Ikeja Electric advisory flags regional load-shedding between 16:00 and 18:30. GridMind recommends pre-cooling Blast Freezer Room A and holding battery SOC above 75%.",
+    details: "PHED advisory flags regional load-shedding between 16:00 and 18:30. GridMind recommends pre-cooling Blast Freezer Room A and holding battery SOC above 75%.",
     sourceAsset: "grid",
     resolved: false,
   },
@@ -518,7 +518,7 @@ export const MOCK_ENERGY_EVENTS: EnergyEventRecord[] = [
     category: "grid_event",
     severity: "warning",
     title: "Grid Voltage Dip Detected & Corrected",
-    details: "Ikeja 11kV Feeder voltage dipped to 378V (-7.4%) for 8 seconds before automated step-up AVR stabilized at 402V.",
+    details: "Uyo 11kV Feeder voltage dipped to 378V (-7.4%) for 8 seconds before automated step-up AVR stabilized at 402V.",
     sourceAsset: "grid",
     resolved: true,
     resolvedAt: "2024-10-24T11:32:08Z",

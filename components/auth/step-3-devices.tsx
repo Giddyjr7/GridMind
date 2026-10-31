@@ -111,14 +111,14 @@ export function Step3Devices({
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto space-y-6">
+    <div className="w-full max-w-3xl mx-auto space-y-6">
       <AuthCard>
         <AuthCardBody className="p-5 sm:p-7 space-y-6">
           {/* Honest Simulation Helper Notice */}
           <div className="p-3 rounded-xl border border-white/[0.08] bg-white/[0.02] flex items-start gap-2.5 text-xs text-slate-400">
             <Info className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
             <p className="leading-relaxed">
-              Devices are added as simulated devices in this demo. Live telemetry is not connected.
+              Devices begin in simulation. Live readings start only after a validated site gateway publishes telemetry.
             </p>
           </div>
 

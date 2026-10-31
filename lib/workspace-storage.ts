@@ -7,7 +7,7 @@ import {
 import { getKrystalDemoDevices } from "./device-catalogue";
 import { MOCK_SITE_PROFILE } from "@/mocks/demo-business";
 
-export const WORKSPACE_STORAGE_KEY = "gridmind_workspace_state_v1";
+export const WORKSPACE_STORAGE_KEY = "gridmind_workspace_state_v2";
 
 export const DEMO_PROFILE: UserProfile = {
   id: "usr_demo_facility_lead",
@@ -25,7 +25,7 @@ export const DEMO_WORKSPACE: Workspace = {
   handle: "krystal-ice-cold-storage",
   businessType: "cold_storage",
   businessTypeLabel: "Cold storage or frozen food",
-  location: "Ikeja, Lagos State",
+  location: "Uyo, Akwa Ibom State",
   createdAt: "2024-01-15T08:00:00Z",
 };
 
@@ -35,7 +35,7 @@ export const DEFAULT_WORKSPACE_STATE: WorkspaceState = {
   devices: getKrystalDemoDevices(),
   invitedMembers: [],
   welcomeDismissed: false,
-  version: 1,
+  version: 2,
 };
 
 /**
@@ -54,7 +54,7 @@ export function loadStoredWorkspaceState(): WorkspaceState {
       return DEFAULT_WORKSPACE_STATE;
     }
     const parsed = JSON.parse(raw);
-    if (!parsed || typeof parsed !== "object" || parsed.version !== 1) {
+    if (!parsed || typeof parsed !== "object" || parsed.version !== 2) {
       return DEFAULT_WORKSPACE_STATE;
     }
     return {
@@ -63,7 +63,7 @@ export function loadStoredWorkspaceState(): WorkspaceState {
       devices: Array.isArray(parsed.devices) ? parsed.devices : [],
       invitedMembers: Array.isArray(parsed.invitedMembers) ? parsed.invitedMembers : [],
       welcomeDismissed: Boolean(parsed.welcomeDismissed),
-      version: 1,
+      version: 2,
     };
   } catch {
     return DEFAULT_WORKSPACE_STATE;
@@ -82,7 +82,7 @@ export function saveStoredWorkspaceState(state: WorkspaceState): boolean {
       devices: state.devices,
       invitedMembers: state.invitedMembers ?? [],
       welcomeDismissed: state.welcomeDismissed,
-      version: 1,
+      version: 2,
     });
     window.localStorage.setItem(WORKSPACE_STORAGE_KEY, serialized);
     return true;

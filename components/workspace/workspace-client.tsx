@@ -13,6 +13,7 @@ import {
   Sparkles,
   ShieldCheck,
   Zap,
+  Boxes,
 } from "lucide-react";
 import { GridMindLogo } from "@/components/brand/gridmind-logo";
 import { WelcomeModal } from "@/components/workspace/welcome-modal";
@@ -196,8 +197,8 @@ export function WorkspaceClient() {
         {filteredDevices.length === 0 ? (
           // Empty State
           <div className="rounded-[20px] border border-white/[0.08] bg-[#0c1410]/70 p-12 text-center flex flex-col items-center justify-center space-y-4">
-            <div className="h-14 w-14 rounded-2xl bg-white/[0.05] border border-white/10 flex items-center justify-center text-slate-400">
-              <Zap className="h-6 w-6 text-emerald-400" />
+            <div className="h-14 w-14 rounded-2xl bg-emerald-500 flex items-center justify-center shadow-[0_8px_24px_rgba(16,185,129,0.2)]">
+              <Boxes className="h-6 w-6 text-[#07110c] stroke-[2.5]" />
             </div>
             <div className="space-y-1">
               <h3 className="text-base font-medium text-white">

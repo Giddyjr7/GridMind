@@ -1,12 +1,30 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { WorkspaceProvider } from "@/context/workspace-context";
+import { ServiceWorkerRegistrar } from "@/components/pwa/service-worker-registrar";
 
 export const metadata: Metadata = {
   title: "GridMind: Smarter Energy. Uninterrupted Business.",
   description:
     "AI-assisted energy management and continuity intelligence for businesses balancing national grid, generators, solar, and battery storage.",
-  icons: { icon: "/brand/gridmind-mark.png" },
+  manifest: "/manifest.webmanifest",
+  applicationName: "GridMind",
+  icons: {
+    icon: "/brand/gridmind-mark.png",
+    apple: "/icons/apple-touch-icon.png",
+  },
+  appleWebApp: {
+    capable: true,
+    title: "GridMind",
+    statusBarStyle: "black-translucent",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#070c0a",
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
@@ -20,6 +38,7 @@ export default function RootLayout({
         <WorkspaceProvider>
           {children}
         </WorkspaceProvider>
+        <ServiceWorkerRegistrar />
       </body>
     </html>
   );

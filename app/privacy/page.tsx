@@ -132,7 +132,7 @@ export default function PrivacyPolicyPage() {
               <Badge variant="neutral" size="sm">Facility Parameters</Badge>
             </div>
             <p className="text-slate-600">
-              Facility identifiers, commercial facility name, municipal location (e.g., Ikeja Industrial Estate, Lagos), electrical service feeder classification (e.g., Nigerian Electricity Regulatory Commission Band A/B/C/D), rated generator capacity, solar PV peak rating, battery chemistry specifications, and equipment criticality rankings.
+              Facility identifiers, commercial facility name, municipal location (e.g., Uyo Industrial Layout, Akwa Ibom), electrical service feeder classification (e.g., Nigerian Electricity Regulatory Commission Band A/B/C/D), rated generator capacity, solar PV peak rating, battery chemistry specifications, and equipment criticality rankings.
             </p>
           </div>
 

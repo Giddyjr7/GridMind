@@ -299,7 +299,7 @@ export function SimulationControlPanel() {
 
             <p className="text-xs text-slate-500 min-h-[32px]">
               {params.gridAvailable
-                ? "Ikeja 11kV Feeder synchronized. Band A ₦206/kWh tariff active."
+                ? "Uyo 11kV Feeder synchronized. Band A ₦206/kWh tariff active."
                 : "Utility feeder offline (0V). Facility isolated in microgrid mode."}
             </p>
 
