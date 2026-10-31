@@ -69,7 +69,7 @@ export function SignupFlow() {
     // Call authService signup simulation
     try {
       await authService.signup({
-        fullName: data.displayName || `${data.firstName} ${data.lastName}`,
+        fullName: `${data.firstName} ${data.lastName}`.trim(),
         email: data.email,
         password: data.password,
         confirmPassword: data.password,
@@ -123,9 +123,9 @@ export function SignupFlow() {
       id: `usr_${Date.now()}`,
       firstName: accountData.firstName || "Engineer",
       lastName: accountData.lastName || "",
-      displayName:
-        accountData.displayName ||
-        `${accountData.firstName || "Engineer"} ${accountData.lastName || ""}`.trim(),
+      displayName: `${accountData.firstName || "Engineer"} ${
+        accountData.lastName || ""
+      }`.trim(),
       email: accountData.email || "user@example.com",
       avatarDataUrl: accountData.avatarDataUrl,
       createdAt: new Date().toISOString(),
@@ -220,7 +220,7 @@ export function SignupFlow() {
       steps={SIGNUP_STEPS}
       currentStepIndex={stepIndex}
       onBack={stepIndex > 0 ? handleBack : undefined}
-      backHref={stepIndex === 0 ? "/login" : undefined}
+      backHref={stepIndex === 0 ? "/" : undefined}
     >
       {stepIndex === 0 && (
         <Step1Account initialValues={accountData} onNext={handleStep1Next} />

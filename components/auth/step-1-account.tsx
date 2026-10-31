@@ -23,7 +23,6 @@ import { authService } from "@/services";
 const step1Schema = z.object({
   firstName: z.string().min(1, "First name is required."),
   lastName: z.string().min(1, "Last name is required."),
-  displayName: z.string().min(1, "Display name is required."),
   email: z
     .string()
     .min(1, "Work email is required.")
@@ -55,7 +54,6 @@ export function Step1Account({ initialValues, onNext }: Step1AccountProps) {
   const {
     register,
     handleSubmit,
-    setValue,
     watch,
     formState: { errors, isSubmitting },
   } = useForm<Step1FormValues>({
@@ -63,7 +61,6 @@ export function Step1Account({ initialValues, onNext }: Step1AccountProps) {
     defaultValues: {
       firstName: initialValues.firstName || "",
       lastName: initialValues.lastName || "",
-      displayName: initialValues.displayName || "",
       email: initialValues.email || "",
       password: initialValues.password || "",
       agreeToTerms: initialValues.agreeToTerms || false,
@@ -73,24 +70,9 @@ export function Step1Account({ initialValues, onNext }: Step1AccountProps) {
 
   const firstNameValue = watch("firstName");
   const lastNameValue = watch("lastName");
-  const displayNameValue = watch("displayName");
   const emailValue = watch("email");
   const passwordValue = watch("password") || "";
   const agreeToTerms = watch("agreeToTerms");
-
-  // Auto-suggest display name from first name if not yet manually edited
-  const [hasManuallyEditedDisplayName, setHasManuallyEditedDisplayName] = React.useState(
-    Boolean(initialValues.displayName)
-  );
-
-  React.useEffect(() => {
-    if (!hasManuallyEditedDisplayName && firstNameValue) {
-      const suggested = lastNameValue
-        ? `${firstNameValue.trim()} ${lastNameValue.trim()}`
-        : firstNameValue.trim();
-      setValue("displayName", suggested, { shouldValidate: true });
-    }
-  }, [firstNameValue, lastNameValue, hasManuallyEditedDisplayName, setValue]);
 
   // Live password rules
   const hasEightChars = passwordValue.length >= 8;
@@ -182,18 +164,6 @@ export function Step1Account({ initialValues, onNext }: Step1AccountProps) {
               {...register("lastName")}
             />
           </div>
-
-          {/* Display Name */}
-          <PremiumInput
-            label="Display name"
-            placeholder="How you appear in GridMind"
-            autoComplete="name"
-            error={errors.displayName?.message}
-            isValidated={Boolean(displayNameValue && !errors.displayName)}
-            {...register("displayName", {
-              onChange: () => setHasManuallyEditedDisplayName(true),
-            })}
-          />
 
           {/* Work Email */}
           <PremiumInput

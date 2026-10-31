@@ -31,9 +31,6 @@ export function GridMindLogo({
           <span className={cn("block text-base font-bold tracking-tight", inverse ? "text-white" : "text-slate-950")}>
             GridMind
           </span>
-          <span className={cn("mt-1 block text-[10px] font-medium", inverse ? "text-slate-400" : "text-slate-500")}>
-            Energy intelligence
-          </span>
         </span>
       )}
     </span>

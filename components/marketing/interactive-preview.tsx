@@ -6,23 +6,17 @@ import {
   Sun,
   BatteryCharging,
   Power,
-  Sliders,
-  AlertTriangle,
   Lightbulb,
-  CheckCircle2,
   Clock,
-  Coins,
   ShieldCheck,
   RefreshCw,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 
 export function InteractiveSimulatorPreview() {
   // Scenario state
   const [gridOnline, setGridOnline] = React.useState<boolean>(false); // Start with simulated outage for impact!
   const [curtailDeferrable, setCurtailDeferrable] = React.useState<boolean>(true);
-  const [batteryReserveHigh, setBatteryReserveHigh] = React.useState<boolean>(false);
 
   // Deterministic calculation
   const criticalLoadKw = 57.1; // Freezers + Pharma + Emergency Lighting
@@ -63,29 +57,30 @@ export function InteractiveSimulatorPreview() {
   const roundedRuntime = runtimeHours.toFixed(1);
 
   return (
-    <section id="simulator-preview" className="py-20 bg-slate-900 text-white relative overflow-hidden">
+    <section id="simulator-preview" className="relative overflow-hidden bg-[#070a09] py-20 text-white sm:py-28">
       {/* Decorative subtle background grid */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-30" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,.025)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,.025)_1px,transparent_1px)] bg-[size:4.5rem_4.5rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_60%,transparent_100%)]" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="relative z-10 mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
         {/* Section Heading */}
-        <div className="text-center max-w-3xl mx-auto mb-12">
-          <Badge variant="healthy" size="md" className="mb-3 font-bold">
-            Interactive Product Preview
-          </Badge>
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">
-            Experience the Energy Crisis Simulator
-          </h2>
-          <p className="mt-4 text-base text-slate-300 leading-relaxed">
-            Test how GridMind responds during a simulated utility feeder drop. Toggle the controls below to see how load prioritization protects critical refrigeration and avoids unnecessary diesel generation.
+        <div className="mb-12 max-w-3xl">
+          <p className="text-xs font-medium uppercase tracking-[0.18em] text-emerald-400">
+            Interactive simulator
           </p>
-          <p className="text-xs text-slate-400 mt-2 font-mono">
-            * Deterministic benchmark demonstration running directly in your browser.
+          <h2 className="mt-4 text-3xl font-medium tracking-[-0.035em] text-white sm:text-5xl">
+            See the operating logic in motion.
+          </h2>
+          <p className="mt-5 max-w-2xl text-sm leading-7 text-slate-500">
+            Drop the utility feeder, change the active load and watch GridMind rebalance solar,
+            storage and backup generation around the equipment that matters.
+          </p>
+          <p className="mt-3 font-mono text-[10px] uppercase tracking-wider text-slate-600">
+            Deterministic benchmark · runs locally in your browser
           </p>
         </div>
 
         {/* Interactive Simulator Shell */}
-        <div className="rounded-2xl border border-slate-700 bg-slate-950 shadow-2xl p-6 lg:p-8">
+        <div className="rounded-2xl border border-white/[0.1] bg-[#0a0f0d] p-5 shadow-2xl shadow-black/30 sm:p-6 lg:p-8">
           {/* Top Controls Bar */}
           <div className="flex flex-col md:flex-row md:items-center justify-between pb-6 border-b border-slate-800 gap-4">
             <div>
@@ -105,7 +100,6 @@ export function InteractiveSimulatorPreview() {
               onClick={() => {
                 setGridOnline(false);
                 setCurtailDeferrable(true);
-                setBatteryReserveHigh(false);
               }}
               className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors"
             >

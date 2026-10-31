@@ -3,7 +3,6 @@
 import * as React from "react";
 import Link from "next/link";
 import { ArrowLeft, Check } from "lucide-react";
-import { GridMindLogo } from "@/components/brand/gridmind-logo";
 import { cn } from "@/lib/utils";
 
 export interface StepItem {
@@ -45,7 +44,7 @@ export function AuthLayout({
       {/* Top bar */}
       <header className="relative z-20 w-full border-b border-white/[0.06] bg-[#070c0a]/80 backdrop-blur-md">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
-          {/* Logo & Product Name */}
+          {/* Back navigation */}
           <div className="flex items-center gap-3">
             {onBack ? (
               <button
@@ -66,9 +65,6 @@ export function AuthLayout({
               </Link>
             ) : null}
 
-            <Link href="/" className="flex items-center gap-2.5 group">
-              <GridMindLogo inverse markClassName="h-8 w-8" />
-            </Link>
           </div>
 
           {/* Centred slim breadcrumb for multi-step onboarding */}
